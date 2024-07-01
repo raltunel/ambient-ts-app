@@ -148,6 +148,13 @@ const useChatSocket = (
 
     useEffect(() => {
         if (isChatOpen) {
+            console.log(
+                'gonna send handshake update | ',
+                new Date().getHours() + ':' + new Date().getMinutes(),
+                address,
+                ensName,
+                room,
+            );
             sendToSocket('handshake-update', {
                 roomId: room,
                 address: address,
