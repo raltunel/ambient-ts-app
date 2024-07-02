@@ -95,6 +95,8 @@ const useChatSocket = (
     const { userAddress: address, ensName } = useContext(UserDataContext);
     const { isUserIdle } = useContext(AppStateContext);
 
+    const isUserIdleRef = useRef<boolean>(isUserIdle);
+
     if (address) {
         domDebug('usechatsocket', address?.substring(0, 4) + '|' + ensName);
     }
@@ -115,6 +117,9 @@ const useChatSocket = (
     }
 
     domDebug('room', qp.roomId);
+    console.log(
+        `heartbeatTS:${heartbeatTS} urlChecker:${isChatOpen && !isUserIdle}`,
+    );
     const {
         lastMessage: socketLastMessage,
         sendMessage: socketSendMessage,
@@ -147,8 +152,7 @@ const useChatSocket = (
                     ':' +
                     new Date().getSeconds(),
             );
-            console.log('isUserIdle', isUserIdle);
-            if (!isUserIdle) {
+            if (!isUserIdleRef.current) {
                 console.log('gonna hearbeatTS');
                 if (setHeartbeatTS) {
                     setHeartbeatTS(new Date().getTime());
