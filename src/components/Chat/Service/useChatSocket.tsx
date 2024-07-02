@@ -117,9 +117,7 @@ const useChatSocket = (
     }
 
     domDebug('room', qp.roomId);
-    console.log(
-        `heartbeatTS:${heartbeatTS} urlChecker:${isChatOpen && !isUserIdle}`,
-    );
+    console.log('isUserIdle', isUserIdle);
     const {
         lastMessage: socketLastMessage,
         sendMessage: socketSendMessage,
@@ -133,25 +131,9 @@ const useChatSocket = (
         shouldReconnect: () => isChatOpen,
         share: true,
         onOpen: () => {
-            console.log(
-                'ws open',
-                new Date().getHours() +
-                    ':' +
-                    new Date().getMinutes() +
-                    ':' +
-                    new Date().getSeconds(),
-            );
             domDebug('connected', getTimeForLog(new Date()));
         },
         onClose: () => {
-            console.log(
-                'ws close',
-                new Date().getHours() +
-                    ':' +
-                    new Date().getMinutes() +
-                    ':' +
-                    new Date().getSeconds(),
-            );
             if (!isUserIdleRef.current) {
                 console.log('gonna hearbeatTS');
                 if (setHeartbeatTS) {
