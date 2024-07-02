@@ -64,6 +64,8 @@ const useChatSocket = (
     ) => void,
     // address?: string,
     // ensName?: string,
+    heartbeatTS?: number,
+    setHeartbeatTS?: Dispatch<SetStateAction<number>>,
     currentUserID?: string,
     freezePanel?: () => void,
     activatePanel?: () => void,
@@ -147,8 +149,10 @@ const useChatSocket = (
             );
             console.log('isUserIdle', isUserIdle);
             if (!isUserIdle) {
-                console.log('gonna heartbeat');
-                setHeartbeat(new Date().getTime());
+                console.log('gonna hearbeatTS');
+                if (setHeartbeatTS) {
+                    setHeartbeatTS(new Date().getTime());
+                }
             }
             domDebug('disconnected', getTimeForLog(new Date()));
         },
@@ -187,7 +191,7 @@ const useChatSocket = (
                 ensName: ensName,
             });
         }
-    }, [address, ensName, room, isChatOpen, isUserIdle, heartbeat]);
+    }, [address, ensName, room, isChatOpen, isUserIdle, heartbeatTS]);
 
     useEffect(() => {
         switch (socketLastMessage.type) {

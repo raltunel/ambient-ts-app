@@ -201,6 +201,8 @@ function ChatPanel(props: propsIF) {
     const [messageForNotificationBubble, setMessageForNotificationBubble] =
         useState<Message | undefined>(undefined);
 
+    const [chatSocketLastRefresh, setChatSocketLastRefresh] = useState(0);
+
     const {
         messages,
         lastMessage,
@@ -228,6 +230,8 @@ function ChatPanel(props: propsIF) {
         isSubscriptionsEnabled,
         isChatOpen,
         activateToastr,
+        chatSocketLastRefresh,
+        setChatSocketLastRefresh,
         // userAddress,
         // ens,
         currentUser,
