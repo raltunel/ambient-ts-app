@@ -86,6 +86,7 @@ const useChatSocket = (
 
     const messagesRef = useRef<Message[]>([]);
     const [listeners, setListeners] = useState<ChatSocketListener[]>([]);
+    const [heartbeat, setHeartbeat] = useState<number>(0);
 
     messagesRef.current = messages;
 
@@ -145,7 +146,8 @@ const useChatSocket = (
                     new Date().getSeconds(),
             );
             if (isChatOpen && !isUserIdle) {
-                triggerHandshake();
+                console.log('gonna heartbeat');
+                setHeartbeat(new Date().getTime());
             }
             domDebug('disconnected', getTimeForLog(new Date()));
         },
@@ -184,15 +186,7 @@ const useChatSocket = (
                 ensName: ensName,
             });
         }
-    }, [address, ensName, room, isChatOpen, isUserIdle]);
-
-    const triggerHandshake = () => {
-        sendToSocket('handshake-update', {
-            roomId: room,
-            address: address,
-            ensName: ensName,
-        });
-    };
+    }, [address, ensName, room, isChatOpen, isUserIdle, heartbeat]);
 
     useEffect(() => {
         switch (socketLastMessage.type) {
