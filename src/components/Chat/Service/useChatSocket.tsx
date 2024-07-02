@@ -146,9 +146,7 @@ const useChatSocket = (
                     new Date().getSeconds(),
             );
             console.log('isUserIdle', isUserIdle);
-            console.log('isChatOpen', isChatOpen);
-            console.log('check', isChatOpen && !isUserIdle);
-            if (isChatOpen && !isUserIdle) {
+            if (!isUserIdle) {
                 console.log('gonna heartbeat');
                 setHeartbeat(new Date().getTime());
             }
