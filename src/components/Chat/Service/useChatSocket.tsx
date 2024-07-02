@@ -158,7 +158,13 @@ const useChatSocket = (
 
     console.log('isUserIdle', isUserIdle);
     console.log('isWsConnected', isWsConnected);
-    if (isChatOpen && !isWsConnected && !isUserIdle && setHeartbeatTS) {
+    if (
+        isChatOpen &&
+        !isWsConnected &&
+        !isUserIdle &&
+        heartbeatTS != 0 &&
+        setHeartbeatTS
+    ) {
         console.log('triggering refresh >>>>> ');
         setHeartbeatTS(new Date().getTime());
     }
