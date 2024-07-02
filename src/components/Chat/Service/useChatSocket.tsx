@@ -122,6 +122,7 @@ const useChatSocket = (
             address: qp.address ? qp.address : '',
             ensName: qp.ensName ? qp.ensName : '',
         },
+        reconnectAttempts: 10,
         shouldReconnect: () => isChatOpen,
         share: true,
         onOpen: () => {
