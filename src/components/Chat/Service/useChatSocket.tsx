@@ -117,7 +117,6 @@ const useChatSocket = (
     }
 
     domDebug('room', qp.roomId);
-    console.log('isUserIdle', isUserIdle);
     const {
         lastMessage: socketLastMessage,
         sendMessage: socketSendMessage,
@@ -134,12 +133,12 @@ const useChatSocket = (
             domDebug('connected', getTimeForLog(new Date()));
         },
         onClose: () => {
-            if (!isUserIdleRef.current) {
-                console.log('gonna hearbeatTS');
-                if (setHeartbeatTS) {
-                    setHeartbeatTS(new Date().getTime());
-                }
-            }
+            // if (!isUserIdleRef.current) {
+            //     console.log('gonna hearbeatTS');
+            //     if (setHeartbeatTS) {
+            //         setHeartbeatTS(new Date().getTime());
+            //     }
+            // }
             domDebug('disconnected', getTimeForLog(new Date()));
         },
         onError: () => {
@@ -156,6 +155,14 @@ const useChatSocket = (
     }[readyState];
 
     const isWsConnected = readyState == ReadyState.OPEN;
+
+    console.log('isUserIdle', isUserIdle);
+    console.log('isWsConnected', isWsConnected);
+    if (!isWsConnected && !isUserIdle && setHeartbeatTS) {
+        console.log('triggering refresh >>>>> ');
+        setHeartbeatTS(new Date().getTime());
+    }
+    console.log('...................................');
     domDebug('connection status', connectionStatus);
 
     useEffect(() => {
