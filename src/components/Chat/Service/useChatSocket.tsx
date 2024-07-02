@@ -123,13 +123,30 @@ const useChatSocket = (
             ensName: qp.ensName ? qp.ensName : '',
         },
         shouldReconnect: () => isChatOpen,
-        // share: true,
+        share: true,
         onOpen: () => {
-            console.log('ws open');
+            console.log(
+                'ws open',
+                new Date().getHours() +
+                    ':' +
+                    new Date().getMinutes() +
+                    ':' +
+                    new Date().getSeconds(),
+            );
             domDebug('connected', getTimeForLog(new Date()));
         },
         onClose: () => {
-            console.log('ws close');
+            console.log(
+                'ws close',
+                new Date().getHours() +
+                    ':' +
+                    new Date().getMinutes() +
+                    ':' +
+                    new Date().getSeconds(),
+            );
+            if (isChatOpen && !isUserIdle) {
+                triggerHandshake();
+            }
             domDebug('disconnected', getTimeForLog(new Date()));
         },
         onError: () => {
@@ -152,7 +169,11 @@ const useChatSocket = (
         if (isChatOpen) {
             console.log(
                 'gonna send handshake update | ',
-                new Date().getHours() + ':' + new Date().getMinutes(),
+                new Date().getHours() +
+                    ':' +
+                    new Date().getMinutes() +
+                    ':' +
+                    new Date().getSeconds(),
                 address,
                 ensName,
                 room,
@@ -164,6 +185,14 @@ const useChatSocket = (
             });
         }
     }, [address, ensName, room, isChatOpen, isUserIdle]);
+
+    const triggerHandshake = () => {
+        sendToSocket('handshake-update', {
+            roomId: room,
+            address: address,
+            ensName: ensName,
+        });
+    };
 
     useEffect(() => {
         switch (socketLastMessage.type) {
