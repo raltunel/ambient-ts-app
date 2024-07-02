@@ -122,13 +122,14 @@ const useChatSocket = (
             address: qp.address ? qp.address : '',
             ensName: qp.ensName ? qp.ensName : '',
         },
-        reconnectAttempts: 10,
         shouldReconnect: () => isChatOpen,
-        share: true,
+        // share: true,
         onOpen: () => {
+            console.log('ws open');
             domDebug('connected', getTimeForLog(new Date()));
         },
         onClose: () => {
+            console.log('ws close');
             domDebug('disconnected', getTimeForLog(new Date()));
         },
         onError: () => {
