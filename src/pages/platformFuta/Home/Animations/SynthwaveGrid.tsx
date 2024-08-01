@@ -12,7 +12,7 @@ export default function SynthwaveGrid(props: PropsIF) {
     const showMobileVersion = useMediaQuery('(max-width: 768px)');
 
     const width = '100vw';
-    const height = 'calc(100vh - 86px)';
+    const height = showMobileVersion ? 'calc(100svh)' : '100vh';
     const initialFrameSkip = hasVideoPlayedOnce ? 700 : 0; // Assume 60 FPS, so 5 seconds * 60 = 300 frames
 
     useEffect(() => {
@@ -26,7 +26,7 @@ export default function SynthwaveGrid(props: PropsIF) {
             const cameraY = 220;
             const cameraZ = 300;
             const cameraRotate = 2.0;
-            const moveSpeed = 3; // Speed at which the grid moves towards the camera
+            const moveSpeed = isCreatePage ? 1 : 3; // Speed at which the grid moves towards the camera
 
             // Grid properties
             const scl = 40; // Scale of each grid cell
@@ -379,6 +379,7 @@ export default function SynthwaveGrid(props: PropsIF) {
                 height: height,
                 opacity: hasVideoPlayedOnce ? '0.5' : '1',
                 overflow: 'hidden',
+                pointerEvents: 'none',
             }}
         ></div>
     );
