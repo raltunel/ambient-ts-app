@@ -27,8 +27,8 @@ export default function CommentInput(props: CommentInputProps) {
         setMessage(inputVal);
     };
 
-    const shouldShowCircularProgressBar = inputLength > 140;
-    const fillPercentage = (inputLength / _characterLimit) * 100;
+    const shouldShowCircularProgressBar = inputLength > 126;
+    const fillPercentage = (inputLength / _characterLimit) * 84;
 
     const handleInputChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
         const newMessage = e.currentTarget.value;
@@ -74,7 +74,7 @@ export default function CommentInput(props: CommentInputProps) {
                             onKeyUp={_onKeyUp}
                             onKeyDown={_onKeyDown}
                             onInput={handleInputChange}
-                            className={`${inputLength > 140 ? styles.about_filled : ''} `}
+                            className={`${inputLength > 126 ? styles.about_filled : ''} `}
                         />
                         <AiOutlineSend
                             onClick={() => {
