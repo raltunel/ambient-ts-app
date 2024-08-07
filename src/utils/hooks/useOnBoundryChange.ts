@@ -35,6 +35,7 @@ const useOnBoundryChange = (
                 if (checkerRef.current) {
                     clearInterval(checkerRef.current);
                 }
+                console.log('checking boundry for ', elementId);
                 const newWidth = el.getBoundingClientRect().width;
                 const newHeight = el.getBoundingClientRect().height;
                 if (
