@@ -125,7 +125,7 @@ function Comments(props: CommentsProps) {
 
     useOnBoundryChange(
         props.resizeEffectorSelector ? props.resizeEffectorSelector : '',
-        1000,
+        200,
         () => {
             bindMaxHeight();
         },
