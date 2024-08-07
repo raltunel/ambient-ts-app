@@ -24,6 +24,8 @@ const useOnBoundryChange = (
     heightRef.current = elementHeight;
 
     const bindListener = () => {
+        if (checkerRef.current) return;
+
         // assign el, and t0 dimension props
         const el = document.getElementById(elementId);
         if (el) {
@@ -32,9 +34,6 @@ const useOnBoundryChange = (
 
             // start interval
             const interval = setInterval(() => {
-                if (checkerRef.current) {
-                    clearInterval(checkerRef.current);
-                }
                 console.log('checking boundry for ', elementId);
                 const newWidth = el.getBoundingClientRect().width;
                 const newHeight = el.getBoundingClientRect().height;
