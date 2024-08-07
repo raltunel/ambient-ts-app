@@ -23,7 +23,7 @@ const useOnBoundryChange = (
     const heightRef = useRef<number>();
     heightRef.current = elementHeight;
 
-    useEffect(() => {
+    const bindListener = () => {
         // assign el, and t0 dimension props
         const el = document.getElementById(elementId);
         if (el) {
@@ -49,12 +49,18 @@ const useOnBoundryChange = (
 
             setBoundryChecker(interval);
         }
+    };
 
+    useEffect(() => {
         return () => {
             if (checkerRef.current) {
                 clearInterval(checkerRef.current);
             }
         };
     }, []);
+
+    useEffect(() => {
+        bindListener();
+    }, [elementId, checkFrequency, handler]);
 };
 export default useOnBoundryChange;
