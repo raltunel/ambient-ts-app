@@ -80,6 +80,7 @@ export default function CommentInput(props: CommentInputProps) {
                             onClick={() => {
                                 sendAction(message);
                             }}
+                            className={styles.send_icon}
                             size={15}
                         />
                         {shouldShowCircularProgressBar && (
