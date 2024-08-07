@@ -24,7 +24,6 @@ function SwapFuta() {
                 <span id={tradeWrapperID}>
                     <Divider count={2} />
                     <Swap isOnTradeRoute />
-                    <Divider count={2} />
                 </span>
                 <Comments
                     isForTrade={true}
