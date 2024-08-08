@@ -22,6 +22,7 @@ export default function CommentInput(props: CommentInputProps) {
 
         if (pressedKey == 'Enter' && inputVal.trim().length > 0) {
             sendAction(inputVal);
+            setInputLength(0);
         }
         setMessage(inputVal);
     };
