@@ -243,7 +243,12 @@
 
     @media only screen and (max-width: 600px){
 
+  
       
+      .connection_status{
+        display: none;
+      }
+
     .all_fetched{
       margin-top: calc(6svh + 2rem); 
     }
@@ -259,7 +264,7 @@
 
   
   .commentsWrapper{
-    max-height: 60svh;
+    max-height: 64svh;
   }
 
   .tradePage .commentsWrapper{
