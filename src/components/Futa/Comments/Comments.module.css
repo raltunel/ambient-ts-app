@@ -256,6 +256,10 @@
   .mainContainer{
     height: calc(100svh - 240px);
   }
+
+  .connection_status{
+    display: none;
+  }
   
   
   .mainContainer.tradePage{

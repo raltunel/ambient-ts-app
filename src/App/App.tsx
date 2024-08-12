@@ -114,12 +114,21 @@ export default function App() {
 
     return (
         <>
+            {location.pathname == '/' && platformName !== 'futa' && (
+                <PageHeader />
+            )}
             <FlexContainer
                 flexDirection='column'
                 className={
                     platformName === 'futa' ? 'futa_main' : containerStyle
                 }
                 data-theme={skin}
+                style={{
+                    height:
+                        location.pathname == '/'
+                            ? 'calc(100vh - 56px)'
+                            : '100vh',
+                }}
             >
                 {showPoints && showPointSystemPopup && (
                     <PointSystemPopup
@@ -127,7 +136,11 @@ export default function App() {
                     />
                 )}
                 <AppOverlay />
-                {platformName === 'futa' ? <Navbar /> : <PageHeader />}
+                {platformName === 'futa' ? (
+                    <Navbar />
+                ) : (
+                    location.pathname !== '/' && <PageHeader />
+                )}
                 <div
                     className={appHeaderDropdown.isActive ? 'app_blur' : ''}
                     onClick={() => appHeaderDropdown.setIsActive(false)}
