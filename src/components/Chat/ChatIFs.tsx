@@ -54,3 +54,8 @@ export interface UserAvatarDataIF {
     avatarThumbnail: string;
     avatarCompressed: string;
 }
+
+export interface DomPositionInterface {
+    x: number;
+    y: number;
+}

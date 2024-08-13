@@ -36,6 +36,7 @@ import useChatApi from './Service/ChatApi';
 import useChatSocket from './Service/useChatSocket';
 import { domDebug } from './DomDebugger/DomDebuggerUtils';
 import { CrocEnvContext } from '../../contexts/CrocEnvContext';
+import ScreenCapture from './ScreenCapture/ScreenCapture';
 
 interface propsIF {
     isFullScreen: boolean;
@@ -1463,6 +1464,7 @@ function ChatPanel(props: propsIF) {
             />
 
             <DomDebugger />
+            <ScreenCapture />
         </div>
     );
 }
