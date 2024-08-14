@@ -5,6 +5,7 @@ import { printDomToImage } from '../../../ambient-utils/dataLayer';
 import { ScreenCaptureOverlayTypes, ScreenCaptureStates } from '../ChatEnums';
 import { DomPositionInterface } from '../ChatIFs';
 import { domDebug } from '../DomDebugger/DomDebuggerUtils';
+import useCopyToClipboard from '../../../utils/hooks/useCopyToClipboard';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 interface propsIF {
@@ -16,6 +17,8 @@ export default function ScreenCapture(props: propsIF) {
         console.log(props);
         document.addEventListener('mousemove', maskMoveListener);
     }, []);
+
+    const [, copy] = useCopyToClipboard();
 
     const [imageComp, setImageComp] = useState<any>(null);
     const [captureState, setCaptureState] = useState<ScreenCaptureStates>(
@@ -30,28 +33,40 @@ export default function ScreenCapture(props: propsIF) {
     const maskRBRef = useRef<DomPositionInterface>();
     maskRBRef.current = maskRB;
 
+    const croppedImageRef = useRef<HTMLDivElement>(null);
+
     const [debugMode, setDebugMode] = useState<boolean>(false);
     const btnListener = async () => {
         // const image = await domToImage(document.body);
         const image = await printDomToImage(document.body);
+        setImageComp(image);
 
         console.log(image);
-        setImageComp(image);
     };
     const maskBtnListener = async () => {
-        setCaptureState(ScreenCaptureStates.MaskReady);
+        setTimeout(() => {
+            setCaptureState(ScreenCaptureStates.MaskReady);
+        }, 200);
     };
     const resetBtnListener = async () => {
         setCaptureState(ScreenCaptureStates.Idle);
+        setImageComp(undefined);
     };
     const debugBtnListener = async () => {
         setDebugMode(!debugMode);
     };
 
+    const captureDom = async () => {
+        const image = await printDomToImage(document.body);
+        setImageComp(image);
+    };
+
     const maskStarter = (e: React.MouseEvent) => {
         setMaskLT({ x: e.clientX, y: e.clientY });
-        setCaptureState(ScreenCaptureStates.Masking);
-
+        captureDom();
+        setTimeout(() => {
+            setCaptureState(ScreenCaptureStates.Masking);
+        }, 300);
         domDebug('maskLT', { x: e.clientX, y: e.clientY });
     };
 
@@ -61,7 +76,22 @@ export default function ScreenCapture(props: propsIF) {
         setMaskRB({ x: e.clientX, y: e.clientY });
 
         domDebug('maskRB', maskRB);
-        console.log(e.clientX, e.clientY);
+    };
+
+    const copyCroppedImageToClipboard = async () => {
+        if (croppedImageRef.current) {
+            const image = await printDomToImage(croppedImageRef.current);
+            if (image) {
+                copy(image);
+            }
+        }
+    };
+
+    const overlayClickListener = () => {
+        if (captureStateRef.current == ScreenCaptureStates.Masking) {
+            console.log('image copying');
+            copyCroppedImageToClipboard();
+        }
     };
 
     const getPosForOverlayRect = (type: ScreenCaptureOverlayTypes) => {
@@ -96,6 +126,31 @@ export default function ScreenCapture(props: propsIF) {
                     right: window.innerWidth - maskLTRef.current.x,
                     bottom: window.innerHeight - maskRBRef.current.y,
                 };
+            case ScreenCaptureOverlayTypes.MaskArea:
+                return {
+                    left: maskLTRef.current.x,
+                    top: maskLTRef.current.y,
+                    right: window.innerWidth - maskRBRef.current.x - 10,
+                    bottom: window.innerHeight - maskRBRef.current.y - 10,
+                };
+        }
+    };
+
+    const getImageOffset = () => {
+        if (maskLTRef.current && maskRBRef.current) {
+            return {
+                left: -1 * maskLTRef.current.x,
+                top: -1 * maskLTRef.current.y,
+            };
+        }
+    };
+
+    const getPreviewSize = () => {
+        if (maskLTRef.current && maskRBRef.current) {
+            return {
+                width: maskRBRef.current.x - maskLTRef.current.x,
+                height: maskRBRef.current.y - maskLTRef.current.y,
+            };
         }
     };
     return (
@@ -149,15 +204,30 @@ export default function ScreenCapture(props: propsIF) {
                         )}
                         className={`${styles.overlay_effect} ${debugMode ? styles.dbg4 : ' '}`}
                     ></div>
+
+                    <div
+                        onClick={overlayClickListener}
+                        style={getPosForOverlayRect(
+                            ScreenCaptureOverlayTypes.MaskArea,
+                        )}
+                        className={`${styles.overlay_effect} ${styles.mask}`}
+                    ></div>
                 </>
             )}
 
-            <div className={styles.preview}>
+            <div ref={croppedImageRef} className={styles.preview_modal}>
                 {imageComp && (
-                    <img
-                        src={URL.createObjectURL(imageComp)}
-                        alt='screenshot'
-                    />
+                    <div
+                        className={styles.image_preview_wrapper}
+                        style={getPreviewSize()}
+                    >
+                        <img
+                            src={URL.createObjectURL(imageComp)}
+                            alt='screenshot'
+                            style={getImageOffset()}
+                            className={styles.captured_raw_image}
+                        />
+                    </div>
                 )}
             </div>
         </>
