@@ -992,7 +992,7 @@ export default function Chart(props: propsIF) {
                 );
 
                 setVisibleDateForCandle(scaleData.xScale.domain()[1]);
-                changeScale(false);
+                changeScale(false, 'timeGaps');
                 render();
             }
         });
@@ -1237,7 +1237,7 @@ export default function Chart(props: propsIF) {
                         render();
 
                         if (rescale) {
-                            changeScale(true);
+                            changeScale(true, 'wheel');
                         }
 
                         if (wheelTimeout) {
@@ -1353,7 +1353,7 @@ export default function Chart(props: propsIF) {
 
                                 if (rescale) {
                                     if (!isCondensedModeEnabled) {
-                                        changeScale(true);
+                                        changeScale(true, 'onZoom');
                                     }
                                     render();
                                 } else {
@@ -1554,6 +1554,14 @@ export default function Chart(props: propsIF) {
     }, [diffHashSigScaleData(scaleData)]);
 
     useEffect(() => {
+        if (scaleData) {
+            d3.select(d3Container.current)
+                .attr('xaxis', scaleData.xScale.domain())
+                .attr('yaxis', scaleData.yScale.domain());
+        }
+    }, [diffHashSigScaleData(scaleData)]);
+
+    useEffect(() => {
         renderCanvasArray([d3CanvasMain]);
         render();
     }, [diffHashSig(showFutaCandles)]);
@@ -1588,7 +1596,7 @@ export default function Chart(props: propsIF) {
     useEffect(() => {
         if (scaleData !== undefined && liquidityData !== undefined) {
             if (rescale) {
-                changeScale(false);
+                changeScale(false, 'rescale');
 
                 if (
                     location.pathname.includes('pool') ||
@@ -2698,7 +2706,7 @@ export default function Chart(props: propsIF) {
             setXScaleDefault();
             fetchCandleForResetOrLatest(isReset);
             setIsChangeScaleChart(false);
-            changeScale(false);
+            changeScale(false, 'resetFunc');
         }
     }
 
@@ -4422,7 +4430,7 @@ export default function Chart(props: propsIF) {
         render();
     }
 
-    function changeScale(isTriggeredByZoom: boolean) {
+    function changeScale(isTriggeredByZoom: boolean, caller: string) {
         if (location.pathname.includes('limit')) {
             changeScaleLimit(isTriggeredByZoom);
         } else if (
@@ -4433,6 +4441,8 @@ export default function Chart(props: propsIF) {
         } else {
             changeScaleSwap(isTriggeredByZoom);
         }
+
+        d3.select(d3Container.current).attr('lastKnownScale', caller);
     }
 
     useEffect(() => {
@@ -4442,7 +4452,7 @@ export default function Chart(props: propsIF) {
             prevPeriod === period &&
             candleTimeInSeconds === period
         ) {
-            changeScale(false);
+            changeScale(false, 'period');
         }
     }, [
         period,
