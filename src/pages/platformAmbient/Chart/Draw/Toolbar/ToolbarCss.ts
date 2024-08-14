@@ -47,7 +47,7 @@ const ToolbarContainer = styled.div<{
 `;
 
 const ScrollableDiv = styled.div<{ height: string; isHover: boolean }>`
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: hidden;
 
     ${({ isHover }) => {
