@@ -744,13 +744,17 @@ export default function ChartSettings(props: ContextMenuIF) {
                                         ? 'var(--accent1)'
                                         : 'var(--text1)'
                                 }
-                                width={'55px'}
+                                width={
+                                    ['futa'].includes(platformName)
+                                        ? '65px'
+                                        : '55px'
+                                }
                                 onClick={() => handleCancelChanges()}
                                 isFuta={['futa'].includes(platformName)}
                             >
                                 <FooterContextText>
                                     {['futa'].includes(platformName)
-                                        ? 'APPLY'
+                                        ? 'CANCEL'
                                         : 'Cancel'}
                                 </FooterContextText>
                             </FooterButtons>
