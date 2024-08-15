@@ -292,12 +292,12 @@ function Swap(props: propsIF) {
                 setIsSellLoading(false);
                 setLastImpactQuery(undefined);
             }
-        } else if (isSellLoading || isBuyLoading) {
-            setSwapAllowed(false);
-            setSwapButtonErrorMessage('...');
         } else if (isPoolInitialized === false) {
             setSwapAllowed(false);
             setSwapButtonErrorMessage('Pool Not Initialized');
+        } else if (isSellLoading || isBuyLoading) {
+            setSwapAllowed(false);
+            setSwapButtonErrorMessage('...');
         } else if (isLiquidityInsufficient) {
             setSwapAllowed(false);
             setSwapButtonErrorMessage('Liquidity Insufficient');
@@ -359,6 +359,7 @@ function Swap(props: propsIF) {
     ]);
 
     useEffect(() => {
+        if (parseFloat(primaryQuantity) === 0) return;
         if (isTokenAPrimary) {
             setIsBuyLoading(true);
             setSwapButtonErrorMessage('...');
@@ -378,7 +379,7 @@ function Swap(props: propsIF) {
         isActiveNetworkScroll ? 10000 : isActiveNetworkBlast ? 10000 : 0,
     );
     const [extraL1GasFeeSwap, setExtraL1GasFeeSwap] = useState(
-        isActiveNetworkBlast ? 0.1 : 0,
+        isActiveNetworkBlast ? 0.01 : 0,
     );
 
     // calculate price of gas for swap

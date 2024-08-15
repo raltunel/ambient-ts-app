@@ -56,7 +56,6 @@ interface propsIF {
     ) => void;
     chartItemStates: chartItemStates;
     setCurrentData: Dispatch<SetStateAction<CandleDataIF | undefined>>;
-    setCurrentVolumeData: Dispatch<SetStateAction<number | undefined>>;
     selectedDate: number | undefined;
     setSelectedDate: Dispatch<number | undefined>;
     rescale: boolean | undefined;
@@ -217,6 +216,16 @@ function TradeCandleStickChart(props: propsIF) {
             setFetchCountForEnoughData(0);
         }
     }, [candleDomains.isResetRequest]);
+
+    useEffect(() => {
+        if (selectedDate) {
+            const selectedDateData = unparsedCandleData?.find(
+                (i) => i.time * 1000 === selectedDate,
+            );
+            props.setCurrentData(selectedDateData);
+            props.setShowTooltip(true);
+        }
+    }, [selectedDate]);
 
     useEffect(() => {
         if (isFetchingEnoughData && scaleData) {
@@ -1063,7 +1072,7 @@ function TradeCandleStickChart(props: propsIF) {
                     height: '100%',
                     width: '100%',
                     display: 'grid',
-                    gridTemplateRows: '1fr 1.5fr',
+                    gridTemplateRows: 'auto auto',
                 }}
             >
                 {(!isOpenChart || isCompletedFetchData) && (
@@ -1072,10 +1081,17 @@ function TradeCandleStickChart(props: propsIF) {
                             style={{
                                 gridColumn: 1,
                                 gridRowStart: 1,
-                                gridRowEnd: 3,
+                                gridRowEnd: 2,
                             }}
                         >
-                            <Spinner size={100} bg='var(--dark2)' centered />
+                            <Spinner
+                                size={100}
+                                bg='var(--dark2)'
+                                centered
+                                style={{
+                                    alignItems: 'end',
+                                }}
+                            />
                         </div>
                         <div
                             style={{
@@ -1096,7 +1112,6 @@ function TradeCandleStickChart(props: propsIF) {
                         denomInBase={isDenomBase}
                         chartItemStates={props.chartItemStates}
                         setCurrentData={props.setCurrentData}
-                        setCurrentVolumeData={props.setCurrentVolumeData}
                         isCandleAdded={isCandleAdded}
                         setIsCandleAdded={setIsCandleAdded}
                         scaleData={scaleData}
