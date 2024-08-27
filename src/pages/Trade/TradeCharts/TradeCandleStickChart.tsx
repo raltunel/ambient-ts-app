@@ -235,7 +235,17 @@ function TradeCandleStickChart(props: propsIF) {
     }, [isFetchingEnoughData]);
 
     useEffect(() => {
-        if (unparsedLiquidityData !== undefined) {
+        if (
+            unparsedLiquidityData !== undefined &&
+            candleData &&
+            (
+                candleData?.pool.baseAddress + candleData?.pool.quoteAddress
+            ).toUpperCase() ===
+                (
+                    unparsedLiquidityData.curveState.base +
+                    unparsedLiquidityData.curveState.quote
+                ).toUpperCase()
+        ) {
             const barThreshold =
                 poolPriceDisplay !== undefined ? poolPriceDisplay : 0;
 
@@ -244,9 +254,16 @@ function TradeCandleStickChart(props: propsIF) {
                     return isDenomBase
                         ? liq.upperBoundInvPriceDecimalCorrected <
                               barThreshold &&
-                              liq.lowerBoundInvPriceDecimalCorrected !== '-inf'
+                              liq.lowerBoundInvPriceDecimalCorrected !==
+                                  '-inf' &&
+                              Number.isFinite(
+                                  liq.lowerBoundInvPriceDecimalCorrected,
+                              )
                         : liq.upperBoundPriceDecimalCorrected > barThreshold &&
-                              liq.upperBoundPriceDecimalCorrected !== '+inf';
+                              liq.upperBoundPriceDecimalCorrected !== '+inf' &&
+                              Number.isFinite(
+                                  liq.upperBoundPriceDecimalCorrected,
+                              );
                 },
             );
 
@@ -256,6 +273,7 @@ function TradeCandleStickChart(props: propsIF) {
                         ? liqBoundaryData.lowerBoundInvPriceDecimalCorrected
                         : liqBoundaryData.lowerBoundPriceDecimalCorrected
                     : barThreshold;
+
             const liqBoundary =
                 typeof liqBoundaryArg === 'number'
                     ? liqBoundaryArg
@@ -267,30 +285,17 @@ function TradeCandleStickChart(props: propsIF) {
         diffHashSigLiquidity(unparsedLiquidityData),
         isDenomBase,
         poolPriceDisplay !== undefined && poolPriceDisplay > 0,
+        candleData?.pool?.baseAddress,
+        candleData?.pool?.quoteAddress,
     ]);
 
-    // temporarily commented to prevent unexpected scaling of liquidity curve after pool change
+    const sumActiveLiq = unparsedLiquidityData
+        ? unparsedLiquidityData.ranges.reduce((sum, range) => {
+              return sum + (range.activeLiq || 0);
+          }, 0)
+        : 0;
 
-    // useEffect(() => {
-    //     if (unparsedCandleData === undefined) {
-    //         clearLiquidityData();
-    //     }
-    // }, [baseTokenAddress + quoteTokenAddress]);
-
-    // const clearLiquidityData = () => {
-    //     if (liquidityData) {
-    //         liquidityData.liqAskData = [];
-    //         liquidityData.liqBidData = [];
-    //         liquidityData.depthLiqBidData = [];
-    //         liquidityData.depthLiqAskData = [];
-    //         liquidityData.topBoundary = 0;
-    //         liquidityData.lowBoundary = 0;
-    //         liquidityData.liqTransitionPointforCurve = 0;
-    //         liquidityData.liqTransitionPointforDepth = 0;
-    //     }
-    // };
-
-    // Parse liquidtiy data
+    // Parse liquidity data
     const liquidityData: liquidityChartData | undefined = useMemo(() => {
         if (
             liqBoundary &&
@@ -613,7 +618,7 @@ function TradeCandleStickChart(props: propsIF) {
         } else {
             return undefined;
         }
-    }, [liqBoundary, baseTokenAddress + quoteTokenAddress]);
+    }, [liqBoundary, baseTokenAddress + quoteTokenAddress, sumActiveLiq]);
 
     useEffect(() => {
         if (unparsedCandleData) {
@@ -910,6 +915,26 @@ function TradeCandleStickChart(props: propsIF) {
         }
     };
 
+    useEffect(() => {
+        if (
+            (unparsedCandleData !== undefined &&
+                unparsedCandleData.length === 0) ||
+            (scaleData === undefined &&
+                unparsedCandleData &&
+                unparsedCandleData.length < 7)
+        ) {
+            setCandleScale((prev: CandleScaleIF) => {
+                return {
+                    isFetchForTimeframe: !prev.isFetchForTimeframe,
+                    lastCandleDate: undefined,
+                    nCandles: 200,
+                    isShowLatestCandle: true,
+                    isFetchFirst200Candle: false,
+                };
+            });
+        }
+    }, [period]);
+
     const isLoading = useMemo(
         () =>
             scaleData === undefined ||
@@ -928,25 +953,12 @@ function TradeCandleStickChart(props: propsIF) {
     );
 
     useEffect(() => {
-        if (prevPeriod === undefined) {
-            setCandleScale((prev: CandleScaleIF) => {
-                return {
-                    isFetchForTimeframe: !prev.isFetchForTimeframe,
-                    lastCandleDate: prev.lastCandleDate,
-                    nCandles: prev.nCandles,
-                    isShowLatestCandle: true,
-                    isFetchFirst200Candle: prev.isFetchFirst200Candle,
-                };
-            });
-        }
-    }, [chartSettings.candleTime.global.defaults.length]);
-
-    useEffect(() => {
         if (isCondensedModeEnabled) {
             if (
                 unparsedCandleData &&
                 unparsedCandleData.length > 0 &&
                 period &&
+                candleData.duration === period &&
                 unparsedCandleData[0].period === period &&
                 isFetchingEnoughData
             ) {
@@ -1029,6 +1041,10 @@ function TradeCandleStickChart(props: propsIF) {
                                 maxRequestCountForCondensed,
                             );
                             setIsFetchingEnoughData(false);
+
+                            if (candles.length < 7) {
+                                setIsCondensedModeEnabled(false);
+                            }
                         }
                     }
                 }
