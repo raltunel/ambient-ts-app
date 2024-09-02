@@ -151,12 +151,27 @@ function Transactions(props: propsIF) {
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const [pagesVisible, setPagesVisible] = useState<[number, number]>([0, 1]);
+    const pagesVisibleRef = useRef<[number, number]>();
+    pagesVisibleRef.current = pagesVisible;
+
+    const [page, setPage] = useState(0);
+    const pageRef = useRef<number>();
+    pageRef.current = page;
     const [extraPagesAvailable, setExtraPagesAvailable] = useState<number>(0);
+    const extraPagesAvailableRef = useRef<number>();
+    extraPagesAvailableRef.current = extraPagesAvailable;
     const [moreDataAvailable, setMoreDataAvailable] = useState<boolean>(true);
+    const moreDataAvailableRef = useRef<boolean>();
+    moreDataAvailableRef.current = moreDataAvailable;
     const [moreDataLoading, setMoreDataLoading] = useState<boolean>(false);
+    const moreDataLoadingRef = useRef<boolean>();
+    moreDataLoadingRef.current = moreDataLoading;
 
     const lastRowRef = useRef<HTMLDivElement | null>(null);
     const firstRowRef = useRef<HTMLDivElement | null>(null);
+
+    
+    const disableAddMoreData = true;
 
     const showAllData = !isAccountView && showAllDataSelection;
 
@@ -181,13 +196,14 @@ function Transactions(props: propsIF) {
 
     const oldestTxTime = useMemo(
         () =>
-            transactionData.length > 0
+            {
+                return transactionData.length > 0
                 ? transactionData.reduce((min, transaction) => {
                       return transaction.txTime < min
                           ? transaction.txTime
                           : min;
                   }, transactionData[0].txTime)
-                : 0,
+                : 0},
         [transactionData],
     );
 
@@ -464,11 +480,12 @@ function Transactions(props: propsIF) {
         useSortedTxs('time', txDataToDisplay);
 
     const sortedTxDataToDisplay = useMemo<TransactionIF[]>(() => {
+
         return isCandleSelected || isAccountView
             ? sortedTransactions
             : sortedTransactions.slice(
-                  pagesVisible[0] * 50,
-                  pagesVisible[1] * 50 + 50,
+                  page * 100,
+                  (page + 1) * 100,
               );
     }, [sortedTransactions, pagesVisible, isCandleSelected, isAccountView]);
 
@@ -518,21 +535,25 @@ function Transactions(props: propsIF) {
         }
     };
 
-    useEffect(() => {
 
-        console.log('add more data check')
-        console.log(lastRowRef.current)
-        console.log('moreDataLoading', moreDataLoading , ' ' , 'moreDataAvailable', moreDataAvailable, ' ', 'extraPagesAvailable', extraPagesAvailable, ' ', 'pagesVisible[1]', pagesVisible[1]);
+    useEffect(() => {
+        
         const observer = new IntersectionObserver(
             (entries) => {
+                
+                let extraPagesVal = extraPagesAvailableRef.current =! undefined ? extraPagesAvailableRef.current : extraPagesAvailable;
+                const pagesVisibleVal = pagesVisibleRef.current != undefined ? pagesVisibleRef.current : pagesVisible;
+                const moreDataAvailableVal = moreDataAvailableRef.current != undefined ? moreDataAvailableRef.current : moreDataAvailable; 
+                const moreDataLoadingVal = moreDataLoadingRef.current != undefined ? moreDataLoadingRef.current : moreDataLoading;
+                if(!extraPagesVal) extraPagesVal = 0;
+                
                 const entry = entries[0];
-                if (moreDataLoading) return;
+                if (moreDataLoadingVal) return;
                 if (entry.isIntersecting) {
-                    console.log(entry);
                     // last row is visible
-                    extraPagesAvailable + 1 > pagesVisible[1]
+                    extraPagesVal + 1 > pagesVisibleVal[1]
                     ? shiftDown()
-                        : moreDataAvailable
+                        : moreDataAvailableVal
                           ? addMoreData()
                           : undefined;
                 }
@@ -541,13 +562,13 @@ function Transactions(props: propsIF) {
                 threshold: 0.1, // Trigger when 10% of the element is visible
             },
         );
+
+        handleAutoScrolling();
         
         const currentElement = lastRowRef.current;
         if (currentElement) {
             observer.observe(currentElement);
         }
-
-        console.log('...............................................................................................................');
 
         return () => {
             if (currentElement) {
@@ -565,11 +586,14 @@ function Transactions(props: propsIF) {
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
+                const pagesVisibleVal = pagesVisibleRef.current != undefined ? pagesVisibleRef.current : pagesVisible;
+                const moreDataLoadingVal = moreDataLoadingRef.current != undefined ? moreDataLoadingRef.current : moreDataLoading;
                 const entry = entries[0];
-                if (moreDataLoading) return;
+
+                if (moreDataLoadingVal) return;
                 if (entry.isIntersecting) {
                     // first row is visible
-                    pagesVisible[0] > 0 && shiftUp();
+                    pagesVisibleVal[0] > 0 && shiftUp();
                 }
             },
             {
@@ -590,14 +614,16 @@ function Transactions(props: propsIF) {
     }, [firstRowRef.current, moreDataLoading, pagesVisible[0]]);
 
     useEffect(() => {
-        setPagesVisible([0, 1]);
+        // setPagesVisible([0, 1]);
+        setPage(0);
         setExtraPagesAvailable(0);
         setMoreDataAvailable(true);
         setMoreDataLoading(false);
     }, [selectedBaseAddress + selectedQuoteAddress]);
 
     const scrollToTop = () => {
-        setPagesVisible([0, 1]);
+        // setPagesVisible([0, 1]);
+        setPage(0);
 
         if (scrollRef.current) {
             // scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' }); // For smooth scrolling
@@ -610,7 +636,9 @@ function Transactions(props: propsIF) {
 
     const shiftUp = (): void => {
         console.log('shiftUp >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ')
-        setPagesVisible((prev) => [prev[0] - 1, prev[1] - 1]);
+        // setPagesVisible((prev) => [prev[0] - 1, prev[1] - 1]);
+
+        setPage(pageRef.current ? pageRef.current - 1 : page - 1);
         // if (scrollRef.current) {
             //     // scroll to middle of container
             //     scrollRef.current.scrollTo({
@@ -622,7 +650,8 @@ function Transactions(props: propsIF) {
     
     const shiftDown = (): void => {
         console.log('shiftDown >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ')
-        setPagesVisible((prev) => [prev[0] + 1, prev[1] + 1]);
+        // setPagesVisible((prev) => [prev[0] + 1, prev[1] + 1]);
+        setPage(pageRef.current ? pageRef.current + 1 : page + 1);
         // if (scrollRef.current) {
         //     // scroll to middle of container
         //     scrollRef.current.scrollTo({
@@ -671,12 +700,14 @@ function Transactions(props: propsIF) {
     }
 
     const addMoreData = (): void => {
+        console.log('ADD MORE DATA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' , oldestTxTime);
+        
+        if(!disableAddMoreData) return;
         // if(scrollRef.current){
             //     bindLastSeenRow();
             // }
             if (!crocEnv || !provider) return;
             // retrieve pool recent changes
-        console.log('ADD MORE DATA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
         setMoreDataLoading(true);
         fetchPoolRecentChanges({
             tokenList: tokens.tokenUniv,
@@ -695,6 +726,7 @@ function Transactions(props: propsIF) {
             cachedEnsResolve: cachedEnsResolve,
         })
             .then((poolChangesJsonData) => {
+                console.log('poolChangesJson', poolChangesJsonData)
                 if (poolChangesJsonData && poolChangesJsonData.length > 0) {
                     setTransactionsByPool((prev) => {
                         const existingChanges = new Set(
@@ -749,14 +781,20 @@ function Transactions(props: propsIF) {
     // }, [transactionsByPool])
 
     const logData = () => {
-        // domDebug('sortedTxDataDisp', sortedTxDataToDisplay.length);
         // if(sortedTxDataToDisplay.length > 0){
-        //     domDebug('sortedTxDataDisp LAST', sortedTxDataToDisplay[sortedTxDataToDisplay.length - 1].txHash);
-        // }
-        // if(sortedTxDataToDisplay.length > 0){
-        //     domDebug('sortedTxDataDisp FIRST', sortedTxDataToDisplay[0].txHash);
-        // }
-        // domDebug('sortedTransactions', sortedTransactions.length);
+            //     domDebug('sortedTxDataDisp LAST', sortedTxDataToDisplay[sortedTxDataToDisplay.length - 1].txHash);
+            // }
+            // if(sortedTxDataToDisplay.length > 0){
+                //     domDebug('sortedTxDataDisp FIRST', sortedTxDataToDisplay[0].txHash);
+                // }
+                if(pagesVisibleRef.current && pagesVisibleRef.current.length > 0){
+                    domDebug('pagesVisible0', pagesVisibleRef.current[0])
+                    domDebug('pagesVisible1', pagesVisibleRef.current[1])
+                }
+        domDebug('sortedTxDataDisp', sortedTxDataToDisplay.length);
+        domDebug('sortedTransactions', sortedTransactions.length);
+        domDebug('extraPagesAvailable', extraPagesAvailableRef.current);
+
         // if(sortedTransactions.length > 0){
         //     domDebug('sortedTransactions LAST ', sortedTransactions[sortedTransactions.length - 1].txHash);
         // }
@@ -765,11 +803,18 @@ function Transactions(props: propsIF) {
         // }
     }
     
-    useEffect(() => {
+
+    const handleAutoScrolling = () => {
         logData();
         bindLastSeenRow();
         findTableElementByTxID(lastSeenTxIDRef.current || '')
-    }, [sortedTxDataToDisplay, sortedTransactions])
+    }
+
+    // useEffect(() => {
+    //     logData();
+    //     bindLastSeenRow();
+    //     findTableElementByTxID(lastSeenTxIDRef.current || '')
+    // }, [sortedTxDataToDisplay, sortedTransactions])
 
     const shouldDisplayNoTableData: boolean =
         !isLoading &&
