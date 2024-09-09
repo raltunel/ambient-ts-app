@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as d3 from 'd3';
 import * as d3fc from 'd3fc';
 import {
@@ -3063,39 +3064,39 @@ export default function Chart(props: propsIF) {
         }
     }, [handleDocumentEvent, isCompletedFetchData]);
 
-    useEffect(() => {
-        const canvas = d3
-            .select(d3CanvasCrosshair.current)
-            .select('canvas')
-            .node() as HTMLCanvasElement;
-        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    // useEffect(() => {
+    //     const canvas = d3
+    //         .select(d3CanvasCrosshair.current)
+    //         .select('canvas')
+    //         .node() as HTMLCanvasElement;
+    //     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-        if (crosshairHorizontal && crosshairVerticalCanvas) {
-            d3.select(d3CanvasCrosshair.current)
-                .on('draw', () => {
-                    setCanvasResolution(canvas);
-                    ctx.setLineDash([4, 2]);
-                    crosshairVerticalCanvas(crosshairData);
-                    if (crosshairActive === 'chart') {
-                        crosshairHorizontal(crosshairData);
-                    }
-                })
-                .on('measure', (event: CustomEvent) => {
-                    scaleData?.xScale.range([0, event.detail.width]);
-                    scaleData?.yScale.range([event.detail.height, 0]);
-                    ctx.setLineDash([4, 2]);
-                    crosshairVerticalCanvas.context(ctx);
-                    if (crosshairActive === 'chart') {
-                        crosshairHorizontal.context(ctx);
-                    }
-                });
-        }
-    }, [
-        crosshairData,
-        crosshairHorizontal,
-        crosshairActive,
-        crosshairVerticalCanvas,
-    ]);
+    //     if (crosshairHorizontal && crosshairVerticalCanvas) {
+    //         d3.select(d3CanvasCrosshair.current)
+    //             .on('draw', () => {
+    //                 setCanvasResolution(canvas);
+    //                 ctx.setLineDash([4, 2]);
+    //                 crosshairVerticalCanvas(crosshairData);
+    //                 if (crosshairActive === 'chart') {
+    //                     crosshairHorizontal(crosshairData);
+    //                 }
+    //             })
+    //             .on('measure', (event: CustomEvent) => {
+    //                 scaleData?.xScale.range([0, event.detail.width]);
+    //                 scaleData?.yScale.range([event.detail.height, 0]);
+    //                 ctx.setLineDash([4, 2]);
+    //                 crosshairVerticalCanvas.context(ctx);
+    //                 if (crosshairActive === 'chart') {
+    //                     crosshairHorizontal.context(ctx);
+    //                 }
+    //             });
+    //     }
+    // }, [
+    //     crosshairData,
+    //     crosshairHorizontal,
+    //     crosshairActive,
+    //     crosshairVerticalCanvas,
+    // ]);
 
     const circleSeries = createCircle(
         scaleData?.xScale,
@@ -6030,10 +6031,10 @@ export default function Chart(props: propsIF) {
                         />
                     )}
 
-                <d3fc-canvas
+             {/*    <d3fc-canvas
                     ref={d3CanvasCrosshair}
                     className='cr-canvas'
-                ></d3fc-canvas>
+                ></d3fc-canvas> */}
                 <d3fc-canvas
                     ref={d3CanvasMarketLine}
                     className='market-line-canvas'
