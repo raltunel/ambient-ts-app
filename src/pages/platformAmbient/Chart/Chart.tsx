@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as d3 from 'd3';
 import * as d3fc from 'd3fc';
 import {
@@ -5945,7 +5946,7 @@ export default function Chart(props: propsIF) {
                     gridTemplateRows: '1fr auto auto auto',
                 }}
             >
-                {platformName !== 'futa' || showFutaCandles ? (
+               {/*  {platformName !== 'futa' || showFutaCandles ? (
                     <CandleChart
                         chartItemStates={props.chartItemStates}
                         data={unparsedCandleData}
@@ -5976,7 +5977,7 @@ export default function Chart(props: propsIF) {
                         chartThemeColors={chartThemeColors}
                         showFutaCandles={showFutaCandles}
                     />
-                )}
+                )} */}
 
                 <VolumeBarCanvas
                     scaleData={scaleData}
