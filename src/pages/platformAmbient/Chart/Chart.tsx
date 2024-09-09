@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as d3 from 'd3';
 import * as d3fc from 'd3fc';
 import {
@@ -6173,7 +6174,7 @@ export default function Chart(props: propsIF) {
                     </>
                 )}
 
-                <div className='xAxis'>
+             {/*    <div className='xAxis'>
                     <hr />
 
                     <XAxisCanvas
@@ -6200,7 +6201,7 @@ export default function Chart(props: propsIF) {
                         timeGaps={timeGaps}
                         isDiscontinuityScaleEnabled={isCondensedModeEnabled}
                     />
-                </div>
+                </div> */}
             </d3fc-group>
             {isShowFloatingToolbar && (
                 <FloatingToolbar
