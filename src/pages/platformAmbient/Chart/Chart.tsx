@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as d3 from 'd3';
 import * as d3fc from 'd3fc';
 import {
@@ -915,136 +916,144 @@ export default function Chart(props: propsIF) {
         }
     }, []);
 
-    useEffect(() => {
-        if (shouldResetBuffer) {
-            setXScaleDefault();
-        }
-    }, [liqMode, shouldResetBuffer]);
+    // useEffect(() => {
+    //     if (shouldResetBuffer) {
+    //         setXScaleDefault();
+    //     }
+    // }, [liqMode, shouldResetBuffer]);
+
+    // useEffect(() => {
+    //     (async () => {
+    //         if (scaleData && timeGaps.length > 0) {
+    //             const canvas = d3
+    //                 .select(d3CanvasMain.current)
+    //                 .select('canvas')
+    //                 .node() as HTMLCanvasElement;
+
+    //             const rectCanvas = canvas.getBoundingClientRect();
+    //             const width = rectCanvas.width;
+    //             scaleData.xScale.range([0, width]);
+    //             const lastDateArray = timeGaps
+    //                 .sort((a, b) => b.range[1] - a.range[1])
+    //                 .filter((i) => i.isAddedPixel);
+    //             let lastDate: undefined | number = undefined;
+    //             if (lastDateArray.length > 0) {
+    //                 lastDate = lastDateArray[0].range[1];
+    //             }
+
+    //             // To maintain the bandwidth of the candles, the domain is updated by the amount of shift.
+    //             // If new data comes from the left, the scale is shifted to the right for a smaller scale, and vice versa.
+    //             timeGaps
+    //                 .filter((i) => !i.isAddedPixel)
+    //                 .forEach((element: timeGapsValue) => {
+    //                     if (isCondensedModeEnabled) {
+    //                         const pix =
+    //                             scaleData.xScale(element.range[0]) -
+    //                             scaleData.xScale(element.range[1]);
+
+    //                         // shift to right
+    //                         let min = scaleData.xScale.invert(pix);
+    //                         let maxDom = scaleData.xScale.domain()[1];
+
+    //                         const dom = scaleData?.xScale.domain();
+    //                         const check =
+    //                             element.range[1] < dom[1] &&
+    //                             element.range[1] > dom[0];
+
+    //                         if (check) {
+    //                             if (lastDate && lastDate < element.range[1]) {
+    //                                 min = scaleData.xScale.domain()[0];
+    //                                 // shift to left
+    //                                 maxDom = scaleData.xScale.invert(
+    //                                     scaleData.xScale.range()[1] - pix,
+    //                                 );
+    //                             }
+    //                             scaleData.xScale.domain([min, maxDom]);
+
+    //                             element.isAddedPixel = true;
+    //                         }
+    //                     }
+    //                 });
+    //         }
+    //     })().then(() => {
+    //         if (scaleData) {
+    //             const data = isCondensedModeEnabled
+    //                 ? timeGaps
+    //                       .filter((element) => element.isAddedPixel)
+    //                       .map((i: timeGapsValue) => i.range)
+    //                 : [];
+
+    //             const newDiscontinuityProvider = d3fc.discontinuityRange(
+    //                 ...data,
+    //             );
+
+    //             setDiscontinuityProvider(newDiscontinuityProvider);
+
+    //             scaleData.xScale.discontinuityProvider(
+    //                 newDiscontinuityProvider,
+    //             );
+
+    //             setVisibleDateForCandle(scaleData.xScale.domain()[1]);
+    //             changeScale(false);
+    //             render();
+    //         }
+    //     });
+    // }, [
+    //     diffHashSig(timeGaps),
+    //     diffHashSigScaleData(scaleData, 'x'),
+    //     isCondensedModeEnabled,
+    // ]);
+
+    // useEffect(() => {
+    //     if (discontinuityProvider) {
+    //         if (!chartResetStatus.isResetChart) {
+    //             const xmin = scaleData?.xScale.domain()[0];
+    //             const xmax = scaleData?.xScale.domain()[1];
+    //             const data = visibleCandleData.filter(
+    //                 (i) => i.time * 1000 <= xmax && i.time * 1000 >= xmin,
+    //             );
+    //             if (data.length > 0) {
+    //                 const width = scaleData?.xScale.range()[1];
+
+    //                 const minDate = data[data.length - 1].time * 1000;
+    //                 const maxDate = data[0].time * 1000;
+
+    //                 const diffPixel =
+    //                     (isShowLatestCandle
+    //                         ? width
+    //                         : scaleData?.xScale(maxDate)) -
+    //                     scaleData?.xScale(minDate);
+
+    //                 const percentPixel = diffPixel / width;
+
+    //                 const isIncludeTimeOfEndCanlde = timeOfEndCandle
+    //                     ? timeOfEndCandle < scaleData?.xScale.domain()[1] &&
+    //                       timeOfEndCandle > scaleData?.xScale.domain()[0]
+    //                     : false;
+
+    //                 if (
+    //                     percentPixel < 0.75 &&
+    //                     isCondensedModeEnabled &&
+    //                     !isIncludeTimeOfEndCanlde
+    //                 ) {
+    //                     resetFunc(true);
+    //                 } else {
+    //                     setIsCompletedFetchData(false);
+    //                 }
+    //             }
+    //         } else {
+    //             setIsCompletedFetchData(false);
+    //         }
+    //     }
+
+
+    // }, [discontinuityProvider === undefined]);
+
 
     useEffect(() => {
-        (async () => {
-            if (scaleData && timeGaps.length > 0) {
-                const canvas = d3
-                    .select(d3CanvasMain.current)
-                    .select('canvas')
-                    .node() as HTMLCanvasElement;
-
-                const rectCanvas = canvas.getBoundingClientRect();
-                const width = rectCanvas.width;
-                scaleData.xScale.range([0, width]);
-                const lastDateArray = timeGaps
-                    .sort((a, b) => b.range[1] - a.range[1])
-                    .filter((i) => i.isAddedPixel);
-                let lastDate: undefined | number = undefined;
-                if (lastDateArray.length > 0) {
-                    lastDate = lastDateArray[0].range[1];
-                }
-
-                // To maintain the bandwidth of the candles, the domain is updated by the amount of shift.
-                // If new data comes from the left, the scale is shifted to the right for a smaller scale, and vice versa.
-                timeGaps
-                    .filter((i) => !i.isAddedPixel)
-                    .forEach((element: timeGapsValue) => {
-                        if (isCondensedModeEnabled) {
-                            const pix =
-                                scaleData.xScale(element.range[0]) -
-                                scaleData.xScale(element.range[1]);
-
-                            // shift to right
-                            let min = scaleData.xScale.invert(pix);
-                            let maxDom = scaleData.xScale.domain()[1];
-
-                            const dom = scaleData?.xScale.domain();
-                            const check =
-                                element.range[1] < dom[1] &&
-                                element.range[1] > dom[0];
-
-                            if (check) {
-                                if (lastDate && lastDate < element.range[1]) {
-                                    min = scaleData.xScale.domain()[0];
-                                    // shift to left
-                                    maxDom = scaleData.xScale.invert(
-                                        scaleData.xScale.range()[1] - pix,
-                                    );
-                                }
-                                scaleData.xScale.domain([min, maxDom]);
-
-                                element.isAddedPixel = true;
-                            }
-                        }
-                    });
-            }
-        })().then(() => {
-            if (scaleData) {
-                const data = isCondensedModeEnabled
-                    ? timeGaps
-                          .filter((element) => element.isAddedPixel)
-                          .map((i: timeGapsValue) => i.range)
-                    : [];
-
-                const newDiscontinuityProvider = d3fc.discontinuityRange(
-                    ...data,
-                );
-
-                setDiscontinuityProvider(newDiscontinuityProvider);
-
-                scaleData.xScale.discontinuityProvider(
-                    newDiscontinuityProvider,
-                );
-
-                setVisibleDateForCandle(scaleData.xScale.domain()[1]);
-                changeScale(false);
-                render();
-            }
-        });
-    }, [
-        diffHashSig(timeGaps),
-        diffHashSigScaleData(scaleData, 'x'),
-        isCondensedModeEnabled,
-    ]);
-
-    useEffect(() => {
-        if (discontinuityProvider) {
-            if (!chartResetStatus.isResetChart) {
-                const xmin = scaleData?.xScale.domain()[0];
-                const xmax = scaleData?.xScale.domain()[1];
-                const data = visibleCandleData.filter(
-                    (i) => i.time * 1000 <= xmax && i.time * 1000 >= xmin,
-                );
-                if (data.length > 0) {
-                    const width = scaleData?.xScale.range()[1];
-
-                    const minDate = data[data.length - 1].time * 1000;
-                    const maxDate = data[0].time * 1000;
-
-                    const diffPixel =
-                        (isShowLatestCandle
-                            ? width
-                            : scaleData?.xScale(maxDate)) -
-                        scaleData?.xScale(minDate);
-
-                    const percentPixel = diffPixel / width;
-
-                    const isIncludeTimeOfEndCanlde = timeOfEndCandle
-                        ? timeOfEndCandle < scaleData?.xScale.domain()[1] &&
-                          timeOfEndCandle > scaleData?.xScale.domain()[0]
-                        : false;
-
-                    if (
-                        percentPixel < 0.75 &&
-                        isCondensedModeEnabled &&
-                        !isIncludeTimeOfEndCanlde
-                    ) {
-                        resetFunc(true);
-                    } else {
-                        setIsCompletedFetchData(false);
-                    }
-                }
-            } else {
-                setIsCompletedFetchData(false);
-            }
-        }
-    }, [discontinuityProvider === undefined]);
+        setIsCompletedFetchData(false);
+    }, [])
+    
 
     useEffect(() => {
         updateDrawnShapeHistoryonLocalStorage();
@@ -1066,58 +1075,58 @@ export default function Chart(props: propsIF) {
         }
     };
 
-    useEffect(() => {
-        if (cursorStyleTrigger && chartZoomEvent !== 'wheel') {
-            d3.select(d3CanvasMain.current).style('cursor', 'grabbing');
+    // useEffect(() => {
+    //     if (cursorStyleTrigger && chartZoomEvent !== 'wheel') {
+    //         d3.select(d3CanvasMain.current).style('cursor', 'grabbing');
 
-            render();
-        } else {
-            const cursorType = d3.select(d3CanvasMain.current).style('cursor');
+    //         render();
+    //     } else {
+    //         const cursorType = d3.select(d3CanvasMain.current).style('cursor');
 
-            if (
-                !(
-                    isOnCandleOrVolumeMouseLocation && cursorType === 'pointer'
-                ) &&
-                !(!isOnCandleOrVolumeMouseLocation && cursorType === 'default')
-            ) {
-                d3.select(d3CanvasMain.current).style(
-                    'cursor',
-                    isOnCandleOrVolumeMouseLocation ? 'pointer' : 'default',
-                );
-            }
-        }
-    }, [
-        chartZoomEvent,
-        diffHashSig(cursorStyleTrigger),
-        isOnCandleOrVolumeMouseLocation,
-    ]);
+    //         if (
+    //             !(
+    //                 isOnCandleOrVolumeMouseLocation && cursorType === 'pointer'
+    //             ) &&
+    //             !(!isOnCandleOrVolumeMouseLocation && cursorType === 'default')
+    //         ) {
+    //             d3.select(d3CanvasMain.current).style(
+    //                 'cursor',
+    //                 isOnCandleOrVolumeMouseLocation ? 'pointer' : 'default',
+    //             );
+    //         }
+    //     }
+    // }, [
+    //     chartZoomEvent,
+    //     diffHashSig(cursorStyleTrigger),
+    //     isOnCandleOrVolumeMouseLocation,
+    // ]);
 
-    useEffect(() => {
-        if (isLineDrag) {
-            d3.select(d3CanvasMain.current).style('cursor', 'none');
-        } else if (canUserDragLimit || canUserDragRange) {
-            d3.select(d3CanvasMain.current).style('cursor', 'row-resize');
-        } else {
-            const cursorType = d3.select(d3CanvasMain.current).style('cursor');
+    // useEffect(() => {
+    //     if (isLineDrag) {
+    //         d3.select(d3CanvasMain.current).style('cursor', 'none');
+    //     } else if (canUserDragLimit || canUserDragRange) {
+    //         d3.select(d3CanvasMain.current).style('cursor', 'row-resize');
+    //     } else {
+    //         const cursorType = d3.select(d3CanvasMain.current).style('cursor');
 
-            if (
-                !(
-                    isOnCandleOrVolumeMouseLocation && cursorType === 'pointer'
-                ) &&
-                !(!isOnCandleOrVolumeMouseLocation && cursorType === 'default')
-            ) {
-                d3.select(d3CanvasMain.current).style(
-                    'cursor',
-                    isOnCandleOrVolumeMouseLocation ? 'pointer' : 'default',
-                );
-            }
-        }
-    }, [
-        canUserDragLimit,
-        canUserDragRange,
-        isLineDrag,
-        isOnCandleOrVolumeMouseLocation,
-    ]);
+    //         if (
+    //             !(
+    //                 isOnCandleOrVolumeMouseLocation && cursorType === 'pointer'
+    //             ) &&
+    //             !(!isOnCandleOrVolumeMouseLocation && cursorType === 'default')
+    //         ) {
+    //             d3.select(d3CanvasMain.current).style(
+    //                 'cursor',
+    //                 isOnCandleOrVolumeMouseLocation ? 'pointer' : 'default',
+    //             );
+    //         }
+    //     }
+    // }, [
+    //     canUserDragLimit,
+    //     canUserDragRange,
+    //     isLineDrag,
+    //     isOnCandleOrVolumeMouseLocation,
+    // ]);
 
     useEffect(() => {
         // auto zoom active
@@ -1207,350 +1216,350 @@ export default function Chart(props: propsIF) {
     }, [isChartZoom]);
 
     // Zoom
-    useEffect(() => {
-        if (
-            scaleData !== undefined &&
-            unparsedCandleData !== undefined &&
-            !isChartZoom
-        ) {
-            let clickedForLine = false;
-            let zoomTimeout: number | undefined = undefined;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            let previousTouch: any | undefined = undefined; // event
-            let previousDeltaTouch: number | undefined = undefined;
-            let previousDeltaTouchLocation: number | undefined = undefined;
-            const lastCandleDate = lastCandleData?.time * 1000;
-            const firstCandleDate = firstCandleData?.time * 1000;
+    // useEffect(() => {
+    //     if (
+    //         scaleData !== undefined &&
+    //         unparsedCandleData !== undefined &&
+    //         !isChartZoom
+    //     ) {
+    //         let clickedForLine = false;
+    //         let zoomTimeout: number | undefined = undefined;
+    //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //         let previousTouch: any | undefined = undefined; // event
+    //         let previousDeltaTouch: number | undefined = undefined;
+    //         let previousDeltaTouchLocation: number | undefined = undefined;
+    //         const lastCandleDate = lastCandleData?.time * 1000;
+    //         const firstCandleDate = firstCandleData?.time * 1000;
 
-            let wheelTimeout: NodeJS.Timeout | null = null; // Declare wheelTimeout
+    //         let wheelTimeout: NodeJS.Timeout | null = null; // Declare wheelTimeout
 
-            if (lastCandleDate && firstCandleDate) {
-                d3.select(d3CanvasMain.current).on(
-                    'wheel',
-                    function (event) {
-                        if (wheelTimeout === null) {
-                            setIsChartZoom(true);
-                            setCursorStyleTrigger(true);
-                        }
+    //         if (lastCandleDate && firstCandleDate) {
+    //             d3.select(d3CanvasMain.current).on(
+    //                 'wheel',
+    //                 function (event) {
+    //                     if (wheelTimeout === null) {
+    //                         setIsChartZoom(true);
+    //                         setCursorStyleTrigger(true);
+    //                     }
 
-                        zoomBase.zoomWithWheel(
-                            event,
-                            scaleData,
-                            firstCandleDate,
-                            lastCandleDate,
-                        );
-                        render();
+    //                     zoomBase.zoomWithWheel(
+    //                         event,
+    //                         scaleData,
+    //                         firstCandleDate,
+    //                         lastCandleDate,
+    //                     );
+    //                     render();
 
-                        if (rescale) {
-                            changeScale(true);
-                        }
+    //                     if (rescale) {
+    //                         changeScale(true);
+    //                     }
 
-                        if (wheelTimeout) {
-                            clearTimeout(wheelTimeout);
-                        }
+    //                     if (wheelTimeout) {
+    //                         clearTimeout(wheelTimeout);
+    //                     }
 
-                        setPrevLastCandleTime(lastCandleData.time);
-                        // check wheel end
-                        wheelTimeout = setTimeout(() => {
-                            setIsChartZoom(false);
-                            setCursorStyleTrigger(false);
-                            showLatestActive();
-                        }, 200);
-                    },
-                    { passive: true },
-                );
+    //                     setPrevLastCandleTime(lastCandleData.time);
+    //                     // check wheel end
+    //                     wheelTimeout = setTimeout(() => {
+    //                         setIsChartZoom(false);
+    //                         setCursorStyleTrigger(false);
+    //                         showLatestActive();
+    //                     }, 200);
+    //                 },
+    //                 { passive: true },
+    //             );
 
-                const zoom = d3
-                    .zoom()
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .on('start', (event: any) => {
-                        setIsChartZoom(true);
+    //             const zoom = d3
+    //                 .zoom()
+    //                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //                 .on('start', (event: any) => {
+    //                     setIsChartZoom(true);
 
-                        if (event.sourceEvent.type.includes('touch')) {
-                            // mobile
-                            previousTouch = event.sourceEvent.touches[0];
+    //                     if (event.sourceEvent.type.includes('touch')) {
+    //                         // mobile
+    //                         previousTouch = event.sourceEvent.touches[0];
 
-                            if (event.sourceEvent.touches.length > 1) {
-                                previousDeltaTouch = Math.hypot(
-                                    event.sourceEvent.touches[0].pageX -
-                                        event.sourceEvent.touches[1].pageX,
-                                    event.sourceEvent.touches[0].pageY -
-                                        event.sourceEvent.touches[1].pageY,
-                                );
-                                previousDeltaTouchLocation =
-                                    event.sourceEvent.touches[0].pageX;
-                            }
-                        }
-                        zoomTimeout = event.sourceEvent.timeStamp;
-                        if (
-                            event.sourceEvent &&
-                            event.sourceEvent.type !== 'dblclick'
-                        ) {
-                            clickedForLine = false;
-                            setChartZoomEvent(event.sourceEvent.type);
-                        }
-                    })
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .on('zoom', (event: any) => {
-                        setContextmenu(false);
+    //                         if (event.sourceEvent.touches.length > 1) {
+    //                             previousDeltaTouch = Math.hypot(
+    //                                 event.sourceEvent.touches[0].pageX -
+    //                                     event.sourceEvent.touches[1].pageX,
+    //                                 event.sourceEvent.touches[0].pageY -
+    //                                     event.sourceEvent.touches[1].pageY,
+    //                             );
+    //                             previousDeltaTouchLocation =
+    //                                 event.sourceEvent.touches[0].pageX;
+    //                         }
+    //                     }
+    //                     zoomTimeout = event.sourceEvent.timeStamp;
+    //                     if (
+    //                         event.sourceEvent &&
+    //                         event.sourceEvent.type !== 'dblclick'
+    //                     ) {
+    //                         clickedForLine = false;
+    //                         setChartZoomEvent(event.sourceEvent.type);
+    //                     }
+    //                 })
+    //                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //                 .on('zoom', (event: any) => {
+    //                     setContextmenu(false);
 
-                        async function newDomains() {
-                            if (
-                                event.sourceEvent &&
-                                event.sourceEvent.type !== 'dblclick' &&
-                                scaleData?.xScale
-                            ) {
-                                if (event.sourceEvent.type === 'touchmove') {
-                                    if (event.sourceEvent.touches.length > 1) {
-                                        // if a second finger touches after one finger touches it
-                                        if (
-                                            !previousDeltaTouch ||
-                                            !previousDeltaTouchLocation
-                                        ) {
-                                            previousDeltaTouch = Math.hypot(
-                                                event.sourceEvent.touches[0]
-                                                    .pageX -
-                                                    event.sourceEvent.touches[1]
-                                                        .pageX,
-                                                event.sourceEvent.touches[0]
-                                                    .pageY -
-                                                    event.sourceEvent.touches[1]
-                                                        .pageY,
-                                            );
+    //                     async function newDomains() {
+    //                         if (
+    //                             event.sourceEvent &&
+    //                             event.sourceEvent.type !== 'dblclick' &&
+    //                             scaleData?.xScale
+    //                         ) {
+    //                             if (event.sourceEvent.type === 'touchmove') {
+    //                                 if (event.sourceEvent.touches.length > 1) {
+    //                                     // if a second finger touches after one finger touches it
+    //                                     if (
+    //                                         !previousDeltaTouch ||
+    //                                         !previousDeltaTouchLocation
+    //                                     ) {
+    //                                         previousDeltaTouch = Math.hypot(
+    //                                             event.sourceEvent.touches[0]
+    //                                                 .pageX -
+    //                                                 event.sourceEvent.touches[1]
+    //                                                     .pageX,
+    //                                             event.sourceEvent.touches[0]
+    //                                                 .pageY -
+    //                                                 event.sourceEvent.touches[1]
+    //                                                     .pageY,
+    //                                         );
 
-                                            previousDeltaTouchLocation =
-                                                event.sourceEvent.touches[0]
-                                                    .pageX;
-                                        }
+    //                                         previousDeltaTouchLocation =
+    //                                             event.sourceEvent.touches[0]
+    //                                                 .pageX;
+    //                                     }
 
-                                        if (
-                                            previousDeltaTouch &&
-                                            previousDeltaTouchLocation
-                                        ) {
-                                            zoomBase.handlePanningMultiTouch(
-                                                event.sourceEvent,
-                                                scaleData,
-                                                previousDeltaTouch,
-                                                previousDeltaTouchLocation,
-                                            );
-                                        }
-                                    } else {
-                                        zoomBase.handlePanningOneTouch(
-                                            event.sourceEvent,
-                                            scaleData,
-                                            previousTouch,
-                                            bandwidth,
-                                            firstCandleDate,
-                                            lastCandleDate,
-                                        );
-                                    }
-                                } else {
-                                    zoomBase.handlePanning(
-                                        event.sourceEvent,
-                                        scaleData,
-                                        firstCandleDate,
-                                        lastCandleDate,
-                                    );
-                                }
+    //                                     if (
+    //                                         previousDeltaTouch &&
+    //                                         previousDeltaTouchLocation
+    //                                     ) {
+    //                                         zoomBase.handlePanningMultiTouch(
+    //                                             event.sourceEvent,
+    //                                             scaleData,
+    //                                             previousDeltaTouch,
+    //                                             previousDeltaTouchLocation,
+    //                                         );
+    //                                     }
+    //                                 } else {
+    //                                     zoomBase.handlePanningOneTouch(
+    //                                         event.sourceEvent,
+    //                                         scaleData,
+    //                                         previousTouch,
+    //                                         bandwidth,
+    //                                         firstCandleDate,
+    //                                         lastCandleDate,
+    //                                     );
+    //                                 }
+    //                             } else {
+    //                                 zoomBase.handlePanning(
+    //                                     event.sourceEvent,
+    //                                     scaleData,
+    //                                     firstCandleDate,
+    //                                     lastCandleDate,
+    //                                 );
+    //                             }
 
-                                render();
-                                setCursorStyleTrigger(true);
+    //                             render();
+    //                             setCursorStyleTrigger(true);
 
-                                if (rescale) {
-                                    if (!isCondensedModeEnabled) {
-                                        changeScale(true);
-                                    }
-                                    render();
-                                } else {
-                                    let domain = undefined;
-                                    if (
-                                        event.sourceEvent.type === 'touchmove'
-                                    ) {
-                                        domain = zoomBase.handlePanningYMobile(
-                                            event.sourceEvent,
-                                            scaleData,
-                                            previousTouch,
-                                        );
-                                    } else {
-                                        domain = zoomBase.handlePanningY(
-                                            event.sourceEvent,
-                                            scaleData,
-                                        );
-                                    }
+    //                             if (rescale) {
+    //                                 if (!isCondensedModeEnabled) {
+    //                                     changeScale(true);
+    //                                 }
+    //                                 render();
+    //                             } else {
+    //                                 let domain = undefined;
+    //                                 if (
+    //                                     event.sourceEvent.type === 'touchmove'
+    //                                 ) {
+    //                                     domain = zoomBase.handlePanningYMobile(
+    //                                         event.sourceEvent,
+    //                                         scaleData,
+    //                                         previousTouch,
+    //                                     );
+    //                                 } else {
+    //                                     domain = zoomBase.handlePanningY(
+    //                                         event.sourceEvent,
+    //                                         scaleData,
+    //                                     );
+    //                                 }
 
-                                    if (domain) {
-                                        setYaxisDomain(domain[0], domain[1]);
-                                    }
+    //                                 if (domain) {
+    //                                     setYaxisDomain(domain[0], domain[1]);
+    //                                 }
 
-                                    if (advancedMode && liquidityData) {
-                                        const liqAllBidPrices =
-                                            liquidityData?.liqBidData.map(
-                                                (
-                                                    liqPrices: LiquidityDataLocal,
-                                                ) => liqPrices.liqPrices,
-                                            );
-                                        const liqBidDeviation =
-                                            standardDeviation(liqAllBidPrices);
+    //                                 if (advancedMode && liquidityData) {
+    //                                     const liqAllBidPrices =
+    //                                         liquidityData?.liqBidData.map(
+    //                                             (
+    //                                                 liqPrices: LiquidityDataLocal,
+    //                                             ) => liqPrices.liqPrices,
+    //                                         );
+    //                                     const liqBidDeviation =
+    //                                         standardDeviation(liqAllBidPrices);
 
-                                        fillLiqAdvanced(
-                                            liqBidDeviation,
-                                            scaleData,
-                                            liquidityData,
-                                        );
-                                    }
-                                }
+    //                                     fillLiqAdvanced(
+    //                                         liqBidDeviation,
+    //                                         scaleData,
+    //                                         liquidityData,
+    //                                     );
+    //                                 }
+    //                             }
 
-                                clickedForLine = true;
-                                setPrevLastCandleTime(lastCandleData.time);
+    //                             clickedForLine = true;
+    //                             setPrevLastCandleTime(lastCandleData.time);
 
-                                render();
-                            }
-                        }
+    //                             render();
+    //                         }
+    //                     }
 
-                        newDomains().then(() => {
-                            // mobile
-                            if (event.sourceEvent.type.includes('touch')) {
-                                previousTouch =
-                                    event.sourceEvent.changedTouches[0];
-                                if (event.sourceEvent.touches.length > 1) {
-                                    previousDeltaTouch = Math.hypot(
-                                        event.sourceEvent.touches[0].pageX -
-                                            event.sourceEvent.touches[1].pageX,
-                                        event.sourceEvent.touches[0].pageY -
-                                            event.sourceEvent.touches[1].pageY,
-                                    );
-                                }
-                            }
-                        });
-                    })
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .on('end', (event: any) => {
-                        setShouldResetBuffer(false);
-                        if (event.sourceEvent.type !== 'wheel') {
-                            setIsChartZoom(false);
-                            setCursorStyleTrigger(false);
-                            setChartZoomEvent('');
+    //                     newDomains().then(() => {
+    //                         // mobile
+    //                         if (event.sourceEvent.type.includes('touch')) {
+    //                             previousTouch =
+    //                                 event.sourceEvent.changedTouches[0];
+    //                             if (event.sourceEvent.touches.length > 1) {
+    //                                 previousDeltaTouch = Math.hypot(
+    //                                     event.sourceEvent.touches[0].pageX -
+    //                                         event.sourceEvent.touches[1].pageX,
+    //                                     event.sourceEvent.touches[0].pageY -
+    //                                         event.sourceEvent.touches[1].pageY,
+    //                                 );
+    //                             }
+    //                         }
+    //                     });
+    //                 })
+    //                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //                 .on('end', (event: any) => {
+    //                     setShouldResetBuffer(false);
+    //                     if (event.sourceEvent.type !== 'wheel') {
+    //                         setIsChartZoom(false);
+    //                         setCursorStyleTrigger(false);
+    //                         setChartZoomEvent('');
 
-                            if (clickedForLine) {
-                                // fires click event when zoom takes too short
-                                if (
-                                    zoomTimeout &&
-                                    event.sourceEvent.timeStamp - zoomTimeout <
-                                        1
-                                ) {
-                                    const {
-                                        isHoverCandleOrVolumeData,
-                                        nearest,
-                                    } = candleOrVolumeDataHoverStatus(
-                                        event.sourceEvent.offsetX,
-                                        event.sourceEvent.offsetY,
-                                    );
-                                    selectedDateEvent(
-                                        isHoverCandleOrVolumeData,
-                                        nearest,
-                                    );
-                                }
-                            }
+    //                         if (clickedForLine) {
+    //                             // fires click event when zoom takes too short
+    //                             if (
+    //                                 zoomTimeout &&
+    //                                 event.sourceEvent.timeStamp - zoomTimeout <
+    //                                     1
+    //                             ) {
+    //                                 const {
+    //                                     isHoverCandleOrVolumeData,
+    //                                     nearest,
+    //                                 } = candleOrVolumeDataHoverStatus(
+    //                                     event.sourceEvent.offsetX,
+    //                                     event.sourceEvent.offsetY,
+    //                                 );
+    //                                 selectedDateEvent(
+    //                                     isHoverCandleOrVolumeData,
+    //                                     nearest,
+    //                                 );
+    //                             }
+    //                         }
 
-                            showLatestActive();
+    //                         showLatestActive();
 
-                            props.setShowTooltip(true);
-                        }
-                    })
-                    .filter((event) => {
-                        setSelectedDrawnShape(undefined);
+    //                         props.setShowTooltip(true);
+    //                     }
+    //                 })
+    //                 .filter((event) => {
+    //                     setSelectedDrawnShape(undefined);
 
-                        if (event.type.includes('touch')) {
-                            const canvas = d3
-                                .select(d3CanvasMain.current)
-                                .select('canvas')
-                                .node() as HTMLCanvasElement;
+    //                     if (event.type.includes('touch')) {
+    //                         const canvas = d3
+    //                             .select(d3CanvasMain.current)
+    //                             .select('canvas')
+    //                             .node() as HTMLCanvasElement;
 
-                            const rectCanvas = canvas.getBoundingClientRect();
+    //                         const rectCanvas = canvas.getBoundingClientRect();
 
-                            const lineBuffer =
-                                (scaleData?.yScale.domain()[1] -
-                                    scaleData?.yScale.domain()[0]) /
-                                15;
+    //                         const lineBuffer =
+    //                             (scaleData?.yScale.domain()[1] -
+    //                                 scaleData?.yScale.domain()[0]) /
+    //                             15;
 
-                            const eventPoint =
-                                event.targetTouches[0].clientY -
-                                rectCanvas?.top;
+    //                         const eventPoint =
+    //                             event.targetTouches[0].clientY -
+    //                             rectCanvas?.top;
 
-                            const eventPointX =
-                                event.targetTouches[0].clientX -
-                                rectCanvas.left;
+    //                         const eventPointX =
+    //                             event.targetTouches[0].clientX -
+    //                             rectCanvas.left;
 
-                            const mousePlacement =
-                                scaleData?.yScale.invert(eventPoint);
+    //                         const mousePlacement =
+    //                             scaleData?.yScale.invert(eventPoint);
 
-                            const isHoverLiquidity = liqMaxActiveLiq
-                                ? liqMaxActiveLiq - eventPointX > 10
-                                : true;
+    //                         const isHoverLiquidity = liqMaxActiveLiq
+    //                             ? liqMaxActiveLiq - eventPointX > 10
+    //                             : true;
 
-                            const limitLineValue = limit;
+    //                         const limitLineValue = limit;
 
-                            const minRangeValue = ranges.filter(
-                                (target: lineValue) => target.name === 'Min',
-                            )[0].value;
-                            const maxRangeValue = ranges.filter(
-                                (target: lineValue) => target.name === 'Max',
-                            )[0].value;
+    //                         const minRangeValue = ranges.filter(
+    //                             (target: lineValue) => target.name === 'Min',
+    //                         )[0].value;
+    //                         const maxRangeValue = ranges.filter(
+    //                             (target: lineValue) => target.name === 'Max',
+    //                         )[0].value;
 
-                            const isOnLimit =
-                                location.pathname.includes('/limit') &&
-                                mousePlacement < limitLineValue + lineBuffer &&
-                                mousePlacement > limitLineValue - lineBuffer;
+    //                         const isOnLimit =
+    //                             location.pathname.includes('/limit') &&
+    //                             mousePlacement < limitLineValue + lineBuffer &&
+    //                             mousePlacement > limitLineValue - lineBuffer;
 
-                            const isOnRangeMin =
-                                (location.pathname.includes('pool') ||
-                                    location.pathname.includes('reposition')) &&
-                                mousePlacement < minRangeValue + lineBuffer &&
-                                mousePlacement > minRangeValue - lineBuffer;
+    //                         const isOnRangeMin =
+    //                             (location.pathname.includes('pool') ||
+    //                                 location.pathname.includes('reposition')) &&
+    //                             mousePlacement < minRangeValue + lineBuffer &&
+    //                             mousePlacement > minRangeValue - lineBuffer;
 
-                            const isOnRangeMax =
-                                (location.pathname.includes('pool') ||
-                                    location.pathname.includes('reposition')) &&
-                                mousePlacement < maxRangeValue + lineBuffer &&
-                                mousePlacement > maxRangeValue - lineBuffer;
+    //                         const isOnRangeMax =
+    //                             (location.pathname.includes('pool') ||
+    //                                 location.pathname.includes('reposition')) &&
+    //                             mousePlacement < maxRangeValue + lineBuffer &&
+    //                             mousePlacement > maxRangeValue - lineBuffer;
 
-                            return (
-                                !isOnLimit &&
-                                !isOnRangeMin &&
-                                !isOnRangeMax &&
-                                isHoverLiquidity
-                            );
-                        } else {
-                            return !canUserDragRange && !canUserDragLimit;
-                        }
-                    });
+    //                         return (
+    //                             !isOnLimit &&
+    //                             !isOnRangeMin &&
+    //                             !isOnRangeMax &&
+    //                             isHoverLiquidity
+    //                         );
+    //                     } else {
+    //                         return !canUserDragRange && !canUserDragLimit;
+    //                     }
+    //                 });
 
-                setMainZoom(() => zoom);
-            }
-        }
-    }, [
-        firstCandleData,
-        lastCandleData,
-        rescale,
-        location,
-        diffHashSigScaleData(scaleData),
-        showLatest,
-        liquidityData,
-        simpleRangeWidth,
-        ranges,
-        limit,
-        isLineDrag,
-        minTickForLimit,
-        maxTickForLimit,
-        canUserDragRange,
-        canUserDragLimit,
-        unparsedCandleData,
-        period,
-        advancedMode,
-        isChartZoom,
-        liqMaxActiveLiq,
-        zoomBase,
-    ]);
+    //             setMainZoom(() => zoom);
+    //         }
+    //     }
+    // }, [
+    //     firstCandleData,
+    //     lastCandleData,
+    //     rescale,
+    //     location,
+    //     diffHashSigScaleData(scaleData),
+    //     showLatest,
+    //     liquidityData,
+    //     simpleRangeWidth,
+    //     ranges,
+    //     limit,
+    //     isLineDrag,
+    //     minTickForLimit,
+    //     maxTickForLimit,
+    //     canUserDragRange,
+    //     canUserDragLimit,
+    //     unparsedCandleData,
+    //     period,
+    //     advancedMode,
+    //     isChartZoom,
+    //     liqMaxActiveLiq,
+    //     zoomBase,
+    // ]);
 
     useEffect(() => {
         if (!isChartZoom) {
@@ -1909,431 +1918,431 @@ export default function Chart(props: propsIF) {
     }
 
     // dragRange
-    useEffect(() => {
-        if (scaleData) {
-            let newRangeValue: lineValue[];
+    // useEffect(() => {
+    //     if (scaleData) {
+    //         let newRangeValue: lineValue[];
 
-            let lowLineMoved: boolean;
-            let highLineMoved: boolean;
+    //         let lowLineMoved: boolean;
+    //         let highLineMoved: boolean;
 
-            let rangeWidthPercentage: number;
+    //         let rangeWidthPercentage: number;
 
-            let dragSwitched = false;
-            let draggingLine: string | undefined = undefined;
+    //         let dragSwitched = false;
+    //         let draggingLine: string | undefined = undefined;
 
-            let cancelDrag = false;
+    //         let cancelDrag = false;
 
-            // clicking esc while dragging the line sets the line to the last value
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const cancelDragEvent = (event: any) => {
-                if (event.key === 'Escape') {
-                    cancelDrag = true;
-                    event.preventDefault();
-                    event.stopPropagation();
-                    document.removeEventListener('keydown', cancelDragEvent);
-                }
-            };
+    //         // clicking esc while dragging the line sets the line to the last value
+    //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //         const cancelDragEvent = (event: any) => {
+    //             if (event.key === 'Escape') {
+    //                 cancelDrag = true;
+    //                 event.preventDefault();
+    //                 event.stopPropagation();
+    //                 document.removeEventListener('keydown', cancelDragEvent);
+    //             }
+    //         };
 
-            const canvas = d3
-                .select(d3CanvasMain.current)
-                .select('canvas')
-                .node() as HTMLCanvasElement;
+    //         const canvas = d3
+    //             .select(d3CanvasMain.current)
+    //             .select('canvas')
+    //             .node() as HTMLCanvasElement;
 
-            const rectCanvas = canvas.getBoundingClientRect();
+    //         const rectCanvas = canvas.getBoundingClientRect();
 
-            let oldRangeMinValue: number | undefined = undefined;
-            let oldRangeMaxValue: number | undefined = undefined;
-            const dragRange = d3
-                .drag<d3.DraggedElementBaseType, unknown, d3.SubjectPosition>()
-                .filter((event) => filterDragEvent(event, rectCanvas.left))
-                .on('start', (event) => {
-                    setCrosshairActive('none');
-                    document.addEventListener('keydown', cancelDragEvent);
-                    d3.select(d3CanvasMain.current).style('cursor', 'none');
+    //         let oldRangeMinValue: number | undefined = undefined;
+    //         let oldRangeMaxValue: number | undefined = undefined;
+    //         const dragRange = d3
+    //             .drag<d3.DraggedElementBaseType, unknown, d3.SubjectPosition>()
+    //             .filter((event) => filterDragEvent(event, rectCanvas.left))
+    //             .on('start', (event) => {
+    //                 setCrosshairActive('none');
+    //                 document.addEventListener('keydown', cancelDragEvent);
+    //                 d3.select(d3CanvasMain.current).style('cursor', 'none');
 
-                    d3.select('#y-axis-canvas').style('cursor', 'none');
+    //                 d3.select('#y-axis-canvas').style('cursor', 'none');
 
-                    const { offsetY: clientY } = getXandYLocationForChartDrag(
-                        event,
-                        rectCanvas,
-                    );
+    //                 const { offsetY: clientY } = getXandYLocationForChartDrag(
+    //                     event,
+    //                     rectCanvas,
+    //                 );
 
-                    const advancedValue = scaleData?.yScale.invert(clientY);
+    //                 const advancedValue = scaleData?.yScale.invert(clientY);
 
-                    const low = ranges.filter(
-                        (target: lineValue) => target.name === 'Min',
-                    )[0].value;
-                    const high = ranges.filter(
-                        (target: lineValue) => target.name === 'Max',
-                    )[0].value;
+    //                 const low = ranges.filter(
+    //                     (target: lineValue) => target.name === 'Min',
+    //                 )[0].value;
+    //                 const high = ranges.filter(
+    //                     (target: lineValue) => target.name === 'Max',
+    //                 )[0].value;
 
-                    oldRangeMinValue = low;
-                    oldRangeMaxValue = high;
+    //                 oldRangeMinValue = low;
+    //                 oldRangeMaxValue = high;
 
-                    if (draggingLine === undefined) {
-                        draggingLine =
-                            event.subject.name !== undefined
-                                ? event.subject.name
-                                : Math.abs(advancedValue - low) <
-                                    Math.abs(advancedValue - high)
-                                  ? 'Min'
-                                  : 'Max';
-                    }
-                })
-                .on('drag', function (event) {
-                    const { offsetY } = getXandYLocationForChartDrag(
-                        event,
-                        rectCanvas,
-                    );
+    //                 if (draggingLine === undefined) {
+    //                     draggingLine =
+    //                         event.subject.name !== undefined
+    //                             ? event.subject.name
+    //                             : Math.abs(advancedValue - low) <
+    //                                 Math.abs(advancedValue - high)
+    //                               ? 'Min'
+    //                               : 'Max';
+    //                 }
+    //             })
+    //             .on('drag', function (event) {
+    //                 const { offsetY } = getXandYLocationForChartDrag(
+    //                     event,
+    //                     rectCanvas,
+    //                 );
 
-                    if (!cancelDrag && liquidityData) {
-                        setIsLineDrag(true);
-                        setCrosshairActive('none');
+    //                 if (!cancelDrag && liquidityData) {
+    //                     setIsLineDrag(true);
+    //                     setCrosshairActive('none');
 
-                        let draggedValue =
-                            scaleData?.yScale.invert(offsetY) >=
-                            liquidityData?.topBoundary
-                                ? liquidityData?.topBoundary
-                                : scaleData?.yScale.invert(offsetY);
+    //                     let draggedValue =
+    //                         scaleData?.yScale.invert(offsetY) >=
+    //                         liquidityData?.topBoundary
+    //                             ? liquidityData?.topBoundary
+    //                             : scaleData?.yScale.invert(offsetY);
 
-                        draggedValue = draggedValue < 0 ? 0 : draggedValue;
+    //                     draggedValue = draggedValue < 0 ? 0 : draggedValue;
 
-                        const displayValue =
-                            poolPriceDisplay !== undefined
-                                ? poolPriceDisplay
-                                : 0;
+    //                     const displayValue =
+    //                         poolPriceDisplay !== undefined
+    //                             ? poolPriceDisplay
+    //                             : 0;
 
-                        const low = ranges.filter(
-                            (target: lineValue) => target.name === 'Min',
-                        )[0].value;
-                        const high = ranges.filter(
-                            (target: lineValue) => target.name === 'Max',
-                        )[0].value;
+    //                     const low = ranges.filter(
+    //                         (target: lineValue) => target.name === 'Min',
+    //                     )[0].value;
+    //                     const high = ranges.filter(
+    //                         (target: lineValue) => target.name === 'Max',
+    //                     )[0].value;
 
-                        const lineToBeSet =
-                            draggedValue > displayValue ? 'Max' : 'Min';
+    //                     const lineToBeSet =
+    //                         draggedValue > displayValue ? 'Max' : 'Min';
 
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        let pinnedDisplayPrices: any;
+    //                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //                     let pinnedDisplayPrices: any;
 
-                        if (
-                            !advancedMode ||
-                            location.pathname.includes('reposition')
-                        ) {
-                            if (
-                                draggedValue === 0 ||
-                                draggedValue === liquidityData?.topBoundary
-                            ) {
-                                const minValue =
-                                    draggedValue === 0
-                                        ? 0
-                                        : draggedValue <
-                                            liquidityData?.lowBoundary
-                                          ? draggedValue
-                                          : 0;
+    //                     if (
+    //                         !advancedMode ||
+    //                         location.pathname.includes('reposition')
+    //                     ) {
+    //                         if (
+    //                             draggedValue === 0 ||
+    //                             draggedValue === liquidityData?.topBoundary
+    //                         ) {
+    //                             const minValue =
+    //                                 draggedValue === 0
+    //                                     ? 0
+    //                                     : draggedValue <
+    //                                         liquidityData?.lowBoundary
+    //                                       ? draggedValue
+    //                                       : 0;
 
-                                setRanges((prevState) => {
-                                    const newTargets = [...prevState];
+    //                             setRanges((prevState) => {
+    //                                 const newTargets = [...prevState];
 
-                                    newTargets.filter(
-                                        (target: lineValue) =>
-                                            target.name === 'Min',
-                                    )[0].value = minValue;
+    //                                 newTargets.filter(
+    //                                     (target: lineValue) =>
+    //                                         target.name === 'Min',
+    //                                 )[0].value = minValue;
 
-                                    newTargets.filter(
-                                        (target: lineValue) =>
-                                            target.name === 'Max',
-                                    )[0].value = liquidityData?.topBoundary;
+    //                                 newTargets.filter(
+    //                                     (target: lineValue) =>
+    //                                         target.name === 'Max',
+    //                                 )[0].value = liquidityData?.topBoundary;
 
-                                    newRangeValue = newTargets;
+    //                                 newRangeValue = newTargets;
 
-                                    return newTargets;
-                                });
-                            } else {
-                                if (lineToBeSet === 'Max') {
-                                    const pinnedTick =
-                                        getPinnedTickFromDisplayPrice(
-                                            isDenomBase,
-                                            baseTokenDecimals,
-                                            quoteTokenDecimals,
-                                            false, // isMinPrice
-                                            draggedValue.toString(),
-                                            lookupChain(chainId).gridSize,
-                                        );
+    //                                 return newTargets;
+    //                             });
+    //                         } else {
+    //                             if (lineToBeSet === 'Max') {
+    //                                 const pinnedTick =
+    //                                     getPinnedTickFromDisplayPrice(
+    //                                         isDenomBase,
+    //                                         baseTokenDecimals,
+    //                                         quoteTokenDecimals,
+    //                                         false, // isMinPrice
+    //                                         draggedValue.toString(),
+    //                                         lookupChain(chainId).gridSize,
+    //                                     );
 
-                                    rangeWidthPercentage = roundToNearestPreset(
-                                        Math.abs(
-                                            pinnedTick - currentPoolPriceTick,
-                                        ) / 100,
-                                    );
+    //                                 rangeWidthPercentage = roundToNearestPreset(
+    //                                     Math.abs(
+    //                                         pinnedTick - currentPoolPriceTick,
+    //                                     ) / 100,
+    //                                 );
 
-                                    const offset = rangeWidthPercentage * 100;
+    //                                 const offset = rangeWidthPercentage * 100;
 
-                                    const lowTick =
-                                        currentPoolPriceTick - offset;
-                                    const highTick =
-                                        currentPoolPriceTick + offset;
+    //                                 const lowTick =
+    //                                     currentPoolPriceTick - offset;
+    //                                 const highTick =
+    //                                     currentPoolPriceTick + offset;
 
-                                    pinnedDisplayPrices =
-                                        getPinnedPriceValuesFromTicks(
-                                            denomInBase,
-                                            baseTokenDecimals,
-                                            quoteTokenDecimals,
-                                            lowTick,
-                                            highTick,
-                                            lookupChain(chainId).gridSize,
-                                        );
-                                } else {
-                                    const pinnedTick =
-                                        getPinnedTickFromDisplayPrice(
-                                            isDenomBase,
-                                            baseTokenDecimals,
-                                            quoteTokenDecimals,
-                                            true, // isMinPrice
-                                            draggedValue.toString(),
-                                            lookupChain(chainId).gridSize,
-                                        );
+    //                                 pinnedDisplayPrices =
+    //                                     getPinnedPriceValuesFromTicks(
+    //                                         denomInBase,
+    //                                         baseTokenDecimals,
+    //                                         quoteTokenDecimals,
+    //                                         lowTick,
+    //                                         highTick,
+    //                                         lookupChain(chainId).gridSize,
+    //                                     );
+    //                             } else {
+    //                                 const pinnedTick =
+    //                                     getPinnedTickFromDisplayPrice(
+    //                                         isDenomBase,
+    //                                         baseTokenDecimals,
+    //                                         quoteTokenDecimals,
+    //                                         true, // isMinPrice
+    //                                         draggedValue.toString(),
+    //                                         lookupChain(chainId).gridSize,
+    //                                     );
 
-                                    rangeWidthPercentage = roundToNearestPreset(
-                                        Math.abs(
-                                            currentPoolPriceTick - pinnedTick,
-                                        ) / 100,
-                                    );
+    //                                 rangeWidthPercentage = roundToNearestPreset(
+    //                                     Math.abs(
+    //                                         currentPoolPriceTick - pinnedTick,
+    //                                     ) / 100,
+    //                                 );
 
-                                    const offset = rangeWidthPercentage * 100;
+    //                                 const offset = rangeWidthPercentage * 100;
 
-                                    const lowTick =
-                                        currentPoolPriceTick - offset;
-                                    const highTick =
-                                        currentPoolPriceTick + offset;
+    //                                 const lowTick =
+    //                                     currentPoolPriceTick - offset;
+    //                                 const highTick =
+    //                                     currentPoolPriceTick + offset;
 
-                                    pinnedDisplayPrices =
-                                        getPinnedPriceValuesFromTicks(
-                                            denomInBase,
-                                            baseTokenDecimals,
-                                            quoteTokenDecimals,
-                                            lowTick,
-                                            highTick,
-                                            lookupChain(chainId).gridSize,
-                                        );
-                                }
+    //                                 pinnedDisplayPrices =
+    //                                     getPinnedPriceValuesFromTicks(
+    //                                         denomInBase,
+    //                                         baseTokenDecimals,
+    //                                         quoteTokenDecimals,
+    //                                         lowTick,
+    //                                         highTick,
+    //                                         lookupChain(chainId).gridSize,
+    //                                     );
+    //                             }
 
-                                if (pinnedDisplayPrices !== undefined) {
-                                    setRanges((prevState) => {
-                                        const newTargets = [...prevState];
+    //                             if (pinnedDisplayPrices !== undefined) {
+    //                                 setRanges((prevState) => {
+    //                                     const newTargets = [...prevState];
 
-                                        newTargets.filter(
-                                            (target: lineValue) =>
-                                                target.name === 'Min',
-                                        )[0].value = Number(
-                                            pinnedDisplayPrices.pinnedMinPriceDisplayTruncated,
-                                        );
-                                        newTargets.filter(
-                                            (target: lineValue) =>
-                                                target.name === 'Max',
-                                        )[0].value = Number(
-                                            pinnedDisplayPrices.pinnedMaxPriceDisplayTruncated,
-                                        );
+    //                                     newTargets.filter(
+    //                                         (target: lineValue) =>
+    //                                             target.name === 'Min',
+    //                                     )[0].value = Number(
+    //                                         pinnedDisplayPrices.pinnedMinPriceDisplayTruncated,
+    //                                     );
+    //                                     newTargets.filter(
+    //                                         (target: lineValue) =>
+    //                                             target.name === 'Max',
+    //                                     )[0].value = Number(
+    //                                         pinnedDisplayPrices.pinnedMaxPriceDisplayTruncated,
+    //                                     );
 
-                                        newRangeValue = newTargets;
-                                        return newTargets;
-                                    });
-                                }
-                            }
-                        } else {
-                            const advancedValue =
-                                scaleData?.yScale.invert(offsetY);
-                            highLineMoved = draggingLine === 'Max';
-                            lowLineMoved = draggingLine === 'Min';
+    //                                     newRangeValue = newTargets;
+    //                                     return newTargets;
+    //                                 });
+    //                             }
+    //                         }
+    //                     } else {
+    //                         const advancedValue =
+    //                             scaleData?.yScale.invert(offsetY);
+    //                         highLineMoved = draggingLine === 'Max';
+    //                         lowLineMoved = draggingLine === 'Min';
 
-                            let pinnedMaxPriceDisplayTruncated = high;
-                            let pinnedMinPriceDisplayTruncated = low;
+    //                         let pinnedMaxPriceDisplayTruncated = high;
+    //                         let pinnedMinPriceDisplayTruncated = low;
 
-                            if (advancedValue >= 0) {
-                                if (draggingLine === 'Max') {
-                                    if (advancedValue < low) {
-                                        pinnedDisplayPrices =
-                                            getPinnedPriceValuesFromDisplayPrices(
-                                                denomInBase,
-                                                baseTokenDecimals,
-                                                quoteTokenDecimals,
-                                                high.toString(),
-                                                advancedValue.toString(),
-                                                lookupChain(chainId).gridSize,
-                                            );
-                                    } else {
-                                        pinnedDisplayPrices =
-                                            getPinnedPriceValuesFromDisplayPrices(
-                                                denomInBase,
-                                                baseTokenDecimals,
-                                                quoteTokenDecimals,
-                                                low.toString(),
-                                                advancedValue.toString(),
-                                                lookupChain(chainId).gridSize,
-                                            );
-                                    }
-                                } else {
-                                    pinnedDisplayPrices =
-                                        getPinnedPriceValuesFromDisplayPrices(
-                                            denomInBase,
-                                            baseTokenDecimals,
-                                            quoteTokenDecimals,
-                                            advancedValue.toString(),
-                                            high.toString(),
-                                            lookupChain(chainId).gridSize,
-                                        );
-                                }
+    //                         if (advancedValue >= 0) {
+    //                             if (draggingLine === 'Max') {
+    //                                 if (advancedValue < low) {
+    //                                     pinnedDisplayPrices =
+    //                                         getPinnedPriceValuesFromDisplayPrices(
+    //                                             denomInBase,
+    //                                             baseTokenDecimals,
+    //                                             quoteTokenDecimals,
+    //                                             high.toString(),
+    //                                             advancedValue.toString(),
+    //                                             lookupChain(chainId).gridSize,
+    //                                         );
+    //                                 } else {
+    //                                     pinnedDisplayPrices =
+    //                                         getPinnedPriceValuesFromDisplayPrices(
+    //                                             denomInBase,
+    //                                             baseTokenDecimals,
+    //                                             quoteTokenDecimals,
+    //                                             low.toString(),
+    //                                             advancedValue.toString(),
+    //                                             lookupChain(chainId).gridSize,
+    //                                         );
+    //                                 }
+    //                             } else {
+    //                                 pinnedDisplayPrices =
+    //                                     getPinnedPriceValuesFromDisplayPrices(
+    //                                         denomInBase,
+    //                                         baseTokenDecimals,
+    //                                         quoteTokenDecimals,
+    //                                         advancedValue.toString(),
+    //                                         high.toString(),
+    //                                         lookupChain(chainId).gridSize,
+    //                                     );
+    //                             }
 
-                                pinnedMaxPriceDisplayTruncated = Number(
-                                    pinnedDisplayPrices.pinnedMaxPriceDisplay,
-                                );
-                                pinnedMinPriceDisplayTruncated = Number(
-                                    pinnedDisplayPrices.pinnedMinPriceDisplay,
-                                );
-                            }
-                            // to:do fix when advanced is fixed AdvancedPepe
-                            setRanges((prevState) => {
-                                const newTargets = [...prevState];
-                                if (draggingLine === 'Max') {
-                                    if (
-                                        dragSwitched ||
-                                        pinnedMaxPriceDisplayTruncated <
-                                            pinnedMinPriceDisplayTruncated
-                                    ) {
-                                        newTargets.filter(
-                                            (target: lineValue) =>
-                                                target.name === 'Min',
-                                        )[0].value =
-                                            pinnedMaxPriceDisplayTruncated;
+    //                             pinnedMaxPriceDisplayTruncated = Number(
+    //                                 pinnedDisplayPrices.pinnedMaxPriceDisplay,
+    //                             );
+    //                             pinnedMinPriceDisplayTruncated = Number(
+    //                                 pinnedDisplayPrices.pinnedMinPriceDisplay,
+    //                             );
+    //                         }
+    //                         // to:do fix when advanced is fixed AdvancedPepe
+    //                         setRanges((prevState) => {
+    //                             const newTargets = [...prevState];
+    //                             if (draggingLine === 'Max') {
+    //                                 if (
+    //                                     dragSwitched ||
+    //                                     pinnedMaxPriceDisplayTruncated <
+    //                                         pinnedMinPriceDisplayTruncated
+    //                                 ) {
+    //                                     newTargets.filter(
+    //                                         (target: lineValue) =>
+    //                                             target.name === 'Min',
+    //                                     )[0].value =
+    //                                         pinnedMaxPriceDisplayTruncated;
 
-                                        dragSwitched = true;
-                                        highLineMoved = false;
-                                        lowLineMoved = true;
-                                    } else {
-                                        newTargets.filter(
-                                            (target: lineValue) =>
-                                                target.name === 'Max',
-                                        )[0].value =
-                                            pinnedMaxPriceDisplayTruncated;
-                                    }
-                                } else {
-                                    if (
-                                        dragSwitched ||
-                                        pinnedMinPriceDisplayTruncated >
-                                            pinnedMaxPriceDisplayTruncated
-                                    ) {
-                                        newTargets.filter(
-                                            (target: lineValue) =>
-                                                target.name === 'Max',
-                                        )[0].value =
-                                            pinnedMinPriceDisplayTruncated;
+    //                                     dragSwitched = true;
+    //                                     highLineMoved = false;
+    //                                     lowLineMoved = true;
+    //                                 } else {
+    //                                     newTargets.filter(
+    //                                         (target: lineValue) =>
+    //                                             target.name === 'Max',
+    //                                     )[0].value =
+    //                                         pinnedMaxPriceDisplayTruncated;
+    //                                 }
+    //                             } else {
+    //                                 if (
+    //                                     dragSwitched ||
+    //                                     pinnedMinPriceDisplayTruncated >
+    //                                         pinnedMaxPriceDisplayTruncated
+    //                                 ) {
+    //                                     newTargets.filter(
+    //                                         (target: lineValue) =>
+    //                                             target.name === 'Max',
+    //                                     )[0].value =
+    //                                         pinnedMinPriceDisplayTruncated;
 
-                                        dragSwitched = true;
-                                        highLineMoved = true;
-                                        lowLineMoved = false;
-                                    } else {
-                                        newTargets.filter(
-                                            (target: lineValue) =>
-                                                target.name === 'Min',
-                                        )[0].value =
-                                            pinnedMinPriceDisplayTruncated;
-                                    }
-                                }
+    //                                     dragSwitched = true;
+    //                                     highLineMoved = true;
+    //                                     lowLineMoved = false;
+    //                                 } else {
+    //                                     newTargets.filter(
+    //                                         (target: lineValue) =>
+    //                                             target.name === 'Min',
+    //                                     )[0].value =
+    //                                         pinnedMinPriceDisplayTruncated;
+    //                                 }
+    //                             }
 
-                                newRangeValue = newTargets;
+    //                             newRangeValue = newTargets;
 
-                                return newTargets;
-                            });
-                        }
-                    } else {
-                        if (
-                            oldRangeMinValue !== undefined &&
-                            oldRangeMaxValue !== undefined
-                        ) {
-                            setRanges([
-                                {
-                                    name: 'Min',
-                                    value: oldRangeMinValue,
-                                },
-                                {
-                                    name: 'Max',
-                                    value: oldRangeMaxValue,
-                                },
-                            ]);
-                        }
-                    }
-                })
-                .on('end', () => {
-                    setIsLineDrag(false);
+    //                             return newTargets;
+    //                         });
+    //                     }
+    //                 } else {
+    //                     if (
+    //                         oldRangeMinValue !== undefined &&
+    //                         oldRangeMaxValue !== undefined
+    //                     ) {
+    //                         setRanges([
+    //                             {
+    //                                 name: 'Min',
+    //                                 value: oldRangeMinValue,
+    //                             },
+    //                             {
+    //                                 name: 'Max',
+    //                                 value: oldRangeMaxValue,
+    //                             },
+    //                         ]);
+    //                     }
+    //                 }
+    //             })
+    //             .on('end', () => {
+    //                 setIsLineDrag(false);
 
-                    if (!cancelDrag) {
-                        if (
-                            (!advancedMode ||
-                                location.pathname.includes('reposition')) &&
-                            rangeWidthPercentage
-                        ) {
-                            setSimpleRangeWidth(rangeWidthPercentage);
-                        }
+    //                 if (!cancelDrag) {
+    //                     if (
+    //                         (!advancedMode ||
+    //                             location.pathname.includes('reposition')) &&
+    //                         rangeWidthPercentage
+    //                     ) {
+    //                         setSimpleRangeWidth(rangeWidthPercentage);
+    //                     }
 
-                        onBlurRange(
-                            newRangeValue,
-                            highLineMoved,
-                            lowLineMoved,
-                            dragSwitched,
-                        );
-                        dragSwitched = false;
-                    } else {
-                        if (
-                            oldRangeMinValue !== undefined &&
-                            oldRangeMaxValue !== undefined
-                        ) {
-                            setRanges([
-                                {
-                                    name: 'Min',
-                                    value: oldRangeMinValue,
-                                },
-                                {
-                                    name: 'Max',
-                                    value: oldRangeMaxValue,
-                                },
-                            ]);
-                        }
-                    }
-                    d3.select(d3CanvasMain.current).style('cursor', 'default');
+    //                     onBlurRange(
+    //                         newRangeValue,
+    //                         highLineMoved,
+    //                         lowLineMoved,
+    //                         dragSwitched,
+    //                     );
+    //                     dragSwitched = false;
+    //                 } else {
+    //                     if (
+    //                         oldRangeMinValue !== undefined &&
+    //                         oldRangeMaxValue !== undefined
+    //                     ) {
+    //                         setRanges([
+    //                             {
+    //                                 name: 'Min',
+    //                                 value: oldRangeMinValue,
+    //                             },
+    //                             {
+    //                                 name: 'Max',
+    //                                 value: oldRangeMaxValue,
+    //                             },
+    //                         ]);
+    //                     }
+    //                 }
+    //                 d3.select(d3CanvasMain.current).style('cursor', 'default');
 
-                    d3.select('#y-axis-canvas').style('cursor', 'default');
+    //                 d3.select('#y-axis-canvas').style('cursor', 'default');
 
-                    setCrosshairActive('none');
-                });
+    //                 setCrosshairActive('none');
+    //             });
 
-            setDragRange(() => {
-                return dragRange;
-            });
-        }
-    }, [
-        poolPriceDisplay,
-        location,
-        advancedMode,
-        ranges,
-        limit,
-        minPrice,
-        maxPrice,
-        minTickForLimit,
-        maxTickForLimit,
-        simpleRangeWidth,
-        liquidityData?.topBoundary,
-        liquidityData?.lowBoundary,
-        scaleData,
-        isDenomBase,
-        baseTokenDecimals,
-        quoteTokenDecimals,
-        currentPoolPriceTick,
-        denomInBase,
-        isTokenABase,
-        chainData.gridSize,
-        rescale,
-        liqMaxActiveLiq,
-    ]);
+    //         setDragRange(() => {
+    //             return dragRange;
+    //         });
+    //     }
+    // }, [
+    //     poolPriceDisplay,
+    //     location,
+    //     advancedMode,
+    //     ranges,
+    //     limit,
+    //     minPrice,
+    //     maxPrice,
+    //     minTickForLimit,
+    //     maxTickForLimit,
+    //     simpleRangeWidth,
+    //     liquidityData?.topBoundary,
+    //     liquidityData?.lowBoundary,
+    //     scaleData,
+    //     isDenomBase,
+    //     baseTokenDecimals,
+    //     quoteTokenDecimals,
+    //     currentPoolPriceTick,
+    //     denomInBase,
+    //     isTokenABase,
+    //     chainData.gridSize,
+    //     rescale,
+    //     liqMaxActiveLiq,
+    // ]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function filterDragEvent(event: any, leftPositin: number) {
@@ -2352,191 +2361,191 @@ export default function Chart(props: propsIF) {
         return true;
     }
     // dragLimit
-    useEffect(() => {
-        const canvas = d3
-            .select(d3CanvasMain.current)
-            .select('canvas')
-            .node() as HTMLCanvasElement;
-        const rectCanvas = canvas.getBoundingClientRect();
-        let offsetY = 0;
-        let movemementY = 0;
-        let newLimitValue: number | undefined;
-        let tempNewLimitValue: number | undefined;
+    // useEffect(() => {
+    //     const canvas = d3
+    //         .select(d3CanvasMain.current)
+    //         .select('canvas')
+    //         .node() as HTMLCanvasElement;
+    //     const rectCanvas = canvas.getBoundingClientRect();
+    //     let offsetY = 0;
+    //     let movemementY = 0;
+    //     let newLimitValue: number | undefined;
+    //     let tempNewLimitValue: number | undefined;
 
-        let tempMovemementY = 0;
-        let cancelDrag = false;
-        let oldLimitValue: number | undefined = undefined;
-        // clicking esc while dragging the line sets the line to the last value
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const cancelDragEvent = (event: any) => {
-            if (event.key === 'Escape') {
-                cancelDrag = true;
-                event.preventDefault();
-                event.stopPropagation();
-                document.removeEventListener('keydown', cancelDragEvent);
-            }
-        };
-        const dragLimit = d3
-            .drag<d3.DraggedElementBaseType, unknown, d3.SubjectPosition>()
-            .filter((event) => filterDragEvent(event, rectCanvas.left))
-            .on('start', (event) => {
-                // When the drag starts:
-                // hide the cursor
-                d3.select(d3CanvasMain.current).style('cursor', 'none');
-                // hide the cursor over the y-axis canvas.
-                d3.select('#y-axis-canvas').style('cursor', 'none');
+    //     let tempMovemementY = 0;
+    //     let cancelDrag = false;
+    //     let oldLimitValue: number | undefined = undefined;
+    //     // clicking esc while dragging the line sets the line to the last value
+    //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //     const cancelDragEvent = (event: any) => {
+    //         if (event.key === 'Escape') {
+    //             cancelDrag = true;
+    //             event.preventDefault();
+    //             event.stopPropagation();
+    //             document.removeEventListener('keydown', cancelDragEvent);
+    //         }
+    //     };
+    //     const dragLimit = d3
+    //         .drag<d3.DraggedElementBaseType, unknown, d3.SubjectPosition>()
+    //         .filter((event) => filterDragEvent(event, rectCanvas.left))
+    //         .on('start', (event) => {
+    //             // When the drag starts:
+    //             // hide the cursor
+    //             d3.select(d3CanvasMain.current).style('cursor', 'none');
+    //             // hide the cursor over the y-axis canvas.
+    //             d3.select('#y-axis-canvas').style('cursor', 'none');
 
-                // add a keydown event listener to cancel the drag.
-                document.addEventListener('keydown', cancelDragEvent);
+    //             // add a keydown event listener to cancel the drag.
+    //             document.addEventListener('keydown', cancelDragEvent);
 
-                // Store the initial value of the limit for potential cancellation.
-                oldLimitValue = limit;
-                newLimitValue = limit;
-                tempNewLimitValue = limit;
-                if (
-                    typeof TouchEvent !== 'undefined' &&
-                    event.sourceEvent instanceof TouchEvent
-                ) {
-                    tempMovemementY =
-                        event.sourceEvent.touches[0].clientY - rectCanvas?.top;
-                }
-            })
-            .on('drag', function (event) {
-                (async () => {
-                    // Indicate that line is dragging
-                    setIsLineDrag(true);
-                    if (
-                        typeof TouchEvent !== 'undefined' &&
-                        event.sourceEvent instanceof TouchEvent
-                    ) {
-                        offsetY =
-                            event.sourceEvent.touches[0].clientY -
-                            rectCanvas?.top;
+    //             // Store the initial value of the limit for potential cancellation.
+    //             oldLimitValue = limit;
+    //             newLimitValue = limit;
+    //             tempNewLimitValue = limit;
+    //             if (
+    //                 typeof TouchEvent !== 'undefined' &&
+    //                 event.sourceEvent instanceof TouchEvent
+    //             ) {
+    //                 tempMovemementY =
+    //                     event.sourceEvent.touches[0].clientY - rectCanvas?.top;
+    //             }
+    //         })
+    //         .on('drag', function (event) {
+    //             (async () => {
+    //                 // Indicate that line is dragging
+    //                 setIsLineDrag(true);
+    //                 if (
+    //                     typeof TouchEvent !== 'undefined' &&
+    //                     event.sourceEvent instanceof TouchEvent
+    //                 ) {
+    //                     offsetY =
+    //                         event.sourceEvent.touches[0].clientY -
+    //                         rectCanvas?.top;
 
-                        movemementY = offsetY - tempMovemementY;
-                    } else {
-                        offsetY = event.sourceEvent.clientY - rectCanvas?.top;
+    //                     movemementY = offsetY - tempMovemementY;
+    //                 } else {
+    //                     offsetY = event.sourceEvent.clientY - rectCanvas?.top;
 
-                        movemementY = event.sourceEvent.movementY;
-                    }
-                    if (!cancelDrag) {
-                        // to hide the crosshair when dragging the line set the crosshairActive to 'none'.
-                        setCrosshairActive('none');
+    //                     movemementY = event.sourceEvent.movementY;
+    //                 }
+    //                 if (!cancelDrag) {
+    //                     // to hide the crosshair when dragging the line set the crosshairActive to 'none'.
+    //                     setCrosshairActive('none');
 
-                        // // Calculate the new limit value based on the Y-coordinate.
-                        if (tempNewLimitValue !== undefined) {
-                            tempNewLimitValue = scaleData?.yScale.invert(
-                                scaleData?.yScale(tempNewLimitValue) +
-                                    movemementY,
-                            );
+    //                     // // Calculate the new limit value based on the Y-coordinate.
+    //                     if (tempNewLimitValue !== undefined) {
+    //                         tempNewLimitValue = scaleData?.yScale.invert(
+    //                             scaleData?.yScale(tempNewLimitValue) +
+    //                                 movemementY,
+    //                         );
 
-                            // Perform calculations based on the new limit value
-                            if (tempNewLimitValue) {
-                                newLimitValue =
-                                    calculateLimit(tempNewLimitValue);
-                            }
-                        }
-                    } else {
-                        // If the drag is canceled, restore the previous limit value.
-                        if (oldLimitValue !== undefined) {
-                            setLimit(() => {
-                                return oldLimitValue as number;
-                            });
-                        }
-                    }
-                })().then(() => {
-                    if (
-                        typeof TouchEvent !== 'undefined' &&
-                        event.sourceEvent instanceof TouchEvent
-                    ) {
-                        tempMovemementY =
-                            event.sourceEvent.touches[0].clientY -
-                            rectCanvas?.top;
-                    }
-                });
-            })
-            .on('end', () => {
-                tempMovemementY = 0;
-                setIsLineDrag(false);
-                // If the drag is not canceled
-                if (!cancelDrag) {
-                    // Change the cursor to 'row-resize'
-                    d3.select(d3Container.current).style(
-                        'cursor',
-                        'row-resize',
-                    );
-                    if (
-                        oldLimitValue !== undefined &&
-                        newLimitValue !== undefined
-                    ) {
-                        onBlurLimitRate(oldLimitValue, newLimitValue);
-                    }
-                } else {
-                    if (oldLimitValue !== undefined) {
-                        setLimit(() => {
-                            return oldLimitValue as number;
-                        });
-                    }
-                }
+    //                         // Perform calculations based on the new limit value
+    //                         if (tempNewLimitValue) {
+    //                             newLimitValue =
+    //                                 calculateLimit(tempNewLimitValue);
+    //                         }
+    //                     }
+    //                 } else {
+    //                     // If the drag is canceled, restore the previous limit value.
+    //                     if (oldLimitValue !== undefined) {
+    //                         setLimit(() => {
+    //                             return oldLimitValue as number;
+    //                         });
+    //                     }
+    //                 }
+    //             })().then(() => {
+    //                 if (
+    //                     typeof TouchEvent !== 'undefined' &&
+    //                     event.sourceEvent instanceof TouchEvent
+    //                 ) {
+    //                     tempMovemementY =
+    //                         event.sourceEvent.touches[0].clientY -
+    //                         rectCanvas?.top;
+    //                 }
+    //             });
+    //         })
+    //         .on('end', () => {
+    //             tempMovemementY = 0;
+    //             setIsLineDrag(false);
+    //             // If the drag is not canceled
+    //             if (!cancelDrag) {
+    //                 // Change the cursor to 'row-resize'
+    //                 d3.select(d3Container.current).style(
+    //                     'cursor',
+    //                     'row-resize',
+    //                 );
+    //                 if (
+    //                     oldLimitValue !== undefined &&
+    //                     newLimitValue !== undefined
+    //                 ) {
+    //                     onBlurLimitRate(oldLimitValue, newLimitValue);
+    //                 }
+    //             } else {
+    //                 if (oldLimitValue !== undefined) {
+    //                     setLimit(() => {
+    //                         return oldLimitValue as number;
+    //                     });
+    //                 }
+    //             }
 
-                // Restore default cursor styles
-                d3.select(d3CanvasMain.current).style('cursor', 'default');
-                d3.select('#y-axis-canvas').style('cursor', 'default');
-                setIsLineDrag(false);
-            });
+    //             // Restore default cursor styles
+    //             d3.select(d3CanvasMain.current).style('cursor', 'default');
+    //             d3.select('#y-axis-canvas').style('cursor', 'default');
+    //             setIsLineDrag(false);
+    //         });
 
-        setDragLimit(() => {
-            return dragLimit;
-        });
-    }, [
-        poolPriceDisplay,
-        location,
-        advancedMode,
-        limit,
-        minPrice,
-        maxPrice,
-        minTickForLimit,
-        maxTickForLimit,
-        scaleData,
-        isDenomBase,
-        baseTokenDecimals,
-        quoteTokenDecimals,
-        currentPoolPriceTick,
-        denomInBase,
-        isTokenABase,
-        chainData.gridSize,
-        rescale,
-        liqMaxActiveLiq,
-    ]);
+    //     setDragLimit(() => {
+    //         return dragLimit;
+    //     });
+    // }, [
+    //     poolPriceDisplay,
+    //     location,
+    //     advancedMode,
+    //     limit,
+    //     minPrice,
+    //     maxPrice,
+    //     minTickForLimit,
+    //     maxTickForLimit,
+    //     scaleData,
+    //     isDenomBase,
+    //     baseTokenDecimals,
+    //     quoteTokenDecimals,
+    //     currentPoolPriceTick,
+    //     denomInBase,
+    //     isTokenABase,
+    //     chainData.gridSize,
+    //     rescale,
+    //     liqMaxActiveLiq,
+    // ]);
 
-    useEffect(() => {
-        if (mainZoom && d3CanvasMain.current) {
-            d3.select<Element, unknown>(d3CanvasMain.current)
-                .call(mainZoom)
-                .on('wheel.zoom', null);
-            if (location.pathname.includes('market')) {
-                d3.select(d3CanvasMain.current).on('.drag', null);
-            }
-            if (
-                location.pathname.includes('pool') ||
-                location.pathname.includes('reposition')
-            ) {
-                if (dragRange && !isLineDrag) {
-                    d3.select<d3.DraggedElementBaseType, unknown>(
-                        d3CanvasMain.current,
-                    ).call(dragRange);
-                }
-            }
-            if (location.pathname.includes('/limit')) {
-                if (dragLimit && !isLineDrag) {
-                    d3.select<d3.DraggedElementBaseType, unknown>(
-                        d3CanvasMain.current,
-                    ).call(dragLimit);
-                }
-            }
-            renderCanvasArray([d3CanvasMain]);
-        }
-    }, [location.pathname, mainZoom, dragLimit, dragRange, isLineDrag]);
+    // useEffect(() => {
+    //     if (mainZoom && d3CanvasMain.current) {
+    //         d3.select<Element, unknown>(d3CanvasMain.current)
+    //             .call(mainZoom)
+    //             .on('wheel.zoom', null);
+    //         if (location.pathname.includes('market')) {
+    //             d3.select(d3CanvasMain.current).on('.drag', null);
+    //         }
+    //         if (
+    //             location.pathname.includes('pool') ||
+    //             location.pathname.includes('reposition')
+    //         ) {
+    //             if (dragRange && !isLineDrag) {
+    //                 d3.select<d3.DraggedElementBaseType, unknown>(
+    //                     d3CanvasMain.current,
+    //                 ).call(dragRange);
+    //             }
+    //         }
+    //         if (location.pathname.includes('/limit')) {
+    //             if (dragLimit && !isLineDrag) {
+    //                 d3.select<d3.DraggedElementBaseType, unknown>(
+    //                     d3CanvasMain.current,
+    //                 ).call(dragLimit);
+    //             }
+    //         }
+    //         renderCanvasArray([d3CanvasMain]);
+    //     }
+    // }, [location.pathname, mainZoom, dragLimit, dragRange, isLineDrag]);
 
     // create market line and liquidity tooltip
     useEffect(() => {
@@ -3022,29 +3031,29 @@ export default function Chart(props: propsIF) {
         }
     }, [scaleData]);
 
-    useEffect(() => {
-        if (d3CanvasMain) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const canvasDiv = d3.select(d3CanvasMain.current) as any;
+    // useEffect(() => {
+    //     if (d3CanvasMain) {
+    //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //         const canvasDiv = d3.select(d3CanvasMain.current) as any;
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const resizeObserver = new ResizeObserver((result: any) => {
-                const canvas = canvasDiv
-                    .select('canvas')
-                    .node() as HTMLCanvasElement;
-                setMainCanvasBoundingClientRect(canvas.getBoundingClientRect());
+    //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //         const resizeObserver = new ResizeObserver((result: any) => {
+    //             const canvas = canvasDiv
+    //                 .select('canvas')
+    //                 .node() as HTMLCanvasElement;
+    //             setMainCanvasBoundingClientRect(canvas.getBoundingClientRect());
 
-                const height = result[0].contentRect.height;
+    //             const height = result[0].contentRect.height;
 
-                setChartHeights(height);
-                render();
-            });
+    //             setChartHeights(height);
+    //             render();
+    //         });
 
-            resizeObserver.observe(canvasDiv.node());
+    //         resizeObserver.observe(canvasDiv.node());
 
-            return () => resizeObserver.unobserve(canvasDiv.node());
-        }
-    }, [handleDocumentEvent]);
+    //         return () => resizeObserver.unobserve(canvasDiv.node());
+    //     }
+    // }, [handleDocumentEvent]);
 
     useEffect(() => {
         if (d3Container) {
@@ -3114,992 +3123,992 @@ export default function Chart(props: propsIF) {
         true,
     );
 
-    useEffect(() => {
-        const canvas = d3
-            .select(d3CanvasMain.current)
-            .select('canvas')
-            .node() as HTMLCanvasElement;
-        const ctx = canvas.getContext('2d');
-
-        const canvasSize = canvas.getBoundingClientRect();
-
-        if (scaleData && lineSeries) {
-            const rayLine = createAnnotationLineSeries(
-                scaleData?.xScale.copy(),
-                scaleData?.yScale,
-                denomInBase,
-            );
-
-            const bandArea = createBandArea(
-                scaleData?.xScale.copy(),
-                scaleData?.yScale,
-                denomInBase,
-            );
-
-            d3.select(d3CanvasMain.current)
-                .on('draw', () => {
-                    setCanvasResolution(canvas);
-
-                    drawnShapeHistory?.forEach((item) => {
-                        if (item.pool) {
-                            const isShapeInCurrentPool =
-                                currentPool.tokenA.address ===
-                                    (isTokenABase === item.pool.isTokenABase
-                                        ? item.pool.tokenA
-                                        : item.pool.tokenB) &&
-                                currentPool.tokenB.address ===
-                                    (isTokenABase === item.pool.isTokenABase
-                                        ? item.pool.tokenB
-                                        : item.pool.tokenA);
-
-                            if (isShapeInCurrentPool) {
-                                if (
-                                    item.type === 'Brush' ||
-                                    item.type === 'Angle'
-                                ) {
-                                    if (ctx) ctx.setLineDash(item.line.dash);
-                                    lineSeries.decorate(
-                                        (context: CanvasRenderingContext2D) => {
-                                            context.strokeStyle =
-                                                item.line.color;
-                                            context.lineWidth =
-                                                item.line.lineWidth;
-                                        },
-                                    );
-
-                                    lineSeries(item?.data);
-                                }
-
-                                if (
-                                    item.type === 'Rect' ||
-                                    item.type === 'DPRange'
-                                ) {
-                                    const range = [
-                                        scaleData?.xScale(item.data[0].x),
-                                        scaleData?.xScale(item.data[1].x),
-                                    ];
-
-                                    bandArea.xScale().range(range);
-
-                                    if (item.background.active) {
-                                        const checkDenom =
-                                            item.data[0].denomInBase ===
-                                            denomInBase;
-                                        const bandData = {
-                                            fromValue: checkDenom
-                                                ? item.data[0].y
-                                                : 1 / item.data[0].y,
-                                            toValue: checkDenom
-                                                ? item.data[1].y
-                                                : 1 / item.data[1].y,
-                                            denomInBase: denomInBase,
-                                        } as bandLineData;
-
-                                        if (item.background) {
-                                            bandArea.decorate(
-                                                (
-                                                    context: CanvasRenderingContext2D,
-                                                ) => {
-                                                    context.fillStyle =
-                                                        item.background.color;
-                                                },
-                                            );
-                                        }
-
-                                        bandArea([bandData]);
-                                    }
-
-                                    if (item.border.active) {
-                                        const lineOfBand =
-                                            createPointsOfBandLine(item.data);
-
-                                        lineOfBand?.forEach((line) => {
-                                            if (ctx)
-                                                ctx.setLineDash(
-                                                    item.border.dash,
-                                                );
-                                            lineSeries.decorate(
-                                                (
-                                                    context: CanvasRenderingContext2D,
-                                                ) => {
-                                                    context.strokeStyle =
-                                                        item.border.color;
-                                                    context.lineWidth =
-                                                        item.border.lineWidth;
-                                                },
-                                            );
-                                            lineSeries(line);
-
-                                            if (item.type === 'Rect')
-                                                if (
-                                                    (hoveredDrawnShape &&
-                                                        hoveredDrawnShape.data
-                                                            .time ===
-                                                            item.time) ||
-                                                    (selectedDrawnShape &&
-                                                        selectedDrawnShape.data
-                                                            .time === item.time)
-                                                ) {
-                                                    line.forEach(
-                                                        (element, _index) => {
-                                                            const selectedCircleIsActive =
-                                                                hoveredDrawnShape &&
-                                                                hoveredDrawnShape.selectedCircle &&
-                                                                hoveredDrawnShape
-                                                                    .selectedCircle
-                                                                    .x ===
-                                                                    element.x &&
-                                                                Number(
-                                                                    element.y.toFixed(
-                                                                        12,
-                                                                    ),
-                                                                ) ===
-                                                                    (element.denomInBase ===
-                                                                    denomInBase
-                                                                        ? Number(
-                                                                              hoveredDrawnShape?.selectedCircle.y.toFixed(
-                                                                                  12,
-                                                                              ),
-                                                                          )
-                                                                        : Number(
-                                                                              (
-                                                                                  1 /
-                                                                                  hoveredDrawnShape
-                                                                                      ?.selectedCircle
-                                                                                      .y
-                                                                              ).toFixed(
-                                                                                  12,
-                                                                              ),
-                                                                          ));
-
-                                                            if (
-                                                                selectedCircleIsActive
-                                                            ) {
-                                                                if (
-                                                                    !isUpdatingShape
-                                                                ) {
-                                                                    selectedCircleSeries(
-                                                                        [
-                                                                            element,
-                                                                        ],
-                                                                    );
-                                                                }
-                                                            } else {
-                                                                circleSeries([
-                                                                    element,
-                                                                ]);
-                                                            }
-                                                        },
-                                                    );
-                                                }
-                                        });
-                                    }
-
-                                    if (
-                                        item.type === 'Rect' &&
-                                        item.line.active
-                                    ) {
-                                        if (ctx)
-                                            ctx.setLineDash(item.line.dash);
-                                        lineSeries.decorate(
-                                            (
-                                                context: CanvasRenderingContext2D,
-                                            ) => {
-                                                context.strokeStyle =
-                                                    item.line.color;
-                                                context.lineWidth =
-                                                    item.line.lineWidth;
-                                            },
-                                        );
-                                        lineSeries(item.data);
-                                    }
-
-                                    if (item.type === 'DPRange') {
-                                        const lineOfDPRange =
-                                            createPointsOfDPRangeLine(
-                                                item.data,
-                                                scaleData.xScale,
-                                            );
-
-                                        lineOfDPRange?.forEach((line) => {
-                                            if (ctx)
-                                                ctx.setLineDash(item.line.dash);
-                                            lineSeries.decorate(
-                                                (
-                                                    context: CanvasRenderingContext2D,
-                                                ) => {
-                                                    context.strokeStyle =
-                                                        item.line.color;
-                                                    context.lineWidth =
-                                                        item.line.lineWidth;
-                                                },
-                                            );
-                                            lineSeries(line);
-                                        });
-
-                                        const firstPointYAxisData =
-                                            item.data[0].denomInBase ===
-                                            denomInBase
-                                                ? item.data[0].y
-                                                : 1 / item.data[0].y;
-                                        const secondPointYAxisData =
-                                            item.data[1].denomInBase ===
-                                            denomInBase
-                                                ? item.data[1].y
-                                                : 1 / item.data[1].y;
-
-                                        const filtered =
-                                            unparsedCandleData.filter(
-                                                (data: CandleDataIF) =>
-                                                    data.time * 1000 >=
-                                                        Math.min(
-                                                            item.data[0].x,
-                                                            item.data[1].x,
-                                                        ) &&
-                                                    data.time * 1000 <=
-                                                        Math.max(
-                                                            item.data[0].x,
-                                                            item.data[1].x,
-                                                        ),
-                                            );
-
-                                        const totalVolumeCovered =
-                                            filtered.reduce(
-                                                (sum, obj) =>
-                                                    sum + obj.volumeUSD,
-                                                0,
-                                            );
-
-                                        const height = Math.abs(
-                                            scaleData.yScale(
-                                                firstPointYAxisData,
-                                            ) -
-                                                scaleData.yScale(
-                                                    secondPointYAxisData,
-                                                ),
-                                        );
-
-                                        const width = Math.abs(
-                                            scaleData.xScale(item.data[0].x) -
-                                                scaleData.xScale(
-                                                    item.data[1].x,
-                                                ),
-                                        );
-
-                                        const lengthAsDate =
-                                            (item.data[0].x > item.data[1].x
-                                                ? '-'
-                                                : '') +
-                                            formatTimeDifference(
-                                                new Date(
-                                                    Math.min(
-                                                        item.data[1].x,
-                                                        item.data[0].x,
-                                                    ),
-                                                ),
-                                                new Date(
-                                                    Math.max(
-                                                        item.data[1].x,
-                                                        item.data[0].x,
-                                                    ),
-                                                ),
-                                            );
-
-                                        const heightAsPrice =
-                                            secondPointYAxisData -
-                                            firstPointYAxisData;
-
-                                        const heightAsPercentage = (
-                                            (Number(heightAsPrice) /
-                                                Math.min(
-                                                    firstPointYAxisData,
-                                                    secondPointYAxisData,
-                                                )) *
-                                            100
-                                        ).toFixed(2);
-
-                                        const infoLabelHeight = 66;
-                                        const infoLabelWidth = 195;
-
-                                        const diff =
-                                            Math.abs(
-                                                scaleData.xScale(
-                                                    item.data[0].x,
-                                                ) -
-                                                    scaleData.xScale(
-                                                        item.data[1].x,
-                                                    ),
-                                            ) / 2;
-
-                                        const infoLabelXAxisData =
-                                            scaleData.xScale(
-                                                Math.min(
-                                                    item.data[0].x,
-                                                    item.data[1].x,
-                                                ),
-                                            ) + diff;
-
-                                        const yAxisLabelPlacement =
-                                            scaleData.yScale(
-                                                firstPointYAxisData,
-                                            ) <
-                                            scaleData.yScale(
-                                                secondPointYAxisData,
-                                            )
-                                                ? scaleData.yScale(
-                                                      firstPointYAxisData,
-                                                  ) > canvas.height
-                                                    ? scaleData.yScale(
-                                                          secondPointYAxisData,
-                                                      ) + 15
-                                                    : Math.min(
-                                                          scaleData.yScale(
-                                                              secondPointYAxisData,
-                                                          ) + 15,
-                                                          canvasSize.height -
-                                                              (infoLabelHeight +
-                                                                  5),
-                                                      )
-                                                : scaleData.yScale(
-                                                        firstPointYAxisData,
-                                                    ) < 5
-                                                  ? scaleData.yScale(
-                                                        secondPointYAxisData,
-                                                    ) -
-                                                    (infoLabelHeight + 15)
-                                                  : Math.max(
-                                                        scaleData.yScale(
-                                                            secondPointYAxisData,
-                                                        ) -
-                                                            (infoLabelHeight +
-                                                                15),
-                                                        5,
-                                                    );
-
-                                        const arrowArray =
-                                            createArrowPointsOfDPRangeLine(
-                                                item.data,
-                                                scaleData,
-                                                denomInBase,
-                                                height > 30 && width > 30
-                                                    ? 10
-                                                    : 5,
-                                            );
-
-                                        arrowArray.forEach((arrow) => {
-                                            lineSeries(arrow);
-                                        });
-
-                                        if (ctx) {
-                                            ctx.beginPath();
-                                            ctx.fillStyle = 'rgb(34,44,58)';
-                                            ctx.fillRect(
-                                                infoLabelXAxisData -
-                                                    infoLabelWidth / 2,
-                                                yAxisLabelPlacement,
-                                                infoLabelWidth,
-                                                infoLabelHeight,
-                                            );
-                                            ctx.fillStyle =
-                                                'rgba(210,210,210,1)';
-                                            ctx.font = '13.5px Lexend Deca';
-                                            ctx.textAlign = 'center';
-                                            ctx.textBaseline = 'middle';
-
-                                            const maxPrice =
-                                                secondPointYAxisData *
-                                                Math.pow(
-                                                    10,
-                                                    baseTokenDecimals -
-                                                        quoteTokenDecimals,
-                                                );
-
-                                            const minPrice =
-                                                firstPointYAxisData *
-                                                Math.pow(
-                                                    10,
-                                                    baseTokenDecimals -
-                                                        quoteTokenDecimals,
-                                                );
-
-                                            const dpRangeTickPrice =
-                                                maxPrice && minPrice
-                                                    ? Math.floor(
-                                                          Math.log(maxPrice) /
-                                                              Math.log(1.0001),
-                                                      ) -
-                                                      Math.floor(
-                                                          Math.log(minPrice) /
-                                                              Math.log(1.0001),
-                                                      )
-                                                    : 0;
-
-                                            ctx.fillText(
-                                                getDollarPrice(heightAsPrice)
-                                                    .formattedValue +
-                                                    ' ' +
-                                                    ' (' +
-                                                    heightAsPercentage.toString() +
-                                                    '%)  ' +
-                                                    dpRangeTickPrice,
-
-                                                infoLabelXAxisData,
-                                                yAxisLabelPlacement + 16,
-                                            );
-                                            const min = Math.min(
-                                                item.data[0].x,
-                                                item.data[1].x,
-                                            );
-                                            const max = Math.max(
-                                                item.data[0].x,
-                                                item.data[1].x,
-                                            );
-                                            const showCandleCount =
-                                                getCandleCount(
-                                                    scaleData.xScale,
-                                                    visibleCandleData,
-                                                    [min, max],
-                                                    period,
-                                                    isCondensedModeEnabled,
-                                                );
-                                            ctx.fillText(
-                                                showCandleCount +
-                                                    ' bars,  ' +
-                                                    lengthAsDate,
-
-                                                infoLabelXAxisData,
-                                                yAxisLabelPlacement + 33,
-                                            );
-                                            ctx.fillText(
-                                                'Vol ' +
-                                                    formatDollarAmountAxis(
-                                                        totalVolumeCovered,
-                                                    ).replace('$', ''),
-
-                                                infoLabelXAxisData,
-                                                yAxisLabelPlacement + 50,
-                                            );
-                                        }
-                                    }
-
-                                    if (
-                                        (hoveredDrawnShape &&
-                                            hoveredDrawnShape.data.time ===
-                                                item.time) ||
-                                        (selectedDrawnShape &&
-                                            selectedDrawnShape.data.time ===
-                                                item.time)
-                                    ) {
-                                        item.data.forEach((element, _index) => {
-                                            const selectedCircleIsActive =
-                                                hoveredDrawnShape &&
-                                                hoveredDrawnShape.selectedCircle &&
-                                                hoveredDrawnShape.selectedCircle
-                                                    .x === element.x &&
-                                                Number(
-                                                    element.y.toFixed(12),
-                                                ) ===
-                                                    (element.denomInBase ===
-                                                    denomInBase
-                                                        ? Number(
-                                                              hoveredDrawnShape?.selectedCircle.y.toFixed(
-                                                                  12,
-                                                              ),
-                                                          )
-                                                        : Number(
-                                                              (
-                                                                  1 /
-                                                                  hoveredDrawnShape
-                                                                      ?.selectedCircle
-                                                                      .y
-                                                              ).toFixed(12),
-                                                          ));
-
-                                            if (selectedCircleIsActive) {
-                                                if (!isUpdatingShape) {
-                                                    selectedCircleSeries([
-                                                        element,
-                                                    ]);
-                                                }
-                                            } else {
-                                                circleSeries([element]);
-                                            }
-                                        });
-                                    }
-                                }
-
-                                if (item.type === 'Ray') {
-                                    rayLine
-                                        .xScale()
-                                        .domain(scaleData.xScale.domain());
-
-                                    rayLine
-                                        .yScale()
-                                        .domain(scaleData.yScale.domain());
-
-                                    const range = [
-                                        scaleData.xScale(item.data[0].x),
-                                        scaleData.xScale.range()[1],
-                                    ];
-
-                                    rayLine.xScale().range(range);
-
-                                    if (ctx) ctx.setLineDash(item.line.dash);
-
-                                    rayLine.decorate(
-                                        (context: CanvasRenderingContext2D) => {
-                                            context.strokeStyle =
-                                                item.line.color;
-                                            context.lineWidth =
-                                                item.line.lineWidth;
-                                        },
-                                    );
-
-                                    rayLine([
-                                        {
-                                            denomInBase:
-                                                item.data[0].denomInBase,
-                                            y: item.data[0].y,
-                                        },
-                                    ]);
-                                    if (
-                                        (hoveredDrawnShape &&
-                                            hoveredDrawnShape.data.time ===
-                                                item.time) ||
-                                        (selectedDrawnShape &&
-                                            selectedDrawnShape.data.time ===
-                                                item.time)
-                                    ) {
-                                        if (
-                                            hoveredDrawnShape &&
-                                            hoveredDrawnShape.selectedCircle &&
-                                            hoveredDrawnShape.selectedCircle
-                                                .x === item.data[0].x &&
-                                            Number(
-                                                item.data[0].y.toFixed(12),
-                                            ) ===
-                                                (item.data[0].denomInBase ===
-                                                denomInBase
-                                                    ? Number(
-                                                          hoveredDrawnShape?.selectedCircle.y.toFixed(
-                                                              12,
-                                                          ),
-                                                      )
-                                                    : Number(
-                                                          (
-                                                              1 /
-                                                              hoveredDrawnShape
-                                                                  ?.selectedCircle
-                                                                  .y
-                                                          ).toFixed(12),
-                                                      ))
-                                        ) {
-                                            if (!isUpdatingShape) {
-                                                selectedCircleSeries([
-                                                    item.data[0],
-                                                ]);
-                                            }
-                                        } else {
-                                            circleSeries([
-                                                {
-                                                    denomInBase:
-                                                        item.data[0]
-                                                            .denomInBase,
-                                                    y: item.data[0].y,
-                                                    x: item.data[0].x,
-                                                },
-                                            ]);
-                                        }
-                                    }
-                                }
-
-                                if (
-                                    item.type === 'FibRetracement' &&
-                                    annotationLineSeries
-                                ) {
-                                    const data = structuredClone(item.data);
-
-                                    if (item.reverse) {
-                                        [data[0], data[1]] = [data[1], data[0]];
-                                    }
-
-                                    const range = [
-                                        item.extendLeft
-                                            ? scaleData.xScale.range()[0]
-                                            : scaleData?.xScale(
-                                                  Math.min(
-                                                      item.data[0].x,
-                                                      item.data[1].x,
-                                                  ),
-                                              ),
-                                        item.extendRight
-                                            ? scaleData.xScale.range()[1]
-                                            : scaleData?.xScale(
-                                                  Math.max(
-                                                      item.data[0].x,
-                                                      item.data[1].x,
-                                                  ),
-                                              ),
-                                    ];
-
-                                    bandArea.xScale().range(range);
-
-                                    annotationLineSeries.xScale().range(range);
-
-                                    const fibLineData = calculateFibRetracement(
-                                        data,
-                                        item.extraData,
-                                    );
-
-                                    const bandAreaData =
-                                        calculateFibRetracementBandAreas(
-                                            data,
-                                            item.extraData,
-                                        );
-
-                                    bandAreaData.forEach((bandData) => {
-                                        bandArea.decorate(
-                                            (
-                                                context: CanvasRenderingContext2D,
-                                            ) => {
-                                                context.fillStyle =
-                                                    bandData.areaColor.toString();
-                                            },
-                                        );
-
-                                        bandArea([bandData]);
-                                    });
-
-                                    fibLineData.forEach((lineData) => {
-                                        const lineLabel =
-                                            lineData[0].level +
-                                            ' (' +
-                                            lineData[0].y
-                                                .toFixed(2)
-                                                .toString() +
-                                            ')';
-
-                                        const lineMeasures =
-                                            ctx?.measureText(lineLabel);
-
-                                        if (
-                                            lineMeasures &&
-                                            (item.extendLeft ||
-                                                item.extendRight) &&
-                                            item.labelAlignment === 'Middle' &&
-                                            ctx
-                                        ) {
-                                            const bufferLeft =
-                                                item.extendLeft &&
-                                                item.labelPlacement === 'Left'
-                                                    ? lineMeasures.width + 15
-                                                    : 0;
-
-                                            const bufferRight =
-                                                canvasSize.width -
-                                                (item.extendRight &&
-                                                item.labelPlacement === 'Right'
-                                                    ? lineMeasures.width + 15
-                                                    : 0);
-
-                                            ctx.save();
-                                            ctx.beginPath();
-
-                                            ctx.rect(
-                                                bufferLeft,
-                                                0,
-                                                bufferRight,
-                                                canvasSize.height,
-                                            );
-
-                                            ctx.clip();
-                                        }
-
-                                        if (
-                                            item.labelPlacement === 'Center' &&
-                                            item.labelAlignment === 'Middle' &&
-                                            lineMeasures &&
-                                            ctx
-                                        ) {
-                                            const buffer = scaleData.xScale(
-                                                Math.min(
-                                                    lineData[0].x,
-                                                    lineData[1].x,
-                                                ) +
-                                                    Math.abs(
-                                                        lineData[0].x -
-                                                            lineData[1].x,
-                                                    ) /
-                                                        2,
-                                            );
-
-                                            ctx.save();
-                                            ctx.beginPath();
-
-                                            ctx.rect(
-                                                0,
-                                                0,
-                                                buffer -
-                                                    lineMeasures.width / 2 -
-                                                    5,
-                                                canvasSize.height,
-                                            );
-                                            ctx.rect(
-                                                buffer +
-                                                    lineMeasures.width / 2 +
-                                                    5,
-                                                0,
-                                                canvasSize.width,
-                                                canvasSize.height,
-                                            );
-
-                                            ctx.clip();
-                                        }
-
-                                        annotationLineSeries.decorate(
-                                            (
-                                                context: CanvasRenderingContext2D,
-                                            ) => {
-                                                context.strokeStyle =
-                                                    lineData[0].lineColor;
-
-                                                context.lineWidth = 1.5;
-                                            },
-                                        );
-
-                                        annotationLineSeries(lineData);
-
-                                        ctx?.restore();
-
-                                        const textColor = lineData[0].lineColor;
-
-                                        let alignment;
-                                        const textBaseline =
-                                            item.labelAlignment === 'Top'
-                                                ? 'bottom'
-                                                : item.labelAlignment ===
-                                                    'Bottom'
-                                                  ? 'top'
-                                                  : (item.labelAlignment.toLowerCase() as CanvasTextBaseline);
-
-                                        if (item.labelPlacement === 'Center') {
-                                            alignment = 'center';
-                                        } else {
-                                            if (item.extendLeft) {
-                                                alignment =
-                                                    item.extendRight &&
-                                                    item.labelPlacement ===
-                                                        'Right'
-                                                        ? 'right'
-                                                        : 'left';
-                                            } else if (
-                                                item.extendRight ||
-                                                item.labelPlacement === 'Left'
-                                            ) {
-                                                alignment = 'right';
-                                            } else {
-                                                alignment = 'left';
-                                            }
-                                        }
-
-                                        if (ctx) {
-                                            (ctx.fillStyle = textColor),
-                                                (ctx.font = '12px Lexend Deca');
-                                            ctx.textAlign =
-                                                alignment as CanvasTextAlign;
-                                            ctx.textBaseline = textBaseline;
-
-                                            let location: number = Math.min(
-                                                lineData[0].x,
-                                                lineData[1].x,
-                                            );
-
-                                            if (
-                                                item.labelPlacement === 'Center'
-                                            ) {
-                                                location =
-                                                    Math.min(
-                                                        lineData[0].x,
-                                                        lineData[1].x,
-                                                    ) +
-                                                    Math.abs(
-                                                        lineData[0].x -
-                                                            lineData[1].x,
-                                                    ) /
-                                                        2;
-                                            } else {
-                                                if (item.extendLeft) {
-                                                    if (
-                                                        item.labelPlacement ===
-                                                        'Left'
-                                                    ) {
-                                                        location =
-                                                            scaleData.xScale.domain()[0];
-                                                    } else if (
-                                                        item.labelPlacement ===
-                                                        'Right'
-                                                    ) {
-                                                        if (item.extendRight) {
-                                                            location =
-                                                                scaleData.xScale.domain()[1];
-                                                        } else {
-                                                            location = Math.max(
-                                                                lineData[0].x,
-                                                                lineData[1].x,
-                                                            );
-                                                        }
-                                                    }
-                                                } else if (item.extendRight) {
-                                                    location =
-                                                        item.labelPlacement ===
-                                                        'Left'
-                                                            ? Math.min(
-                                                                  lineData[0].x,
-                                                                  lineData[1].x,
-                                                              )
-                                                            : scaleData.xScale.domain()[1];
-                                                } else {
-                                                    location =
-                                                        item.labelPlacement ===
-                                                        'Left'
-                                                            ? Math.min(
-                                                                  lineData[0].x,
-                                                                  lineData[1].x,
-                                                              )
-                                                            : Math.max(
-                                                                  lineData[0].x,
-                                                                  lineData[1].x,
-                                                              );
-                                                }
-                                            }
-
-                                            const linePlacement =
-                                                scaleData.xScale(location) +
-                                                (alignment === 'right'
-                                                    ? -10
-                                                    : alignment === 'left'
-                                                      ? +10
-                                                      : 0);
-
-                                            ctx.fillText(
-                                                lineLabel,
-                                                linePlacement,
-                                                scaleData.yScale(
-                                                    denomInBase ===
-                                                        lineData[0].denomInBase
-                                                        ? lineData[0].y
-                                                        : 1 / lineData[0].y,
-                                                ) +
-                                                    (item.labelAlignment.toLowerCase() ===
-                                                    'bottom'
-                                                        ? 5
-                                                        : item.labelAlignment.toLowerCase() ===
-                                                            'top'
-                                                          ? -5
-                                                          : 0),
-                                            );
-                                        }
-                                    });
-
-                                    if (item.line.active) {
-                                        if (ctx)
-                                            ctx.setLineDash(item.line.dash);
-                                        lineSeries.decorate(
-                                            (
-                                                context: CanvasRenderingContext2D,
-                                            ) => {
-                                                context.strokeStyle =
-                                                    item.line.color;
-                                                context.lineWidth =
-                                                    item.line.lineWidth;
-                                            },
-                                        );
-                                        lineSeries(data);
-                                    }
-
-                                    if (ctx) ctx.setLineDash([0, 0]);
-                                }
-
-                                if (
-                                    item.type === 'Brush' ||
-                                    item.type === 'Angle' ||
-                                    item.type === 'FibRetracement'
-                                ) {
-                                    if (
-                                        (hoveredDrawnShape &&
-                                            hoveredDrawnShape.data.time ===
-                                                item.time) ||
-                                        (selectedDrawnShape &&
-                                            selectedDrawnShape.data.time ===
-                                                item.time)
-                                    ) {
-                                        item.data.forEach((element) => {
-                                            if (
-                                                hoveredDrawnShape &&
-                                                hoveredDrawnShape.selectedCircle &&
-                                                hoveredDrawnShape.selectedCircle
-                                                    .x === element.x &&
-                                                Number(
-                                                    element.y.toFixed(12),
-                                                ) ===
-                                                    (element.denomInBase ===
-                                                    denomInBase
-                                                        ? Number(
-                                                              hoveredDrawnShape?.selectedCircle.y.toFixed(
-                                                                  12,
-                                                              ),
-                                                          )
-                                                        : Number(
-                                                              (
-                                                                  1 /
-                                                                  hoveredDrawnShape
-                                                                      ?.selectedCircle
-                                                                      .y
-                                                              ).toFixed(12),
-                                                          ))
-                                            ) {
-                                                if (!isUpdatingShape) {
-                                                    selectedCircleSeries([
-                                                        element,
-                                                    ]);
-                                                }
-                                            } else {
-                                                circleSeries([element]);
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    setIsShapeEdited(false);
-                })
-                .on('measure', () => {
-                    bandArea.context(ctx);
-                    rayLine.context(ctx);
-                    lineSeries.context(ctx);
-                    annotationLineSeries.context(ctx);
-                    circleSeries.context(ctx);
-                    selectedCircleSeries.context(ctx);
-                });
-
-            render();
-        }
-    }, [
-        diffHashSig(drawnShapeHistory),
-        lineSeries,
-        annotationLineSeries,
-        hoveredDrawnShape,
-        selectedDrawnShape,
-        isUpdatingShape,
-        denomInBase,
-        period,
-        isShapeEdited,
-        getDollarPrice,
-        bandwidth,
-        // anglePointSeries,
-    ]);
+    // useEffect(() => {
+    //     const canvas = d3
+    //         .select(d3CanvasMain.current)
+    //         .select('canvas')
+    //         .node() as HTMLCanvasElement;
+    //     const ctx = canvas.getContext('2d');
+
+    //     const canvasSize = canvas.getBoundingClientRect();
+
+    //     if (scaleData && lineSeries) {
+    //         const rayLine = createAnnotationLineSeries(
+    //             scaleData?.xScale.copy(),
+    //             scaleData?.yScale,
+    //             denomInBase,
+    //         );
+
+    //         const bandArea = createBandArea(
+    //             scaleData?.xScale.copy(),
+    //             scaleData?.yScale,
+    //             denomInBase,
+    //         );
+
+    //         d3.select(d3CanvasMain.current)
+    //             .on('draw', () => {
+    //                 setCanvasResolution(canvas);
+
+    //                 drawnShapeHistory?.forEach((item) => {
+    //                     if (item.pool) {
+    //                         const isShapeInCurrentPool =
+    //                             currentPool.tokenA.address ===
+    //                                 (isTokenABase === item.pool.isTokenABase
+    //                                     ? item.pool.tokenA
+    //                                     : item.pool.tokenB) &&
+    //                             currentPool.tokenB.address ===
+    //                                 (isTokenABase === item.pool.isTokenABase
+    //                                     ? item.pool.tokenB
+    //                                     : item.pool.tokenA);
+
+    //                         if (isShapeInCurrentPool) {
+    //                             if (
+    //                                 item.type === 'Brush' ||
+    //                                 item.type === 'Angle'
+    //                             ) {
+    //                                 if (ctx) ctx.setLineDash(item.line.dash);
+    //                                 lineSeries.decorate(
+    //                                     (context: CanvasRenderingContext2D) => {
+    //                                         context.strokeStyle =
+    //                                             item.line.color;
+    //                                         context.lineWidth =
+    //                                             item.line.lineWidth;
+    //                                     },
+    //                                 );
+
+    //                                 lineSeries(item?.data);
+    //                             }
+
+    //                             if (
+    //                                 item.type === 'Rect' ||
+    //                                 item.type === 'DPRange'
+    //                             ) {
+    //                                 const range = [
+    //                                     scaleData?.xScale(item.data[0].x),
+    //                                     scaleData?.xScale(item.data[1].x),
+    //                                 ];
+
+    //                                 bandArea.xScale().range(range);
+
+    //                                 if (item.background.active) {
+    //                                     const checkDenom =
+    //                                         item.data[0].denomInBase ===
+    //                                         denomInBase;
+    //                                     const bandData = {
+    //                                         fromValue: checkDenom
+    //                                             ? item.data[0].y
+    //                                             : 1 / item.data[0].y,
+    //                                         toValue: checkDenom
+    //                                             ? item.data[1].y
+    //                                             : 1 / item.data[1].y,
+    //                                         denomInBase: denomInBase,
+    //                                     } as bandLineData;
+
+    //                                     if (item.background) {
+    //                                         bandArea.decorate(
+    //                                             (
+    //                                                 context: CanvasRenderingContext2D,
+    //                                             ) => {
+    //                                                 context.fillStyle =
+    //                                                     item.background.color;
+    //                                             },
+    //                                         );
+    //                                     }
+
+    //                                     bandArea([bandData]);
+    //                                 }
+
+    //                                 if (item.border.active) {
+    //                                     const lineOfBand =
+    //                                         createPointsOfBandLine(item.data);
+
+    //                                     lineOfBand?.forEach((line) => {
+    //                                         if (ctx)
+    //                                             ctx.setLineDash(
+    //                                                 item.border.dash,
+    //                                             );
+    //                                         lineSeries.decorate(
+    //                                             (
+    //                                                 context: CanvasRenderingContext2D,
+    //                                             ) => {
+    //                                                 context.strokeStyle =
+    //                                                     item.border.color;
+    //                                                 context.lineWidth =
+    //                                                     item.border.lineWidth;
+    //                                             },
+    //                                         );
+    //                                         lineSeries(line);
+
+    //                                         if (item.type === 'Rect')
+    //                                             if (
+    //                                                 (hoveredDrawnShape &&
+    //                                                     hoveredDrawnShape.data
+    //                                                         .time ===
+    //                                                         item.time) ||
+    //                                                 (selectedDrawnShape &&
+    //                                                     selectedDrawnShape.data
+    //                                                         .time === item.time)
+    //                                             ) {
+    //                                                 line.forEach(
+    //                                                     (element, _index) => {
+    //                                                         const selectedCircleIsActive =
+    //                                                             hoveredDrawnShape &&
+    //                                                             hoveredDrawnShape.selectedCircle &&
+    //                                                             hoveredDrawnShape
+    //                                                                 .selectedCircle
+    //                                                                 .x ===
+    //                                                                 element.x &&
+    //                                                             Number(
+    //                                                                 element.y.toFixed(
+    //                                                                     12,
+    //                                                                 ),
+    //                                                             ) ===
+    //                                                                 (element.denomInBase ===
+    //                                                                 denomInBase
+    //                                                                     ? Number(
+    //                                                                           hoveredDrawnShape?.selectedCircle.y.toFixed(
+    //                                                                               12,
+    //                                                                           ),
+    //                                                                       )
+    //                                                                     : Number(
+    //                                                                           (
+    //                                                                               1 /
+    //                                                                               hoveredDrawnShape
+    //                                                                                   ?.selectedCircle
+    //                                                                                   .y
+    //                                                                           ).toFixed(
+    //                                                                               12,
+    //                                                                           ),
+    //                                                                       ));
+
+    //                                                         if (
+    //                                                             selectedCircleIsActive
+    //                                                         ) {
+    //                                                             if (
+    //                                                                 !isUpdatingShape
+    //                                                             ) {
+    //                                                                 selectedCircleSeries(
+    //                                                                     [
+    //                                                                         element,
+    //                                                                     ],
+    //                                                                 );
+    //                                                             }
+    //                                                         } else {
+    //                                                             circleSeries([
+    //                                                                 element,
+    //                                                             ]);
+    //                                                         }
+    //                                                     },
+    //                                                 );
+    //                                             }
+    //                                     });
+    //                                 }
+
+    //                                 if (
+    //                                     item.type === 'Rect' &&
+    //                                     item.line.active
+    //                                 ) {
+    //                                     if (ctx)
+    //                                         ctx.setLineDash(item.line.dash);
+    //                                     lineSeries.decorate(
+    //                                         (
+    //                                             context: CanvasRenderingContext2D,
+    //                                         ) => {
+    //                                             context.strokeStyle =
+    //                                                 item.line.color;
+    //                                             context.lineWidth =
+    //                                                 item.line.lineWidth;
+    //                                         },
+    //                                     );
+    //                                     lineSeries(item.data);
+    //                                 }
+
+    //                                 if (item.type === 'DPRange') {
+    //                                     const lineOfDPRange =
+    //                                         createPointsOfDPRangeLine(
+    //                                             item.data,
+    //                                             scaleData.xScale,
+    //                                         );
+
+    //                                     lineOfDPRange?.forEach((line) => {
+    //                                         if (ctx)
+    //                                             ctx.setLineDash(item.line.dash);
+    //                                         lineSeries.decorate(
+    //                                             (
+    //                                                 context: CanvasRenderingContext2D,
+    //                                             ) => {
+    //                                                 context.strokeStyle =
+    //                                                     item.line.color;
+    //                                                 context.lineWidth =
+    //                                                     item.line.lineWidth;
+    //                                             },
+    //                                         );
+    //                                         lineSeries(line);
+    //                                     });
+
+    //                                     const firstPointYAxisData =
+    //                                         item.data[0].denomInBase ===
+    //                                         denomInBase
+    //                                             ? item.data[0].y
+    //                                             : 1 / item.data[0].y;
+    //                                     const secondPointYAxisData =
+    //                                         item.data[1].denomInBase ===
+    //                                         denomInBase
+    //                                             ? item.data[1].y
+    //                                             : 1 / item.data[1].y;
+
+    //                                     const filtered =
+    //                                         unparsedCandleData.filter(
+    //                                             (data: CandleDataIF) =>
+    //                                                 data.time * 1000 >=
+    //                                                     Math.min(
+    //                                                         item.data[0].x,
+    //                                                         item.data[1].x,
+    //                                                     ) &&
+    //                                                 data.time * 1000 <=
+    //                                                     Math.max(
+    //                                                         item.data[0].x,
+    //                                                         item.data[1].x,
+    //                                                     ),
+    //                                         );
+
+    //                                     const totalVolumeCovered =
+    //                                         filtered.reduce(
+    //                                             (sum, obj) =>
+    //                                                 sum + obj.volumeUSD,
+    //                                             0,
+    //                                         );
+
+    //                                     const height = Math.abs(
+    //                                         scaleData.yScale(
+    //                                             firstPointYAxisData,
+    //                                         ) -
+    //                                             scaleData.yScale(
+    //                                                 secondPointYAxisData,
+    //                                             ),
+    //                                     );
+
+    //                                     const width = Math.abs(
+    //                                         scaleData.xScale(item.data[0].x) -
+    //                                             scaleData.xScale(
+    //                                                 item.data[1].x,
+    //                                             ),
+    //                                     );
+
+    //                                     const lengthAsDate =
+    //                                         (item.data[0].x > item.data[1].x
+    //                                             ? '-'
+    //                                             : '') +
+    //                                         formatTimeDifference(
+    //                                             new Date(
+    //                                                 Math.min(
+    //                                                     item.data[1].x,
+    //                                                     item.data[0].x,
+    //                                                 ),
+    //                                             ),
+    //                                             new Date(
+    //                                                 Math.max(
+    //                                                     item.data[1].x,
+    //                                                     item.data[0].x,
+    //                                                 ),
+    //                                             ),
+    //                                         );
+
+    //                                     const heightAsPrice =
+    //                                         secondPointYAxisData -
+    //                                         firstPointYAxisData;
+
+    //                                     const heightAsPercentage = (
+    //                                         (Number(heightAsPrice) /
+    //                                             Math.min(
+    //                                                 firstPointYAxisData,
+    //                                                 secondPointYAxisData,
+    //                                             )) *
+    //                                         100
+    //                                     ).toFixed(2);
+
+    //                                     const infoLabelHeight = 66;
+    //                                     const infoLabelWidth = 195;
+
+    //                                     const diff =
+    //                                         Math.abs(
+    //                                             scaleData.xScale(
+    //                                                 item.data[0].x,
+    //                                             ) -
+    //                                                 scaleData.xScale(
+    //                                                     item.data[1].x,
+    //                                                 ),
+    //                                         ) / 2;
+
+    //                                     const infoLabelXAxisData =
+    //                                         scaleData.xScale(
+    //                                             Math.min(
+    //                                                 item.data[0].x,
+    //                                                 item.data[1].x,
+    //                                             ),
+    //                                         ) + diff;
+
+    //                                     const yAxisLabelPlacement =
+    //                                         scaleData.yScale(
+    //                                             firstPointYAxisData,
+    //                                         ) <
+    //                                         scaleData.yScale(
+    //                                             secondPointYAxisData,
+    //                                         )
+    //                                             ? scaleData.yScale(
+    //                                                   firstPointYAxisData,
+    //                                               ) > canvas.height
+    //                                                 ? scaleData.yScale(
+    //                                                       secondPointYAxisData,
+    //                                                   ) + 15
+    //                                                 : Math.min(
+    //                                                       scaleData.yScale(
+    //                                                           secondPointYAxisData,
+    //                                                       ) + 15,
+    //                                                       canvasSize.height -
+    //                                                           (infoLabelHeight +
+    //                                                               5),
+    //                                                   )
+    //                                             : scaleData.yScale(
+    //                                                     firstPointYAxisData,
+    //                                                 ) < 5
+    //                                               ? scaleData.yScale(
+    //                                                     secondPointYAxisData,
+    //                                                 ) -
+    //                                                 (infoLabelHeight + 15)
+    //                                               : Math.max(
+    //                                                     scaleData.yScale(
+    //                                                         secondPointYAxisData,
+    //                                                     ) -
+    //                                                         (infoLabelHeight +
+    //                                                             15),
+    //                                                     5,
+    //                                                 );
+
+    //                                     const arrowArray =
+    //                                         createArrowPointsOfDPRangeLine(
+    //                                             item.data,
+    //                                             scaleData,
+    //                                             denomInBase,
+    //                                             height > 30 && width > 30
+    //                                                 ? 10
+    //                                                 : 5,
+    //                                         );
+
+    //                                     arrowArray.forEach((arrow) => {
+    //                                         lineSeries(arrow);
+    //                                     });
+
+    //                                     if (ctx) {
+    //                                         ctx.beginPath();
+    //                                         ctx.fillStyle = 'rgb(34,44,58)';
+    //                                         ctx.fillRect(
+    //                                             infoLabelXAxisData -
+    //                                                 infoLabelWidth / 2,
+    //                                             yAxisLabelPlacement,
+    //                                             infoLabelWidth,
+    //                                             infoLabelHeight,
+    //                                         );
+    //                                         ctx.fillStyle =
+    //                                             'rgba(210,210,210,1)';
+    //                                         ctx.font = '13.5px Lexend Deca';
+    //                                         ctx.textAlign = 'center';
+    //                                         ctx.textBaseline = 'middle';
+
+    //                                         const maxPrice =
+    //                                             secondPointYAxisData *
+    //                                             Math.pow(
+    //                                                 10,
+    //                                                 baseTokenDecimals -
+    //                                                     quoteTokenDecimals,
+    //                                             );
+
+    //                                         const minPrice =
+    //                                             firstPointYAxisData *
+    //                                             Math.pow(
+    //                                                 10,
+    //                                                 baseTokenDecimals -
+    //                                                     quoteTokenDecimals,
+    //                                             );
+
+    //                                         const dpRangeTickPrice =
+    //                                             maxPrice && minPrice
+    //                                                 ? Math.floor(
+    //                                                       Math.log(maxPrice) /
+    //                                                           Math.log(1.0001),
+    //                                                   ) -
+    //                                                   Math.floor(
+    //                                                       Math.log(minPrice) /
+    //                                                           Math.log(1.0001),
+    //                                                   )
+    //                                                 : 0;
+
+    //                                         ctx.fillText(
+    //                                             getDollarPrice(heightAsPrice)
+    //                                                 .formattedValue +
+    //                                                 ' ' +
+    //                                                 ' (' +
+    //                                                 heightAsPercentage.toString() +
+    //                                                 '%)  ' +
+    //                                                 dpRangeTickPrice,
+
+    //                                             infoLabelXAxisData,
+    //                                             yAxisLabelPlacement + 16,
+    //                                         );
+    //                                         const min = Math.min(
+    //                                             item.data[0].x,
+    //                                             item.data[1].x,
+    //                                         );
+    //                                         const max = Math.max(
+    //                                             item.data[0].x,
+    //                                             item.data[1].x,
+    //                                         );
+    //                                         const showCandleCount =
+    //                                             getCandleCount(
+    //                                                 scaleData.xScale,
+    //                                                 visibleCandleData,
+    //                                                 [min, max],
+    //                                                 period,
+    //                                                 isCondensedModeEnabled,
+    //                                             );
+    //                                         ctx.fillText(
+    //                                             showCandleCount +
+    //                                                 ' bars,  ' +
+    //                                                 lengthAsDate,
+
+    //                                             infoLabelXAxisData,
+    //                                             yAxisLabelPlacement + 33,
+    //                                         );
+    //                                         ctx.fillText(
+    //                                             'Vol ' +
+    //                                                 formatDollarAmountAxis(
+    //                                                     totalVolumeCovered,
+    //                                                 ).replace('$', ''),
+
+    //                                             infoLabelXAxisData,
+    //                                             yAxisLabelPlacement + 50,
+    //                                         );
+    //                                     }
+    //                                 }
+
+    //                                 if (
+    //                                     (hoveredDrawnShape &&
+    //                                         hoveredDrawnShape.data.time ===
+    //                                             item.time) ||
+    //                                     (selectedDrawnShape &&
+    //                                         selectedDrawnShape.data.time ===
+    //                                             item.time)
+    //                                 ) {
+    //                                     item.data.forEach((element, _index) => {
+    //                                         const selectedCircleIsActive =
+    //                                             hoveredDrawnShape &&
+    //                                             hoveredDrawnShape.selectedCircle &&
+    //                                             hoveredDrawnShape.selectedCircle
+    //                                                 .x === element.x &&
+    //                                             Number(
+    //                                                 element.y.toFixed(12),
+    //                                             ) ===
+    //                                                 (element.denomInBase ===
+    //                                                 denomInBase
+    //                                                     ? Number(
+    //                                                           hoveredDrawnShape?.selectedCircle.y.toFixed(
+    //                                                               12,
+    //                                                           ),
+    //                                                       )
+    //                                                     : Number(
+    //                                                           (
+    //                                                               1 /
+    //                                                               hoveredDrawnShape
+    //                                                                   ?.selectedCircle
+    //                                                                   .y
+    //                                                           ).toFixed(12),
+    //                                                       ));
+
+    //                                         if (selectedCircleIsActive) {
+    //                                             if (!isUpdatingShape) {
+    //                                                 selectedCircleSeries([
+    //                                                     element,
+    //                                                 ]);
+    //                                             }
+    //                                         } else {
+    //                                             circleSeries([element]);
+    //                                         }
+    //                                     });
+    //                                 }
+    //                             }
+
+    //                             if (item.type === 'Ray') {
+    //                                 rayLine
+    //                                     .xScale()
+    //                                     .domain(scaleData.xScale.domain());
+
+    //                                 rayLine
+    //                                     .yScale()
+    //                                     .domain(scaleData.yScale.domain());
+
+    //                                 const range = [
+    //                                     scaleData.xScale(item.data[0].x),
+    //                                     scaleData.xScale.range()[1],
+    //                                 ];
+
+    //                                 rayLine.xScale().range(range);
+
+    //                                 if (ctx) ctx.setLineDash(item.line.dash);
+
+    //                                 rayLine.decorate(
+    //                                     (context: CanvasRenderingContext2D) => {
+    //                                         context.strokeStyle =
+    //                                             item.line.color;
+    //                                         context.lineWidth =
+    //                                             item.line.lineWidth;
+    //                                     },
+    //                                 );
+
+    //                                 rayLine([
+    //                                     {
+    //                                         denomInBase:
+    //                                             item.data[0].denomInBase,
+    //                                         y: item.data[0].y,
+    //                                     },
+    //                                 ]);
+    //                                 if (
+    //                                     (hoveredDrawnShape &&
+    //                                         hoveredDrawnShape.data.time ===
+    //                                             item.time) ||
+    //                                     (selectedDrawnShape &&
+    //                                         selectedDrawnShape.data.time ===
+    //                                             item.time)
+    //                                 ) {
+    //                                     if (
+    //                                         hoveredDrawnShape &&
+    //                                         hoveredDrawnShape.selectedCircle &&
+    //                                         hoveredDrawnShape.selectedCircle
+    //                                             .x === item.data[0].x &&
+    //                                         Number(
+    //                                             item.data[0].y.toFixed(12),
+    //                                         ) ===
+    //                                             (item.data[0].denomInBase ===
+    //                                             denomInBase
+    //                                                 ? Number(
+    //                                                       hoveredDrawnShape?.selectedCircle.y.toFixed(
+    //                                                           12,
+    //                                                       ),
+    //                                                   )
+    //                                                 : Number(
+    //                                                       (
+    //                                                           1 /
+    //                                                           hoveredDrawnShape
+    //                                                               ?.selectedCircle
+    //                                                               .y
+    //                                                       ).toFixed(12),
+    //                                                   ))
+    //                                     ) {
+    //                                         if (!isUpdatingShape) {
+    //                                             selectedCircleSeries([
+    //                                                 item.data[0],
+    //                                             ]);
+    //                                         }
+    //                                     } else {
+    //                                         circleSeries([
+    //                                             {
+    //                                                 denomInBase:
+    //                                                     item.data[0]
+    //                                                         .denomInBase,
+    //                                                 y: item.data[0].y,
+    //                                                 x: item.data[0].x,
+    //                                             },
+    //                                         ]);
+    //                                     }
+    //                                 }
+    //                             }
+
+    //                             if (
+    //                                 item.type === 'FibRetracement' &&
+    //                                 annotationLineSeries
+    //                             ) {
+    //                                 const data = structuredClone(item.data);
+
+    //                                 if (item.reverse) {
+    //                                     [data[0], data[1]] = [data[1], data[0]];
+    //                                 }
+
+    //                                 const range = [
+    //                                     item.extendLeft
+    //                                         ? scaleData.xScale.range()[0]
+    //                                         : scaleData?.xScale(
+    //                                               Math.min(
+    //                                                   item.data[0].x,
+    //                                                   item.data[1].x,
+    //                                               ),
+    //                                           ),
+    //                                     item.extendRight
+    //                                         ? scaleData.xScale.range()[1]
+    //                                         : scaleData?.xScale(
+    //                                               Math.max(
+    //                                                   item.data[0].x,
+    //                                                   item.data[1].x,
+    //                                               ),
+    //                                           ),
+    //                                 ];
+
+    //                                 bandArea.xScale().range(range);
+
+    //                                 annotationLineSeries.xScale().range(range);
+
+    //                                 const fibLineData = calculateFibRetracement(
+    //                                     data,
+    //                                     item.extraData,
+    //                                 );
+
+    //                                 const bandAreaData =
+    //                                     calculateFibRetracementBandAreas(
+    //                                         data,
+    //                                         item.extraData,
+    //                                     );
+
+    //                                 bandAreaData.forEach((bandData) => {
+    //                                     bandArea.decorate(
+    //                                         (
+    //                                             context: CanvasRenderingContext2D,
+    //                                         ) => {
+    //                                             context.fillStyle =
+    //                                                 bandData.areaColor.toString();
+    //                                         },
+    //                                     );
+
+    //                                     bandArea([bandData]);
+    //                                 });
+
+    //                                 fibLineData.forEach((lineData) => {
+    //                                     const lineLabel =
+    //                                         lineData[0].level +
+    //                                         ' (' +
+    //                                         lineData[0].y
+    //                                             .toFixed(2)
+    //                                             .toString() +
+    //                                         ')';
+
+    //                                     const lineMeasures =
+    //                                         ctx?.measureText(lineLabel);
+
+    //                                     if (
+    //                                         lineMeasures &&
+    //                                         (item.extendLeft ||
+    //                                             item.extendRight) &&
+    //                                         item.labelAlignment === 'Middle' &&
+    //                                         ctx
+    //                                     ) {
+    //                                         const bufferLeft =
+    //                                             item.extendLeft &&
+    //                                             item.labelPlacement === 'Left'
+    //                                                 ? lineMeasures.width + 15
+    //                                                 : 0;
+
+    //                                         const bufferRight =
+    //                                             canvasSize.width -
+    //                                             (item.extendRight &&
+    //                                             item.labelPlacement === 'Right'
+    //                                                 ? lineMeasures.width + 15
+    //                                                 : 0);
+
+    //                                         ctx.save();
+    //                                         ctx.beginPath();
+
+    //                                         ctx.rect(
+    //                                             bufferLeft,
+    //                                             0,
+    //                                             bufferRight,
+    //                                             canvasSize.height,
+    //                                         );
+
+    //                                         ctx.clip();
+    //                                     }
+
+    //                                     if (
+    //                                         item.labelPlacement === 'Center' &&
+    //                                         item.labelAlignment === 'Middle' &&
+    //                                         lineMeasures &&
+    //                                         ctx
+    //                                     ) {
+    //                                         const buffer = scaleData.xScale(
+    //                                             Math.min(
+    //                                                 lineData[0].x,
+    //                                                 lineData[1].x,
+    //                                             ) +
+    //                                                 Math.abs(
+    //                                                     lineData[0].x -
+    //                                                         lineData[1].x,
+    //                                                 ) /
+    //                                                     2,
+    //                                         );
+
+    //                                         ctx.save();
+    //                                         ctx.beginPath();
+
+    //                                         ctx.rect(
+    //                                             0,
+    //                                             0,
+    //                                             buffer -
+    //                                                 lineMeasures.width / 2 -
+    //                                                 5,
+    //                                             canvasSize.height,
+    //                                         );
+    //                                         ctx.rect(
+    //                                             buffer +
+    //                                                 lineMeasures.width / 2 +
+    //                                                 5,
+    //                                             0,
+    //                                             canvasSize.width,
+    //                                             canvasSize.height,
+    //                                         );
+
+    //                                         ctx.clip();
+    //                                     }
+
+    //                                     annotationLineSeries.decorate(
+    //                                         (
+    //                                             context: CanvasRenderingContext2D,
+    //                                         ) => {
+    //                                             context.strokeStyle =
+    //                                                 lineData[0].lineColor;
+
+    //                                             context.lineWidth = 1.5;
+    //                                         },
+    //                                     );
+
+    //                                     annotationLineSeries(lineData);
+
+    //                                     ctx?.restore();
+
+    //                                     const textColor = lineData[0].lineColor;
+
+    //                                     let alignment;
+    //                                     const textBaseline =
+    //                                         item.labelAlignment === 'Top'
+    //                                             ? 'bottom'
+    //                                             : item.labelAlignment ===
+    //                                                 'Bottom'
+    //                                               ? 'top'
+    //                                               : (item.labelAlignment.toLowerCase() as CanvasTextBaseline);
+
+    //                                     if (item.labelPlacement === 'Center') {
+    //                                         alignment = 'center';
+    //                                     } else {
+    //                                         if (item.extendLeft) {
+    //                                             alignment =
+    //                                                 item.extendRight &&
+    //                                                 item.labelPlacement ===
+    //                                                     'Right'
+    //                                                     ? 'right'
+    //                                                     : 'left';
+    //                                         } else if (
+    //                                             item.extendRight ||
+    //                                             item.labelPlacement === 'Left'
+    //                                         ) {
+    //                                             alignment = 'right';
+    //                                         } else {
+    //                                             alignment = 'left';
+    //                                         }
+    //                                     }
+
+    //                                     if (ctx) {
+    //                                         (ctx.fillStyle = textColor),
+    //                                             (ctx.font = '12px Lexend Deca');
+    //                                         ctx.textAlign =
+    //                                             alignment as CanvasTextAlign;
+    //                                         ctx.textBaseline = textBaseline;
+
+    //                                         let location: number = Math.min(
+    //                                             lineData[0].x,
+    //                                             lineData[1].x,
+    //                                         );
+
+    //                                         if (
+    //                                             item.labelPlacement === 'Center'
+    //                                         ) {
+    //                                             location =
+    //                                                 Math.min(
+    //                                                     lineData[0].x,
+    //                                                     lineData[1].x,
+    //                                                 ) +
+    //                                                 Math.abs(
+    //                                                     lineData[0].x -
+    //                                                         lineData[1].x,
+    //                                                 ) /
+    //                                                     2;
+    //                                         } else {
+    //                                             if (item.extendLeft) {
+    //                                                 if (
+    //                                                     item.labelPlacement ===
+    //                                                     'Left'
+    //                                                 ) {
+    //                                                     location =
+    //                                                         scaleData.xScale.domain()[0];
+    //                                                 } else if (
+    //                                                     item.labelPlacement ===
+    //                                                     'Right'
+    //                                                 ) {
+    //                                                     if (item.extendRight) {
+    //                                                         location =
+    //                                                             scaleData.xScale.domain()[1];
+    //                                                     } else {
+    //                                                         location = Math.max(
+    //                                                             lineData[0].x,
+    //                                                             lineData[1].x,
+    //                                                         );
+    //                                                     }
+    //                                                 }
+    //                                             } else if (item.extendRight) {
+    //                                                 location =
+    //                                                     item.labelPlacement ===
+    //                                                     'Left'
+    //                                                         ? Math.min(
+    //                                                               lineData[0].x,
+    //                                                               lineData[1].x,
+    //                                                           )
+    //                                                         : scaleData.xScale.domain()[1];
+    //                                             } else {
+    //                                                 location =
+    //                                                     item.labelPlacement ===
+    //                                                     'Left'
+    //                                                         ? Math.min(
+    //                                                               lineData[0].x,
+    //                                                               lineData[1].x,
+    //                                                           )
+    //                                                         : Math.max(
+    //                                                               lineData[0].x,
+    //                                                               lineData[1].x,
+    //                                                           );
+    //                                             }
+    //                                         }
+
+    //                                         const linePlacement =
+    //                                             scaleData.xScale(location) +
+    //                                             (alignment === 'right'
+    //                                                 ? -10
+    //                                                 : alignment === 'left'
+    //                                                   ? +10
+    //                                                   : 0);
+
+    //                                         ctx.fillText(
+    //                                             lineLabel,
+    //                                             linePlacement,
+    //                                             scaleData.yScale(
+    //                                                 denomInBase ===
+    //                                                     lineData[0].denomInBase
+    //                                                     ? lineData[0].y
+    //                                                     : 1 / lineData[0].y,
+    //                                             ) +
+    //                                                 (item.labelAlignment.toLowerCase() ===
+    //                                                 'bottom'
+    //                                                     ? 5
+    //                                                     : item.labelAlignment.toLowerCase() ===
+    //                                                         'top'
+    //                                                       ? -5
+    //                                                       : 0),
+    //                                         );
+    //                                     }
+    //                                 });
+
+    //                                 if (item.line.active) {
+    //                                     if (ctx)
+    //                                         ctx.setLineDash(item.line.dash);
+    //                                     lineSeries.decorate(
+    //                                         (
+    //                                             context: CanvasRenderingContext2D,
+    //                                         ) => {
+    //                                             context.strokeStyle =
+    //                                                 item.line.color;
+    //                                             context.lineWidth =
+    //                                                 item.line.lineWidth;
+    //                                         },
+    //                                     );
+    //                                     lineSeries(data);
+    //                                 }
+
+    //                                 if (ctx) ctx.setLineDash([0, 0]);
+    //                             }
+
+    //                             if (
+    //                                 item.type === 'Brush' ||
+    //                                 item.type === 'Angle' ||
+    //                                 item.type === 'FibRetracement'
+    //                             ) {
+    //                                 if (
+    //                                     (hoveredDrawnShape &&
+    //                                         hoveredDrawnShape.data.time ===
+    //                                             item.time) ||
+    //                                     (selectedDrawnShape &&
+    //                                         selectedDrawnShape.data.time ===
+    //                                             item.time)
+    //                                 ) {
+    //                                     item.data.forEach((element) => {
+    //                                         if (
+    //                                             hoveredDrawnShape &&
+    //                                             hoveredDrawnShape.selectedCircle &&
+    //                                             hoveredDrawnShape.selectedCircle
+    //                                                 .x === element.x &&
+    //                                             Number(
+    //                                                 element.y.toFixed(12),
+    //                                             ) ===
+    //                                                 (element.denomInBase ===
+    //                                                 denomInBase
+    //                                                     ? Number(
+    //                                                           hoveredDrawnShape?.selectedCircle.y.toFixed(
+    //                                                               12,
+    //                                                           ),
+    //                                                       )
+    //                                                     : Number(
+    //                                                           (
+    //                                                               1 /
+    //                                                               hoveredDrawnShape
+    //                                                                   ?.selectedCircle
+    //                                                                   .y
+    //                                                           ).toFixed(12),
+    //                                                       ))
+    //                                         ) {
+    //                                             if (!isUpdatingShape) {
+    //                                                 selectedCircleSeries([
+    //                                                     element,
+    //                                                 ]);
+    //                                             }
+    //                                         } else {
+    //                                             circleSeries([element]);
+    //                                         }
+    //                                     });
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 });
+
+    //                 setIsShapeEdited(false);
+    //             })
+    //             .on('measure', () => {
+    //                 bandArea.context(ctx);
+    //                 rayLine.context(ctx);
+    //                 lineSeries.context(ctx);
+    //                 annotationLineSeries.context(ctx);
+    //                 circleSeries.context(ctx);
+    //                 selectedCircleSeries.context(ctx);
+    //             });
+
+    //         render();
+    //     }
+    // }, [
+    //     diffHashSig(drawnShapeHistory),
+    //     lineSeries,
+    //     annotationLineSeries,
+    //     hoveredDrawnShape,
+    //     selectedDrawnShape,
+    //     isUpdatingShape,
+    //     denomInBase,
+    //     period,
+    //     isShapeEdited,
+    //     getDollarPrice,
+    //     bandwidth,
+    //     // anglePointSeries,
+    // ]);
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -6043,11 +6052,11 @@ export default function Chart(props: propsIF) {
 
                 <LimitLineChart {...limitCanvasProps} />
 
-                <d3fc-canvas
+              {/*   <d3fc-canvas
                     ref={d3CanvasMain}
                     className='main-canvas'
                     id={mainCanvasElementId}
-                ></d3fc-canvas>
+                ></d3fc-canvas> */}
 
                 {activeDrawingType !== 'Cross' && scaleData && (
                     <DrawCanvas
