@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as d3 from 'd3';
 import * as d3fc from 'd3fc';
 import {
@@ -5988,7 +5989,7 @@ export default function Chart(props: propsIF) {
                     chartThemeColors={chartThemeColors}
                 />
 
-                {liquidityData && platformName !== 'futa' && (
+               {/*  {liquidityData && platformName !== 'futa' && (
                     <LiquidityChart
                         liqMode={liqMode}
                         liquidityData={liquidityData}
@@ -6009,7 +6010,7 @@ export default function Chart(props: propsIF) {
                         colorChangeTrigger={colorChangeTrigger}
                         setColorChangeTrigger={setColorChangeTrigger}
                     />
-                )}
+                )} */}
 
                 {(showSwap || showLiquidity || showHistorical) &&
                     circleScale &&
