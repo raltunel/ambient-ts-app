@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as d3 from 'd3';
 import * as d3fc from 'd3fc';
 import {
@@ -5978,7 +5979,7 @@ export default function Chart(props: propsIF) {
                     />
                 )}
 
-                <VolumeBarCanvas
+              {/*   <VolumeBarCanvas
                     scaleData={scaleData}
                     volumeData={unparsedCandleData}
                     denomInBase={denomInBase}
@@ -5986,7 +5987,7 @@ export default function Chart(props: propsIF) {
                     showVolume={showVolume}
                     visibleDateForCandle={visibleDateForCandle}
                     chartThemeColors={chartThemeColors}
-                />
+                /> */}
 
                 {liquidityData && platformName !== 'futa' && (
                     <LiquidityChart
