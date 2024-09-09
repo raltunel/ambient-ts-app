@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as d3 from 'd3';
 import * as d3fc from 'd3fc';
 import {
@@ -6011,7 +6012,7 @@ export default function Chart(props: propsIF) {
                     />
                 )}
 
-                {(showSwap || showLiquidity || showHistorical) &&
+             {/*    {(showSwap || showLiquidity || showHistorical) &&
                     circleScale &&
                     scaleData && (
                         <OrderHistoryCanvas
@@ -6028,7 +6029,7 @@ export default function Chart(props: propsIF) {
                             isSelectedOrderHistory={isSelectedOrderHistory}
                             selectedOrderHistory={selectedOrderHistory}
                         />
-                    )}
+                    )} */}
 
                 <d3fc-canvas
                     ref={d3CanvasCrosshair}
