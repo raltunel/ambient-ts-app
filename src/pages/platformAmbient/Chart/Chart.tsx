@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as d3 from 'd3';
 import * as d3fc from 'd3fc';
 import {
@@ -6041,7 +6042,7 @@ export default function Chart(props: propsIF) {
 
                 <RangeLinesChart {...rangeCanvasProps} />
 
-                <LimitLineChart {...limitCanvasProps} />
+              {/*   <LimitLineChart {...limitCanvasProps} /> */}
 
                 <d3fc-canvas
                     ref={d3CanvasMain}
