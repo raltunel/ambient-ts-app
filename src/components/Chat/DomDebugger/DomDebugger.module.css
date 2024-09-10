@@ -89,9 +89,6 @@
     animation: dom_debugger_val_signal 0.2s forwards ease-in-out;
 }
 
-.dom_debug_nodes_wrapper {
-}
-
 .dom_debug_toolbar {
     display: block;
     width: 100%;
