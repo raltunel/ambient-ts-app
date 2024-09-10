@@ -74,7 +74,6 @@ import {
 } from '../../../../contexts/ReceiptContext';
 import TableRows from '../TableRows';
 import { candleTimeIF } from '../../../../App/hooks/useChartSettings';
-import { domDebug } from '../../../Chat/DomDebugger/DomDebuggerUtils';
 
 interface propsIF {
     filter?: CandleDataIF | undefined;
@@ -725,7 +724,6 @@ function Transactions(props: propsIF) {
     };
 
     useEffect(() => {
-        domDebug('sortBy', sortBy);
         scrollToTop();
     }, [sortBy, showAllData]);
 
@@ -766,7 +764,6 @@ function Transactions(props: propsIF) {
             if (txDiv) {
                 const txText = txDiv.querySelector('span')?.textContent;
                 setFirstSeenTxID(txText || '');
-                domDebug('firstSeenTxID', txText);
             }
         }
     };
@@ -787,7 +784,6 @@ function Transactions(props: propsIF) {
             if (txDiv) {
                 const txText = txDiv.querySelector('span')?.textContent;
                 setLastSeenTxID(txText || '');
-                domDebug('lastSeenTxID', txText);
             }
         }
     };
@@ -862,29 +858,9 @@ function Transactions(props: propsIF) {
             .catch(console.error);
     };
 
-    const logData = () => {
-        domDebug('sortedTxDataDisp', sortedTxDataToDisplay.length);
-        // if(sortedTxDataToDisplay.length > 0){
-        //     domDebug('sortedTxDataDisp LAST', sortedTxDataToDisplay[sortedTxDataToDisplay.length - 1].txHash);
-        // }
-        // if(sortedTxDataToDisplay.length > 0){
-        //     domDebug('sortedTxDataDisp FIRST', sortedTxDataToDisplay[0].txHash);
-        // }
-        domDebug('sortedTransactions', sortedTransactions.length);
-        domDebug('pagesVisible', pagesVisible[0] + ' ' + pagesVisible[1]);
-        // if(sortedTransactions.length > 0){
-        //     domDebug('sortedTransactions LAST ', sortedTransactions[sortedTransactions.length - 1].txHash);
-        // }
-        // if(sortedTransactions.length > 0){
-        //     domDebug('sortedTransactions FIRST ', sortedTransactions[0].txHash);
-        // }
-    };
 
-    // const disableAutoScroll = true;
 
     useEffect(() => {
-        logData();
-        // if(disableAutoScroll) return;
         if (autoScroll) {
             if (sortBy === 'time' || !autoScrollAlternateSolutionActive) {
                 if (autoScrollDirection === ScrollDirection.DOWN) {
