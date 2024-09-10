@@ -91,15 +91,6 @@ interface Changes {
 }
 
 
-enum ScrollDirection {
-    UP,
-    DOWN,
-}
-
-enum ScrollPosition {
-    TOP,
-    BOTTOM,
-}
 
 function Transactions(props: propsIF) {
     const {
@@ -222,9 +213,9 @@ function Transactions(props: propsIF) {
     autoScrollRef.current = autoScroll;
 
     const [autoScrollDirection, setAutoScrollDirection] = useState(
-        ScrollDirection.DOWN,
+        'down',
     );
-    const autoScrollDirectionRef = useRef<ScrollDirection>();
+    const autoScrollDirectionRef = useRef<string>();
     autoScrollDirectionRef.current = autoScrollDirection;
 
     useEffect(() => {
@@ -693,7 +684,7 @@ function Transactions(props: propsIF) {
     };
 
     const triggerAutoScroll = (
-        direction: ScrollDirection,
+        direction: string,
         timeout?: number,
     ) => {
         setTransactionTableOpacity('1');
@@ -715,12 +706,12 @@ function Transactions(props: propsIF) {
 
     const shiftUp = (): void => {
         setPagesVisible((prev) => [prev[0] - 1, prev[1] - 1]);
-        triggerAutoScroll(ScrollDirection.UP);
+        triggerAutoScroll('up');
     };
 
     const shiftDown = (): void => {
         setPagesVisible((prev) => [prev[0] + 1, prev[1] + 1]);
-        triggerAutoScroll(ScrollDirection.DOWN);
+        triggerAutoScroll('down');
     };
 
     useEffect(() => {
@@ -729,7 +720,7 @@ function Transactions(props: propsIF) {
 
     const markRows = false;
 
-    const scrollByTxID = (txID: string, pos: ScrollPosition): void => {
+    const scrollByTxID = (txID: string, pos: string): void => {
         const txSpans = document.querySelectorAll(
             '#current_row_scroll > div > div:nth-child(2) > div > span',
         );
@@ -745,7 +736,7 @@ function Transactions(props: propsIF) {
                 }
 
                 parent.scrollIntoView({
-                    block: pos === ScrollPosition.BOTTOM ? 'end' : 'start',
+                    block: pos === 'bottom' ? 'end' : 'start',
                     behavior: 'instant' as ScrollBehavior,
                 });
             }
@@ -832,7 +823,7 @@ function Transactions(props: propsIF) {
                                 prev[1] + 1,
                             ]);
 
-                            triggerAutoScroll(ScrollDirection.DOWN);
+                            triggerAutoScroll('down');
                         } else {
                             setMoreDataAvailable(false);
                         }
@@ -863,15 +854,15 @@ function Transactions(props: propsIF) {
     useEffect(() => {
         if (autoScroll) {
             if (sortBy === 'time' || !autoScrollAlternateSolutionActive) {
-                if (autoScrollDirection === ScrollDirection.DOWN) {
+                if (autoScrollDirection === 'down') {
                     scrollByTxID(
                         lastSeenTxIDRef.current || '',
-                        ScrollPosition.BOTTOM,
+                        'bottom',
                     );
-                } else if (autoScrollDirection === ScrollDirection.UP) {
+                } else if (autoScrollDirection === 'up') {
                     scrollByTxID(
                         firstSeenTxIDRef.current || '',
-                        ScrollPosition.TOP,
+                        'top',
                     );
                 }
             } else {
@@ -881,13 +872,13 @@ function Transactions(props: propsIF) {
     }, [sortedTxDataToDisplay]);
 
     const scrollWithAlternateStrategy = () => {
-        if (autoScrollDirection === ScrollDirection.DOWN && scrollRef.current) {
+        if (autoScrollDirection === 'down' && scrollRef.current) {
             scrollRef.current.scrollTo({
                 top: 1912,
                 behavior: 'instant' as ScrollBehavior,
             });
         } else if (
-            autoScrollDirection === ScrollDirection.UP &&
+            autoScrollDirection === 'up' &&
             scrollRef.current
         ) {
             scrollRef.current.scrollTo({
