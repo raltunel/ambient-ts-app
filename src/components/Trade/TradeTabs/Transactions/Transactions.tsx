@@ -57,7 +57,6 @@ import {
 } from '../../../../styled/Components/TransactionTable';
 import { FlexContainer } from '../../../../styled/Common';
 import {
-    Changes,
     GraphDataContext,
     GraphDataContextIF,
 } from '../../../../contexts/GraphDataContext';
@@ -86,6 +85,12 @@ interface propsIF {
     setSelectedInsideTab?: Dispatch<number>;
     fullLayoutActive?: boolean;
 }
+
+interface Changes {
+    dataReceived: boolean;
+    changes: Array<TransactionIF>;
+}
+
 
 enum ScrollDirection {
     UP,
