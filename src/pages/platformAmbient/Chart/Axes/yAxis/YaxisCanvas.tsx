@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
     useEffect,
     useRef,
@@ -834,35 +835,35 @@ function YAxisCanvas(props: yAxisIF) {
         isLineDrag,
     ]);
 
-    useEffect(() => {
-        if (yAxis && yAxisZoom && d3Yaxis.current) {
-            d3.select<Element, unknown>(d3Yaxis.current)
-                .call(yAxisZoom)
-                .on('dblclick.zoom', null);
+    // useEffect(() => {
+    //     if (yAxis && yAxisZoom && d3Yaxis.current) {
+    //         d3.select<Element, unknown>(d3Yaxis.current)
+    //             .call(yAxisZoom)
+    //             .on('dblclick.zoom', null);
 
-            if (location.pathname.includes('market')) {
-                d3.select(d3Yaxis.current).on('.drag', null);
-            }
-            if (
-                (location.pathname.includes('pool') ||
-                    location.pathname.includes('reposition')) &&
-                !isLineDrag
-            ) {
-                d3.select(d3Yaxis.current).call(dragRange);
-            }
-            if (location.pathname.includes('/limit') && !isLineDrag) {
-                d3.select(d3Yaxis.current).call(dragLimit);
-            }
-            renderCanvasArray([d3Yaxis]);
-        }
-    }, [
-        location.pathname,
-        yAxisZoom,
-        dragLimit,
-        dragRange,
-        d3.select('#range-line-canvas')?.node(),
-        d3.select('#limit-line-canvas')?.node(),
-    ]);
+    //         if (location.pathname.includes('market')) {
+    //             d3.select(d3Yaxis.current).on('.drag', null);
+    //         }
+    //         if (
+    //             (location.pathname.includes('pool') ||
+    //                 location.pathname.includes('reposition')) &&
+    //             !isLineDrag
+    //         ) {
+    //             d3.select(d3Yaxis.current).call(dragRange);
+    //         }
+    //         if (location.pathname.includes('/limit') && !isLineDrag) {
+    //             d3.select(d3Yaxis.current).call(dragLimit);
+    //         }
+    //         renderCanvasArray([d3Yaxis]);
+    //     }
+    // }, [
+    //     location.pathname,
+    //     yAxisZoom,
+    //     dragLimit,
+    //     dragRange,
+    //     d3.select('#range-line-canvas')?.node(),
+    //     d3.select('#limit-line-canvas')?.node(),
+    // ]);
 
     // Axis's
     useEffect(() => {

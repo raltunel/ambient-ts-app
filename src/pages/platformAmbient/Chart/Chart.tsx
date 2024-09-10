@@ -2509,34 +2509,34 @@ export default function Chart(props: propsIF) {
         liqMaxActiveLiq,
     ]);
 
-    useEffect(() => {
-        if (mainZoom && d3CanvasMain.current) {
-            d3.select<Element, unknown>(d3CanvasMain.current)
-                .call(mainZoom)
-                .on('wheel.zoom', null);
-            if (location.pathname.includes('market')) {
-                d3.select(d3CanvasMain.current).on('.drag', null);
-            }
-            if (
-                location.pathname.includes('pool') ||
-                location.pathname.includes('reposition')
-            ) {
-                if (dragRange && !isLineDrag) {
-                    d3.select<d3.DraggedElementBaseType, unknown>(
-                        d3CanvasMain.current,
-                    ).call(dragRange);
-                }
-            }
-            if (location.pathname.includes('/limit')) {
-                if (dragLimit && !isLineDrag) {
-                    d3.select<d3.DraggedElementBaseType, unknown>(
-                        d3CanvasMain.current,
-                    ).call(dragLimit);
-                }
-            }
-            renderCanvasArray([d3CanvasMain]);
-        }
-    }, [location.pathname, mainZoom, dragLimit, dragRange, isLineDrag]);
+    // useEffect(() => {
+    //     if (mainZoom && d3CanvasMain.current) {
+    //         d3.select<Element, unknown>(d3CanvasMain.current)
+    //             .call(mainZoom)
+    //             .on('wheel.zoom', null);
+    //         if (location.pathname.includes('market')) {
+    //             d3.select(d3CanvasMain.current).on('.drag', null);
+    //         }
+    //         if (
+    //             location.pathname.includes('pool') ||
+    //             location.pathname.includes('reposition')
+    //         ) {
+    //             if (dragRange && !isLineDrag) {
+    //                 d3.select<d3.DraggedElementBaseType, unknown>(
+    //                     d3CanvasMain.current,
+    //                 ).call(dragRange);
+    //             }
+    //         }
+    //         if (location.pathname.includes('/limit')) {
+    //             if (dragLimit && !isLineDrag) {
+    //                 d3.select<d3.DraggedElementBaseType, unknown>(
+    //                     d3CanvasMain.current,
+    //                 ).call(dragLimit);
+    //             }
+    //         }
+    //         renderCanvasArray([d3CanvasMain]);
+    //     }
+    // }, [location.pathname, mainZoom, dragLimit, dragRange, isLineDrag]);
 
     // create market line and liquidity tooltip
     useEffect(() => {
