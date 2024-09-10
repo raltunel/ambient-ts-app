@@ -52,7 +52,6 @@ export default function DomDebugger() {
 
     const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
 
-        console.log(e)
         setIsDragging(true);
         setDragStart([e.clientX, e.clientY]);
     }
