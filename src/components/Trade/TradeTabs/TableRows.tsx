@@ -195,7 +195,6 @@ function TableRows({
     const transactionContent = () => {
         return (
             <>
-                {/* <div id='omega'>OMEGA</div> */}
                 {(data as TransactionIF[]).map((tx, idx) => (
                     <TransactionRow
                         key={idx}
