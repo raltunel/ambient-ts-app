@@ -152,7 +152,6 @@ function Transactions(props: propsIF) {
         TransactionIF[]
     >([]);
 
-    // ref holding scrollable element (to attach event listener)
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const [pagesVisible, setPagesVisible] = useState<[number, number]>([0, 1]);
@@ -223,7 +222,7 @@ function Transactions(props: propsIF) {
             fetchedTransactions.changes.map(
                 (change) => change.txHash || change.txId,
             ),
-        ); // Adjust if using a different unique identifier
+        ); 
 
         const uniqueChanges = transactionsByPool.changes.filter(
             (change) => !existingChanges.has(change.txHash || change.txId),
@@ -303,7 +302,6 @@ function Transactions(props: propsIF) {
             tx.txDetails?.poolIdx === poolIndex,
     );
 
-    // TODO: Use these as media width constants
     const isSmallScreen: boolean = useMediaQuery('(max-width: 800px)');
     const isLargeScreen: boolean = useMediaQuery('(min-width: 1600px)');
 
@@ -363,7 +361,6 @@ function Transactions(props: propsIF) {
             })
             .catch(console.error);
 
-    // update candle transactions on fresh load
     useEffect(() => {
         if (
             isServerEnabled &&
@@ -558,7 +555,6 @@ function Transactions(props: propsIF) {
     const handleKeyDownViewTransaction = (
         event: React.KeyboardEvent<HTMLUListElement | HTMLDivElement>,
     ): void => {
-        // Opens a modal which displays the contents of a transaction and some other information
         const { key } = event;
 
         if (key === 'ArrowDown' || key === 'ArrowUp') {
@@ -614,7 +610,7 @@ function Transactions(props: propsIF) {
                 }
             },
             {
-                threshold: 0.1, // Trigger when 10% of the element is visible
+                threshold: 0.1, 
             },
         );
 
@@ -633,7 +629,6 @@ function Transactions(props: propsIF) {
         moreDataLoading,
         moreDataAvailable,
         extraPagesAvailable,
-        // pagesVisible[1],
     ]);
 
     useEffect(() => {
@@ -642,13 +637,12 @@ function Transactions(props: propsIF) {
                 const entry = entries[0];
                 if (moreDataLoading) return;
                 if (entry.isIntersecting) {
-                    // first row is visible
                     pagesVisible[0] > 0 && shiftUp();
                     bindFirstSeenRow();
                 }
             },
             {
-                threshold: 0.1, // Trigger when 10% of the element is visible
+                threshold: 0.1, 
             },
         );
 
@@ -675,7 +669,6 @@ function Transactions(props: propsIF) {
         setPagesVisible([0, 1]);
 
         if (scrollRef.current) {
-            // scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' }); // For smooth scrolling
             scrollRef.current.scrollTo({
                 top: 0,
                 behavior: 'instant' as ScrollBehavior,
@@ -728,7 +721,6 @@ function Transactions(props: propsIF) {
         txSpans.forEach((span) => {
             if (span.textContent === txID) {
                 const row = span.parentElement?.parentElement as HTMLDivElement;
-                // row.style.backgroundColor = 'red';
 
                 const parent = row.parentElement as HTMLDivElement;
                 if (markRows) {
@@ -762,7 +754,6 @@ function Transactions(props: propsIF) {
     const bindLastSeenRow = (): void => {
         const rows = document.querySelectorAll('#current_row_scroll > div');
         if (rows.length > 0) {
-            // const lastRow = rows[rows.length - 1] as HTMLDivElement;
             rows.forEach((row) => {
                 (row as HTMLDivElement).style.backgroundColor = 'transparent';
             });
@@ -783,7 +774,6 @@ function Transactions(props: propsIF) {
 
     const addMoreData = (): void => {
         if (!crocEnv || !provider) return;
-        // retrieve pool recent changes
         setMoreDataLoading(true);
         fetchPoolRecentChanges({
             tokenList: tokens.tokenUniv,
@@ -803,13 +793,12 @@ function Transactions(props: propsIF) {
         })
             .then((poolChangesJsonData) => {
                 if (poolChangesJsonData && poolChangesJsonData.length > 0) {
-                    // setTransactionsByPool((prev) => {
                     setFetchedTransactions((prev) => {
                         const existingChanges = new Set(
                             prev.changes.map(
                                 (change) => change.txHash || change.txId,
                             ),
-                        ); // Adjust if using a different unique identifier
+                        ); 
                         const uniqueChanges = poolChangesJsonData.filter(
                             (change) =>
                                 !existingChanges.has(
