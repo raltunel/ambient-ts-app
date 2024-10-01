@@ -3,7 +3,7 @@ import styles from './ScreenCapture.module.css';
 // import { domToImage } from 'modern-screenshot';
 import { printDomToImage } from '../../../ambient-utils/dataLayer';
 import { ScreenCaptureOverlayTypes, ScreenCaptureStates } from '../ChatEnums';
-import { DomPositionInterface } from '../ChatIFs';
+import { DomPositionInterface, DomRectIF } from '../ChatIFs';
 import { domDebug } from '../DomDebugger/DomDebuggerUtils';
 import useCopyToClipboard from '../../../utils/hooks/useCopyToClipboard';
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -32,6 +32,8 @@ export default function ScreenCapture(props: propsIF) {
     const [maskRB, setMaskRB] = useState<DomPositionInterface>();
     const maskRBRef = useRef<DomPositionInterface>();
     maskRBRef.current = maskRB;
+
+    const [overlayRect, setOverlayRect] = useState<DomRectIF>({ lt: { x: 0, y: 0 }, rt: { x: 0, y: 0 }, rb: { x: 0, y: 0 }, lb: { x: 0, y: 0 } });
 
     const croppedImageRef = useRef<HTMLDivElement>(null);
 
@@ -74,10 +76,14 @@ export default function ScreenCapture(props: propsIF) {
         if (captureStateRef.current != ScreenCaptureStates.Masking) return;
 
         setMaskRB({ x: e.clientX, y: e.clientY });
+        if(maskLTRef.current){
+            setOverlayRect(getOverlayPoints(maskLTRef.current, { x: e.clientX, y: e.clientY }));
+        }
 
         domDebug('maskRB', maskRB);
     };
 
+    console.log(overlayRect)
     const copyCroppedImageToClipboard = async () => {
         if (croppedImageRef.current) {
             const image = await printDomToImage(croppedImageRef.current);
@@ -102,6 +108,8 @@ export default function ScreenCapture(props: propsIF) {
                 return {
                     left: 0,
                     top: 0,
+                    // right: window.innerWidth - maskRBRef.current.x,
+                    // bottom: window.innerHeight - maskLTRef.current.y,
                     right: window.innerWidth - maskRBRef.current.x,
                     bottom: window.innerHeight - maskLTRef.current.y,
                 };
@@ -128,31 +136,40 @@ export default function ScreenCapture(props: propsIF) {
                 };
             case ScreenCaptureOverlayTypes.MaskArea:
                 return {
-                    left: maskLTRef.current.x,
-                    top: maskLTRef.current.y,
-                    right: window.innerWidth - maskRBRef.current.x - 10,
-                    bottom: window.innerHeight - maskRBRef.current.y - 10,
+                    // left: maskLTRef.current.x,
+                    // top: maskLTRef.current.y,
+                    // right: window.innerWidth - maskRBRef.current.x - 10,
+                    // bottom: window.innerHeight - maskRBRef.current.y - 10,
+                    left: overlayRect.lt.x,
+                    top: overlayRect.lt.y,
+                    right: window.innerWidth - overlayRect.rt.x,
+                    bottom: window.innerHeight - overlayRect.rb.y,
                 };
         }
     };
 
     const getImageOffset = () => {
-        if (maskLTRef.current && maskRBRef.current) {
             return {
-                left: -1 * maskLTRef.current.x,
-                top: -1 * maskLTRef.current.y,
+                left: -1 * overlayRect.lt.x,
+                top: -1 * overlayRect.lt.y,
             };
-        }
     };
 
     const getPreviewSize = () => {
-        if (maskLTRef.current && maskRBRef.current) {
             return {
-                width: maskRBRef.current.x - maskLTRef.current.x,
-                height: maskRBRef.current.y - maskLTRef.current.y,
+                width: overlayRect.rt.x - overlayRect.lt.x,
+                height: overlayRect.lb.y - overlayRect.lt.y,
             };
-        }
     };
+
+    const getOverlayPoints = (first: DomPositionInterface, second: DomPositionInterface) => {
+        const lt = { x: Math.min(first.x, second.x), y: Math.min(first.y, second.y) };
+        const rt = { x: Math.max(first.x, second.x), y: Math.min(first.y, second.y) };
+        const lb = { x: Math.min(first.x, second.x), y: Math.max(first.y, second.y) };
+        const rb = { x: Math.max(first.x, second.x), y: Math.max(first.y, second.y) };
+        return { lt, rt, rb, lb};
+    }
+
     return (
         <>
             <div className={styles.capture_btn} onClick={btnListener}>
