@@ -686,7 +686,9 @@ function Transactions(props: propsIF) {
             }
         />
     ) : (
-        <div onKeyDown={handleKeyDownViewTransaction}>
+        <div onKeyDown={handleKeyDownViewTransaction}
+            // style={{height: '100%'}}
+        >
             <ul
                 ref={listRef}
                 id='current_row_scroll'
@@ -695,6 +697,7 @@ function Transactions(props: propsIF) {
                         ? isAccountView
                             ? { maxHeight: 'calc(100svh - 310px)', overflowY:'auto' }
                             : { height: 'calc(100svh - 300px)', overflowY:'auto' }
+                            // : { height: '100%' }
                         : undefined
                 }
             >
@@ -824,7 +827,10 @@ function Transactions(props: propsIF) {
                     :
                     (<TableRows
                         type='Transaction'
-                        data={sortedTransactions}
+                        // data={sortedTransactions}  // using filter came from develop branch last version
+                        data={sortedTransactions.filter(
+                            (tx) => tx.changeType !== 'cross',
+                        )}
                         fullData={sortedTransactions}
                         tableView={tableView}
                         isAccountView={isAccountView}
