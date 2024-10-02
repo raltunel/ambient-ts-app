@@ -1,4 +1,4 @@
-import { memo, useContext, useEffect, useState } from 'react';
+import { memo, MutableRefObject, useContext, useEffect, useState } from 'react';
 import {
     LimitModalAction,
     LimitOrderIF,
@@ -26,6 +26,8 @@ interface propsIF {
     isAccountView: boolean;
     isLeaderboard?: boolean;
     positionsByApy?: string[];
+    firstRowRef?: MutableRefObject<HTMLDivElement | null>;
+    lastRowRef?: MutableRefObject<HTMLDivElement | null>;
 }
 
 type ActiveRecord = TransactionIF | LimitOrderIF | PositionIF | undefined;
@@ -38,6 +40,8 @@ function TableRows({
     tableView,
     isLeaderboard,
     positionsByApy,
+    firstRowRef,
+    lastRowRef,
 }: propsIF) {
     const [isDetailsModalOpen, openDetailsModal, closeDetailsModal] =
         useModal();
@@ -152,6 +156,13 @@ function TableRows({
                     <RangesRow
                         key={idx}
                         position={position}
+                        observedRowRef={
+                            idx === 0
+                                ? firstRowRef
+                                : idx === data.length - 1
+                                  ? lastRowRef
+                                  : undefined
+                        }
                         tableView={tableView}
                         isAccountView={isAccountView}
                         isLeaderboard={isLeaderboard}
@@ -192,10 +203,18 @@ function TableRows({
     const transactionContent = () => {
         return (
             <>
+                {/* <div id='omega'>OMEGA</div> */}
                 {(data as TransactionIF[]).map((tx, idx) => (
                     <TransactionRow
                         key={idx}
                         idForDOM={`tx_row_${idx}`}
+                        observedRowRef={
+                            idx === 0
+                                ? firstRowRef
+                                : idx === data.length - 1
+                                  ? lastRowRef
+                                  : undefined
+                        }
                         tx={tx}
                         tableView={tableView}
                         isAccountView={isAccountView}
@@ -225,6 +244,13 @@ function TableRows({
                         limitOrder={order}
                         tableView={tableView}
                         isAccountView={isAccountView}
+                        observedRowRef={
+                            idx === 0
+                                ? firstRowRef
+                                : idx === data.length - 1
+                                  ? lastRowRef
+                                  : undefined
+                        }
                         openDetailsModal={() =>
                             openLimitModal(order.limitOrderId, 'details')
                         }
