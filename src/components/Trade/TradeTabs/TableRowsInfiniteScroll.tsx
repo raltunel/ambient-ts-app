@@ -1,6 +1,5 @@
 import { Dispatch, memo, SetStateAction, useEffect, useRef, useState} from 'react';
 import { RiArrowUpSLine } from 'react-icons/ri';
-import { } from '../../../ambient-utils/api';
 import {
     LimitOrderIF,
     PositionIF,
