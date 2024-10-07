@@ -40,7 +40,7 @@ export default function ScreenCapture(props: propsIF) {
     const [debugMode, setDebugMode] = useState<boolean>(false);
     const btnListener = async () => {
         // const image = await domToImage(document.body);
-        const image = await printDomToImage(document.body);
+        const image = await printDomToImage(document.getElementById('root') as HTMLElement);
         setImageComp(image);
 
         console.log(image);
@@ -59,7 +59,7 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const captureDom = async () => {
-        const image = await printDomToImage(document.body);
+        const image = await printDomToImage(document.getElementById('root') as HTMLElement);
         setImageComp(image);
     };
 
