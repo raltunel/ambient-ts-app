@@ -1,11 +1,16 @@
 /* eslint @typescript-eslint/no-var-requires: "off" */
 import fs from 'fs';
 import * as path from 'path';
-const superagent = require('superagent');
-const admZip = require('adm-zip');
+import { fileURLToPath } from 'url';
+import superagent from 'superagent';
+import admZip from'adm-zip';
 
 const mmaskURL =
-    'https://github.com/MetaMask/metamask-extension/releases/download/v11.0.0/metamask-chrome-11.0.0.zip';
+    // 'https://github.com/MetaMask/metamask-extension/releases/download/v11.0.0/metamask-chrome-11.0.0.zip';
+    'https://github.com/MetaMask/metamask-extension/releases/download/v12.0.0/metamask-chrome-12.0.0.zip';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename)
 const downloadPath = path.join(__dirname, 'metamask.zip');
 const extractPath = path.join(__dirname, 'metamask');
 

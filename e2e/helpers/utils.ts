@@ -1,9 +1,14 @@
 import { chromium, Page, BrowserContext, Browser } from 'playwright';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 import * as dotenv from 'dotenv';
 import fs from 'fs';
 
 dotenv.config({ path: '.env.local' });
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename)
 
 import { downloadMMask } from './mmask-fetch';
 
@@ -82,6 +87,8 @@ export async function initWallet(context: BrowserContext) {
     const seed = seedEnv.split(',');
 
     console.log('Seed phrase loaded');
+    console.log(seedEnv);
+    console.log('...............................................');
 
     async function processWallet(page) {
         const elementHandle = await page.$('#onboarding__terms-checkbox');
