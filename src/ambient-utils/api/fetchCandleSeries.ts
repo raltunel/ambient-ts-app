@@ -252,7 +252,8 @@ function decorateCandleData(
         .filter(
             (p) =>
                 //  p.priceOpen > 0 &&
-                p.time > PRE_BURN_TIME,
+                p.time > PRE_BURN_TIME 
+                && p.priceOpen > 0 && p.priceClose > 0,
         )
         .map((p) => {
             const baseDecMult = 1 / Math.pow(10, baseDecimals);
