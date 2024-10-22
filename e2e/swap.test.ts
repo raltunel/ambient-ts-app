@@ -138,12 +138,12 @@ async function testMeta(browser: BrowserContext) {
 }
 test.setTimeout(90000);
 
-async function initWalletTest(browser: BrowserContext) {
-    await waiter(5);
+test('test_CS_1132_Swap_Wallet', async () => {
     await initWallet(browser);
 });
 
 test('Make swap', async () => {
+    await initWallet(browser);
     await testMeta(browser);
 });
 // no more in scope, interface changed
@@ -199,6 +199,11 @@ test('test_CS_1042_Account', async () => {
     const page: Page = await context.newPage();
     await goto(page);
     await page.bringToFront();
+
+    
+    await waiter(2)
+    await checkForWalletConnection(page, browser);
+
     // go to account page
     await clickAccountPage(page);
     // assert if account page is visible
