@@ -11,6 +11,7 @@ import styles from './DropdownMenu2.module.css'
 import { motion } from 'framer-motion';
 // Interface for React functional components
 interface propsIF {
+    id?: string;
     title: string;
     children: ReactNode;
     marginTop?: string;
@@ -93,8 +94,9 @@ export default function DropdownMenu2(props: propsIF) {
     )
 
     return (
-        <div ref={dropdownRefItem}>
+        <div ref={dropdownRefItem} >
             <div className={styles.menu}
+                id={props.id}
                 onClick={() => expandable && toggleMenu()}
                 style={{
                     minWidth: !showFullMenu

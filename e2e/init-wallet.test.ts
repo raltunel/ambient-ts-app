@@ -14,12 +14,23 @@ import {
     checkForWalletConnection,
 } from './helpers/utils';
 
-// test('init wallet', async () => {
-//   await initWalletFunc();
 
-//   console.log('first test done !!!!!!!!!!!')
-// })
+
+let browser: BrowserContext;
+
+test.beforeEach(async () => {
+    if (browser) {
+        return browser;
+    }
+    browser = await prepareBrowser();
+});
 
 export async function initWalletFunc(browser: BrowserContext) {
     await initWallet(browser);
 }
+
+
+test('init wallet', async () => {
+    await initWallet(browser);
+    await waiter(5);
+});

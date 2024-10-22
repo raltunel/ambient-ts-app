@@ -266,7 +266,9 @@ export default function NetworkSelector(props: propsIF) {
             }}
         >
             <div className={styles.dropdownMenuContainer}>
+
                 <DropdownMenu2
+                    id='network-select-dropdown'
                     marginTop={'50px'}
                     marginRight={smallScreen ? '70px' : ''}
                     titleWidth={'80px'}

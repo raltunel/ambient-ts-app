@@ -12,6 +12,7 @@ import {
     prepareBrowser,
     waiter,
     checkForWalletConnection,
+    setNetwork,
 } from './helpers/utils';
 
 let browser: BrowserContext;
@@ -26,14 +27,17 @@ test.beforeEach(async () => {
 async function testMeta(browser: BrowserContext) {
     const context: BrowserContext = browser;
 
-    await waiter(2);
+    await waiter(8);
     const page: Page = await context.newPage();
 
     await page.goto(
-        'http://localhost:3000/trade/market/chain=0x5&tokenA=0x0000000000000000000000000000000000000000&tokenB=0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C',
+        // 'http://localhost:3000/trade/market/chain=0x5&tokenA=0x0000000000000000000000000000000000000000&tokenB=0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C',
+        'http://localhost:3000/trade/market/chain=0xaa36a7&tokenA=0x0000000000000000000000000000000000000000&tokenB=0x60bBA138A74C5e7326885De5090700626950d509',
     );
 
     try {
+        await setNetwork(page);
+        await waiter(2)
         await checkForWalletConnection(page, browser);
         await fill('#swap_sell_qty', page, '.007');
 
@@ -57,7 +61,7 @@ async function testMeta(browser: BrowserContext) {
 }
 
 async function initWalletTest(browser: BrowserContext) {
-    await waiter(2);
+    await waiter(5);
     await initWallet(browser);
     await waiter(5);
 }

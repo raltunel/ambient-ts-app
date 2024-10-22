@@ -23,7 +23,7 @@ export async function checkAndClick(selector: string, page: Page) {
     const el = await page.$(selector);
 
     if (el) {
-        el.click();
+        await el.click();
     }
 }
 
@@ -97,7 +97,7 @@ export async function initWallet(context: BrowserContext) {
 
             await clickmmask('onboarding-import-wallet', page);
 
-            await clickmmask('metametrics-i-agree', page);
+            await checkAndClickMMask('metametrics-no-thanks', page);
 
             for (let i = 0; i < 12; i++) {
                 await fill('#import-srp__srp-word-' + i, page, seed[i]);
@@ -111,10 +111,14 @@ export async function initWallet(context: BrowserContext) {
             await fillmmask('create-password-confirm', page, '11111111');
 
             await clickmmask('create-password-import', page);
+
             await clickmmask('onboarding-complete-done', page);
+
             await clickmmask('pin-extension-next', page);
+
             await clickmmask('pin-extension-done', page);
-            await clickmmask('popover-close', page);
+            
+            await checkAndClickMMask('popover-close', page);
 
             await clickmmask('network-display', page);
             await checkAndClick(
@@ -146,33 +150,56 @@ export async function initWallet(context: BrowserContext) {
             );
         }
 
-        // select goerli network
+        // select sepolia network
         setTimeout(async () => {
-            const spanElement = await page
-                .locator(
-                    '.multichain-network-list-menu-content-wrapper span:text("Goerli")',
-                )
-                .first();
-            if (spanElement) {
-                spanElement.click();
-            }
+            // const spanElement = await page
+            //     .locator(
+            //         '.multichain-network-list-menu-content-wrapper span:text("Goerli")',
+            //     )
+            //     .first();
+            // if (spanElement) {
+            //     spanElement.click();
+            // }
+
+            await clickmmask('Sepolia', page);
             setTimeout(async () => {
                 page.close();
             }, 300);
-        }, 500);
+        }, 1000);
     }
 
     const pages = context.pages();
-    pages.map(async (page) => {
+    let extensionPage;
+    pages.map((page) => {
         if (
             page.url().includes('chrome-extension') &&
             page.url().includes('home.html')
         ) {
-            console.log('Page found with URL:', page.url());
-            await processWallet(page);
+            extensionPage = page;
         }
     });
+
+    if(!extensionPage){
+        console.log('extension page not found, redirecting...')
+        const page = await context.newPage();
+        await page.goto('chrome-extension://flndlnecmoofflbammaghnboonfhgaaf/home.html#');
+        extensionPage = page;
+    }
+    await waiter(2);
+
+    if(extensionPage){
+        processWallet(extensionPage);
+    }
 }
+
+export async function setNetwork(
+    page: Page,
+) {
+    await click('#network-select-dropdown', page);
+    await waiter(1)
+    await click('#sepolia_network_selector', page);
+}
+
 
 export async function checkForWalletConnection(
     page: Page,
@@ -187,14 +214,15 @@ export async function checkForWalletConnection(
         button.click();
         await waiter(2);
         // Aggree button
-        await checkAndClick('#agree_button_ToS', page);
+        // await checkAndClick('#agree_button_ToS', page);
+        await clickmmask('wallet-selector-eip6963', page);
 
-        // Metamask button
-        await page
-            .locator(
-                '#Modal_Global [class^="WalletButton_container"]:nth-child(1)',
-            )
-            .click();
+        // // Metamask button
+        // await page
+        //     .locator(
+        //         '#Modal_Global [class^="WalletButton_container"]:nth-child(1)',
+        //     )
+        //     .click();
 
         try {
             // browser.on('page', async (ppp) => {
