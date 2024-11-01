@@ -126,6 +126,14 @@ export type chartItemStates = {
     setShowFeeRate: React.Dispatch<React.SetStateAction<boolean>>;
     liqMode: string;
     showSwap: boolean;
+    setShowSwap: React.Dispatch<React.SetStateAction<boolean>>;
+    showLatest:  boolean;
+    setShowLatest: React.Dispatch<React.SetStateAction<boolean>>;
+    setLatest: React.Dispatch<React.SetStateAction<boolean>>;
+    rescale: boolean;
+    setRescale: React.Dispatch<React.SetStateAction<boolean>>;
+    reset: boolean;
+    setReset: React.Dispatch<React.SetStateAction<boolean>>;
     showLiquidity: boolean;
     showHistorical: boolean;
 };
@@ -164,6 +172,10 @@ export type orderHistory = {
     tokenAAmount: number;
     tokenB: string;
     tokenBAmount: number;
+};
+export const isIOS = (): boolean => {
+    const userAgent = navigator.userAgent;
+    return /iPad|iPhone|iPod/.test(userAgent);
 };
 
 export function setCanvasResolution(canvas: HTMLCanvasElement) {
@@ -621,9 +633,9 @@ export function roundToNearestPreset(closest: number) {
     return Math.floor(closest);
 }
 
-export const getCssVariable = (skin: skins, variableName: string) => {
+export const getCssVariable = (activeSkin: skins, variableName: string) => {
     const themeElement = document.querySelector(
-        '[data-theme="' + skin + '"]',
+        '[data-theme="' + activeSkin + '"]',
     ) as Element;
 
     const value = getComputedStyle(themeElement)

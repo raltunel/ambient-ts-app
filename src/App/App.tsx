@@ -27,6 +27,9 @@ import FooterNav from '../components/Global/FooterNav/FooterNav';
 import { RouteRenderer } from '../routes';
 import Navbar from '../components/Futa/Navbar/Navbar';
 import Footer from '../components/Futa/Footer/Footer';
+import { useModal } from '../components/Global/Modal/useModal';
+import CSSModal from '../pages/common/CSSDebug/CSSModal';
+import { useBottomSheet } from '../contexts/BottomSheetContext';
 
 /** ***** React Function *******/
 export default function App() {
@@ -49,6 +52,7 @@ export default function App() {
     const {
         sidebar: { toggle: toggleSidebar },
     } = useContext(SidebarContext);
+    const { isBottomSheetOpen } = useBottomSheet();
 
     const containerStyle = currentLocation.includes('trade')
         ? 'content-container-trade'
@@ -102,16 +106,8 @@ export default function App() {
     }, [location]);
 
     const showMobileVersion = useMediaQuery('(max-width: 800px)');
-    // const showChatPanel =
-    //     currentLocation !== '/' &&
-    //     currentLocation !== '/404' &&
-    //     currentLocation !== '/terms' &&
-    //     currentLocation !== '/privacy' &&
-    //     currentLocation !== '/faq' &&
-    //     !currentLocation.includes('/chat') &&
-    //     isChatEnabled;
     const ambientFooter = (
-        <div data-theme={skin} className='footer_container'>
+        <div data-theme={skin.active} className='footer_container'>
             {currentLocation !== '/' &&
                 currentLocation !== '/404' &&
                 currentLocation !== '/terms' &&
@@ -119,9 +115,35 @@ export default function App() {
                 currentLocation !== '/faq' &&
                 !currentLocation.includes('/chat') &&
                 isChatEnabled && <ChatPanel isFullScreen={false} />}
-            {showMobileVersion && <FooterNav />}
         </div>
     );
+
+    // logic to handle opening and closing of the CSS modal
+    const [isCSSModalOpen, openCSSModal, closeCSSModal] = useModal();
+    // bind keyboard event to toggle CSS modal open or closed
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent): void => {
+            if (
+                (e.ctrlKey || e.metaKey) &&
+                e.shiftKey &&
+                e.key.toLowerCase() === 'k'
+            ) {
+                isCSSModalOpen ? closeCSSModal() : openCSSModal();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isCSSModalOpen]);
+
+    const footerDisplay =
+        platformName === 'futa' ? (
+            <Footer data-theme={skin.active} />
+        ) : (
+            showMobileVersion && <FooterNav />
+        );
 
     return (
         <>
@@ -133,7 +155,7 @@ export default function App() {
                 className={
                     platformName === 'futa' ? 'futa_main' : containerStyle
                 }
-                data-theme={skin}
+                data-theme={skin.active}
                 style={{
                     height:
                         location.pathname == '/'
@@ -152,25 +174,17 @@ export default function App() {
                 ) : (
                     location.pathname !== '/' && <PageHeader />
                 )}
-                {/* <div
-                    className={appHeaderDropdown.isActive ? 'app_blur' : ''}
-                    onClick={() => appHeaderDropdown.setIsActive(false)}
-                    
-                    onTouchMoveCapture={() =>
-                        appHeaderDropdown.setIsActive(false)
-                    }
-                /> */}
                 <RouteRenderer platformName={platformName} />
             </FlexContainer>
-            {platformName === 'futa' ? (
-                <Footer data-theme={skin} />
-            ) : (
-                ambientFooter
-            )}
 
-            <GlobalPopup data-theme={skin} />
+            <GlobalPopup data-theme={skin.active} />
             <SnackbarComponent />
+
+            {ambientFooter}
+            {!isBottomSheetOpen && footerDisplay}
+
             {isWalletModalOpen && <GateWalletModal />}
+            {isCSSModalOpen && <CSSModal close={() => closeCSSModal()} />}
         </>
     );
 }
