@@ -19,6 +19,10 @@ export const printDomToImage = async (
                 height: node.offsetHeight + 'px',
                 ...additionalStyles,
             },
+            features:{
+                copyScrollbar: true,
+                restoreScrollPosition: true
+            }
         });
         return blob;
     } catch (e) {
