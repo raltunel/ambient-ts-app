@@ -446,7 +446,7 @@
 }
 
 .msg_bubble_back{
-
+opacity: 0;
     top: 0;
     left: 0;
     position: absolute;

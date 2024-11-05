@@ -256,6 +256,8 @@
         var(--accent1) 100%
     );
 
+    /* --scrollbar-thumb: red; */
+
     --title-gradient: linear-gradient(
         90deg,
         #62ebf1 0%,

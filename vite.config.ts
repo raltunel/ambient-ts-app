@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import macrosPlugin from 'vite-plugin-babel-macros';
 import checker from 'vite-plugin-checker';
 import { execSync } from 'child_process';
+import vitePluginImporter from 'vite-plugin-importer';
 
 export default defineConfig({
     base: '/',
@@ -32,6 +33,11 @@ export default defineConfig({
                     );
             },
         },
+        vitePluginImporter({
+            libraryName: 'react-icons',
+            libraryDirectory: 'lib',
+            camel2DashComponentName: false,
+        }),
     ],
     define: {
         'import.meta.env': {},

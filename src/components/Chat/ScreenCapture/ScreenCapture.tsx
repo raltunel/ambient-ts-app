@@ -33,6 +33,8 @@ export default function ScreenCapture(props: propsIF) {
     const maskRBRef = useRef<DomPositionInterface>();
     maskRBRef.current = maskRB;
 
+    const [previewActive, setPreviewActive] = useState<boolean>(false);
+
     const [overlayRect, setOverlayRect] = useState<DomRectIF>({ lt: { x: 0, y: 0 }, rt: { x: 0, y: 0 }, rb: { x: 0, y: 0 }, lb: { x: 0, y: 0 } });
 
     const croppedImageRef = useRef<HTMLDivElement>(null);
@@ -53,6 +55,7 @@ export default function ScreenCapture(props: propsIF) {
     const resetBtnListener = async () => {
         setCaptureState(ScreenCaptureStates.Idle);
         setImageComp(undefined);
+        setPreviewActive(false);
     };
     const debugBtnListener = async () => {
         setDebugMode(!debugMode);
@@ -73,6 +76,7 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const maskMoveListener = (e: MouseEvent) => {
+        if( captureStateRef.current == ScreenCaptureStates.PreviewReady) return;
         if (captureStateRef.current != ScreenCaptureStates.Masking) return;
 
         setMaskRB({ x: e.clientX, y: e.clientY });
@@ -83,7 +87,6 @@ export default function ScreenCapture(props: propsIF) {
         domDebug('maskRB', maskRB);
     };
 
-    console.log(overlayRect)
     const copyCroppedImageToClipboard = async () => {
         if (croppedImageRef.current) {
             const image = await printDomToImage(croppedImageRef.current);
@@ -95,8 +98,11 @@ export default function ScreenCapture(props: propsIF) {
 
     const overlayClickListener = () => {
         if (captureStateRef.current == ScreenCaptureStates.Masking) {
-            console.log('image copying');
-            copyCroppedImageToClipboard();
+            console.log('to clipboard');
+            setPreviewActive(true);
+            // copyCroppedImageToClipboard();
+            console.log(copyCroppedImageToClipboard);
+            setCaptureState(ScreenCaptureStates.PreviewReady);
         }
     };
 
@@ -142,8 +148,8 @@ export default function ScreenCapture(props: propsIF) {
                     // bottom: window.innerHeight - maskRBRef.current.y - 10,
                     left: overlayRect.lt.x,
                     top: overlayRect.lt.y,
-                    right: window.innerWidth - overlayRect.rt.x,
-                    bottom: window.innerHeight - overlayRect.rb.y,
+                    right: window.innerWidth - overlayRect.rt.x - 2,
+                    bottom: window.innerHeight - overlayRect.rb.y - 2,
                 };
         }
     };
@@ -161,6 +167,23 @@ export default function ScreenCapture(props: propsIF) {
                 height: overlayRect.lb.y - overlayRect.lt.y,
             };
     };
+
+    const downloadBlob = async (image: Blob) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(image);
+        a.download = 'screenshot-' + new Date().toISOString() + '.png';
+        a.click();
+    };
+
+    const downloadImage = async () => {
+        if (croppedImageRef.current) {
+        const image = await printDomToImage(croppedImageRef.current);
+        if(image) {
+            downloadBlob(image);
+        }
+        }
+    };
+
 
     const getOverlayPoints = (first: DomPositionInterface, second: DomPositionInterface) => {
         const lt = { x: Math.min(first.x, second.x), y: Math.min(first.y, second.y) };
@@ -232,9 +255,12 @@ export default function ScreenCapture(props: propsIF) {
                 </>
             )}
 
-            <div ref={croppedImageRef} className={styles.preview_modal}>
+            <div  className={`${styles.preview_modal} ${previewActive ? styles.active : ''}`}>
+                <div className={styles.modal_title}>Share Image
+                    <div className={styles.close_btn} onClick={() => setPreviewActive(false)}>X</div>
+                </div>
                 {imageComp && (
-                    <div
+                    <div ref={croppedImageRef}
                         className={styles.image_preview_wrapper}
                         style={getPreviewSize()}
                     >
@@ -245,7 +271,12 @@ export default function ScreenCapture(props: propsIF) {
                             className={styles.captured_raw_image}
                         />
                     </div>
-                )}
+                )} 
+                <div className={styles.btn_section}>
+                    <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={downloadImage}> Send to Chat </div>
+                    <div className={styles.btn_wrapper} onClick={downloadImage}> Download Image </div>
+                    <div className={styles.btn_wrapper} onClick={copyCroppedImageToClipboard}> Copy to Clipboard </div>
+                </div>
             </div>
         </>
     );

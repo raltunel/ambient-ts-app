@@ -7,6 +7,7 @@ export enum ScreenCaptureStates {
     Idle,
     MaskReady,
     Masking,
+    PreviewReady,
 }
 
 export enum ScreenCaptureOverlayTypes {
