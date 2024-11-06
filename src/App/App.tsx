@@ -30,6 +30,7 @@ import Footer from '../components/Futa/Footer/Footer';
 import { useModal } from '../components/Global/Modal/useModal';
 import CSSModal from '../pages/common/CSSDebug/CSSModal';
 import { useBottomSheet } from '../contexts/BottomSheetContext';
+import ScreenCapture from '../components/Chat/ScreenCapture/ScreenCapture';
 
 /** ***** React Function *******/
 export default function App() {
@@ -185,6 +186,7 @@ export default function App() {
 
             {isWalletModalOpen && <GateWalletModal />}
             {isCSSModalOpen && <CSSModal close={() => closeCSSModal()} />}
+            <ScreenCapture />
         </>
     );
 }

@@ -114,7 +114,7 @@
 
 .overlay_effect{
     position: fixed;
-    z-index: 99;
+    z-index: 9;
 }
 
 .overlay_effect.full{
@@ -142,6 +142,7 @@
     box-shadow: 0 0px 50px 0 color-mix(in srgb, var(--accent1) 30%, transparent);
     z-index: 10;
     animation: maskAnim 2s ease-in-out infinite;
+    position: fixed;
 }
 
 
@@ -187,6 +188,7 @@
     color: rgba(255,255,255, .5);
     max-width: 10rem;
     vertical-align: middle;
+    white-space: nowrap;
 }
 
 .btn_wrapper:hover{
@@ -255,6 +257,17 @@
 }
 
 
+.icon_wrapper_inner{
+   display: inline-block;
+   vertical-align: middle;
+   margin-right: .2rem;
+}
+
+.btn_wrapper svg{
+    fill: white !important
+}
+
+
 
 @media (max-width: 768px) {
 
@@ -285,7 +298,5 @@
     .debug_btn{
         left: 80%;
     }
-    
-    
 
 }

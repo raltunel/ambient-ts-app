@@ -1,3 +1,7 @@
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { useContext, useEffect, useRef, useState } from 'react';
 import styles from './ScreenCapture.module.css';
 // import { domToImage } from 'modern-screenshot';
@@ -11,7 +15,7 @@ import { domDebug } from '../DomDebugger/DomDebuggerUtils';
 import { TextOnlyTooltip } from '../../Global/StyledTooltip/StyledTooltip';
 import { AppStateContext } from '../../../contexts';
 import useMediaQuery from '../../../utils/hooks/useMediaQuery';
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { BiSend } from 'react-icons/bi';
 
 interface propsIF {
     name?: string;
@@ -83,6 +87,7 @@ export default function ScreenCapture(props: propsIF) {
 
 
     const overlayOnClick = (e: React.MouseEvent) => {
+        console.log('overlay click');
         if(isMobile) return;
         maskStarter(e.clientX, e.clientY);
     }
@@ -141,10 +146,10 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const maskEndClickListener = () => {
+        console.log('mask End click listener')
         if (captureStateRef.current == ScreenCaptureStates.Masking) {
             setPreviewActive(true);
             // copyCroppedImageToClipboard();
-            console.log(copyCroppedImageToClipboard);
             setCaptureState(ScreenCaptureStates.PreviewReady);
         }
     };
@@ -156,6 +161,7 @@ export default function ScreenCapture(props: propsIF) {
     const getPosForOverlayRect = (type: ScreenCaptureOverlayTypes) => {
         if (maskLTRef.current == undefined || maskRBRef.current == undefined)
             return;
+        const maskOverlayOffset = 10;
         switch (type) {
             case ScreenCaptureOverlayTypes.LeftTop:
                 return {
@@ -193,10 +199,10 @@ export default function ScreenCapture(props: propsIF) {
                     // top: maskLTRef.current.y,
                     // right: window.innerWidth - maskRBRef.current.x - 10,
                     // bottom: window.innerHeight - maskRBRef.current.y - 10,
-                    left: overlayRect.lt.x,
-                    top: overlayRect.lt.y,
-                    right: window.innerWidth - overlayRect.rt.x - 2,
-                    bottom: window.innerHeight - overlayRect.rb.y - 2,
+                    left: overlayRect.lt.x - maskOverlayOffset,
+                    top: overlayRect.lt.y - maskOverlayOffset,
+                    right: window.innerWidth - overlayRect.rt.x - maskOverlayOffset,
+                    bottom: window.innerHeight - overlayRect.rb.y - maskOverlayOffset,
                 };
         }
     };
@@ -240,6 +246,8 @@ export default function ScreenCapture(props: propsIF) {
         return { lt, rt, rb, lb};
     }
 
+    
+
     return (
         <>
             <div className={styles.capture_btn} onClick={btnListener}>
@@ -259,7 +267,7 @@ export default function ScreenCapture(props: propsIF) {
                 Debug Overlays
             </div>
 
-            {(captureState == ScreenCaptureStates.MaskReady || isMobile) && (
+            {(captureState == ScreenCaptureStates.MaskReady || isMobile === true) && (
                 <div
                     className={`${styles.overlay_effect} ${styles.full}`}
                     onClick={overlayOnClick}
@@ -308,7 +316,7 @@ export default function ScreenCapture(props: propsIF) {
 
             <div  className={`${styles.preview_modal} ${previewActive ? styles.active : ''}`}>
                 <div className={styles.modal_title}>Share Image
-                    <div className={styles.close_btn} onClick={() => setPreviewActive(false)}>X</div>
+                    <div className={styles.close_btn} onClick={resetBtnListener}>X</div>
                 </div>
                 {imageComp && (
                     <div ref={croppedImageRef}
@@ -324,7 +332,7 @@ export default function ScreenCapture(props: propsIF) {
                     </div>
                 )} 
                 <div className={styles.btn_section}>
-                    <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={downloadImage}> Send to Chat </div>
+                    <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={downloadImage}> <div className={styles.icon_wrapper_inner}><BiSend size={18} /></div> Chat </div>
                     <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Download Image</div>} placement='top' >
                         <div className={styles.icon_btn_wrapper} onClick={downloadImage}>
                             <RiDownload2Line size={18} color='var(--text3)' />
@@ -336,10 +344,8 @@ export default function ScreenCapture(props: propsIF) {
                             <BsCopy size={18} color='var(--text3)' />
                         </div>
                     </TextOnlyTooltip>
-                    {/* <div className={styles.btn_wrapper} onClick={downloadImage}> Download Image </div>
-                    <div className={styles.btn_wrapper} onClick={copyCroppedImageToClipboard}> Copy to Clipboard </div> */}
                 </div>
-            </div>
+            </div> 
         </>
     );
 }
