@@ -39,6 +39,7 @@ import { ReceiptContext } from '../../../contexts/ReceiptContext';
 import { BrandContext, BrandContextIF } from '../../../contexts/BrandContext';
 import styles from './PageHeader.module.css';
 import { useBottomSheet } from '../../../contexts/BottomSheetContext';
+import ScreenCapture from '../../../components/Chat/ScreenCapture/ScreenCapture';
 
 const PageHeader = function () {
     const {
@@ -467,6 +468,7 @@ const PageHeader = function () {
                 </div>
             </header>
             {/* {isDevMenuEnabled && showDevMenu && <MobileDropdown />} */}
+            <ScreenCapture />
         </>
     );
 };

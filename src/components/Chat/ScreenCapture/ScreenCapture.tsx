@@ -1,11 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import styles from './ScreenCapture.module.css';
 // import { domToImage } from 'modern-screenshot';
+import { BsCopy } from 'react-icons/bs';
+import { RiDownload2Line } from 'react-icons/ri';
 import { printDomToImage } from '../../../ambient-utils/dataLayer';
+import useCopyToClipboard from '../../../utils/hooks/useCopyToClipboard';
 import { ScreenCaptureOverlayTypes, ScreenCaptureStates } from '../ChatEnums';
 import { DomPositionInterface, DomRectIF } from '../ChatIFs';
 import { domDebug } from '../DomDebugger/DomDebuggerUtils';
-import useCopyToClipboard from '../../../utils/hooks/useCopyToClipboard';
+import { TextOnlyTooltip } from '../../Global/StyledTooltip/StyledTooltip';
+import { AppStateContext } from '../../../contexts';
+import useMediaQuery from '../../../utils/hooks/useMediaQuery';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 interface propsIF {
@@ -15,8 +20,17 @@ interface propsIF {
 export default function ScreenCapture(props: propsIF) {
     useEffect(() => {
         console.log(props);
-        document.addEventListener('mousemove', maskMoveListener);
+        if(!isMobile){
+            document.addEventListener('mousemove', mouseMoveListener);
+        }
     }, []);
+
+    const {
+        snackbar: { open: openSnackbar },
+    } = useContext(AppStateContext);
+
+    const isMobile = useMediaQuery('(max-width: 768px)');
+
 
     const [, copy] = useCopyToClipboard();
 
@@ -48,6 +62,7 @@ export default function ScreenCapture(props: propsIF) {
         console.log(image);
     };
     const maskBtnListener = async () => {
+        console.log('mask');
         setTimeout(() => {
             setCaptureState(ScreenCaptureStates.MaskReady);
         }, 200);
@@ -66,22 +81,50 @@ export default function ScreenCapture(props: propsIF) {
         setImageComp(image);
     };
 
-    const maskStarter = (e: React.MouseEvent) => {
-        setMaskLT({ x: e.clientX, y: e.clientY });
+
+    const overlayOnClick = (e: React.MouseEvent) => {
+        if(isMobile) return;
+        maskStarter(e.clientX, e.clientY);
+    }
+
+    const overlayOnTouch = (e: React.TouchEvent) => {
+        console.log('touch');
+        if(!isMobile) return;
+        maskStarter(e.touches[0].clientX, e.touches[0].clientY);
+    }
+
+    const maskStarter = (x: number, y:number) => {
+        setMaskLT({ x: x, y: y });
         captureDom();
         setTimeout(() => {
             setCaptureState(ScreenCaptureStates.Masking);
         }, 300);
-        domDebug('maskLT', { x: e.clientX, y: e.clientY });
+        domDebug('maskLT', { x: x, y: y });
     };
 
-    const maskMoveListener = (e: MouseEvent) => {
+    const mouseMoveListener = (e: MouseEvent) => {
+        if(isMobile) return;
+
+        maskMoveListener(e.clientX, e.clientY);
+    }
+
+    const touchMoveListener = (e: React.TouchEvent<HTMLDivElement>) => {
+        console.log('touch move');
+        if(!isMobile) return;
+
+        console.log(e.touches[0].clientX, e.touches[0].clientY);
+
+        maskMoveListener(e.touches[0].clientX, e.touches[0].clientY);
+    }
+
+    const maskMoveListener = (x: number, y: number) => {
+        
         if( captureStateRef.current == ScreenCaptureStates.PreviewReady) return;
         if (captureStateRef.current != ScreenCaptureStates.Masking) return;
 
-        setMaskRB({ x: e.clientX, y: e.clientY });
+        setMaskRB({ x: x, y: y });
         if(maskLTRef.current){
-            setOverlayRect(getOverlayPoints(maskLTRef.current, { x: e.clientX, y: e.clientY }));
+            setOverlayRect(getOverlayPoints(maskLTRef.current, { x: x, y: y }));
         }
 
         domDebug('maskRB', maskRB);
@@ -93,18 +136,22 @@ export default function ScreenCapture(props: propsIF) {
             if (image) {
                 copy(image);
             }
+            openSnackbar('Copied to clipboard!', 'success');
         }
     };
 
-    const overlayClickListener = () => {
+    const maskEndClickListener = () => {
         if (captureStateRef.current == ScreenCaptureStates.Masking) {
-            console.log('to clipboard');
             setPreviewActive(true);
             // copyCroppedImageToClipboard();
             console.log(copyCroppedImageToClipboard);
             setCaptureState(ScreenCaptureStates.PreviewReady);
         }
     };
+
+    useEffect(() => {
+        console.log(captureState);
+    }, [captureState]);
 
     const getPosForOverlayRect = (type: ScreenCaptureOverlayTypes) => {
         if (maskLTRef.current == undefined || maskRBRef.current == undefined)
@@ -212,12 +259,16 @@ export default function ScreenCapture(props: propsIF) {
                 Debug Overlays
             </div>
 
-            {captureState == ScreenCaptureStates.MaskReady && (
+            {(captureState == ScreenCaptureStates.MaskReady || isMobile) && (
                 <div
                     className={`${styles.overlay_effect} ${styles.full}`}
-                    onClick={maskStarter}
+                    onClick={overlayOnClick}
+                    onTouchStart={overlayOnTouch}
+                    onTouchMove={touchMoveListener}
+                    onTouchEnd={maskEndClickListener}
                 ></div>
             )}
+
             {captureState == ScreenCaptureStates.Masking && (
                 <>
                     <div
@@ -246,7 +297,7 @@ export default function ScreenCapture(props: propsIF) {
                     ></div>
 
                     <div
-                        onClick={overlayClickListener}
+                        onClick={maskEndClickListener}
                         style={getPosForOverlayRect(
                             ScreenCaptureOverlayTypes.MaskArea,
                         )}
@@ -274,8 +325,19 @@ export default function ScreenCapture(props: propsIF) {
                 )} 
                 <div className={styles.btn_section}>
                     <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={downloadImage}> Send to Chat </div>
-                    <div className={styles.btn_wrapper} onClick={downloadImage}> Download Image </div>
-                    <div className={styles.btn_wrapper} onClick={copyCroppedImageToClipboard}> Copy to Clipboard </div>
+                    <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Download Image</div>} placement='top' >
+                        <div className={styles.icon_btn_wrapper} onClick={downloadImage}>
+                            <RiDownload2Line size={18} color='var(--text3)' />
+                        </div>
+                    </TextOnlyTooltip>
+                    
+                    <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Copy to Clipboard</div>} placement='top' >
+                        <div className={styles.icon_btn_wrapper} onClick={copyCroppedImageToClipboard}>
+                            <BsCopy size={18} color='var(--text3)' />
+                        </div>
+                    </TextOnlyTooltip>
+                    {/* <div className={styles.btn_wrapper} onClick={downloadImage}> Download Image </div>
+                    <div className={styles.btn_wrapper} onClick={copyCroppedImageToClipboard}> Copy to Clipboard </div> */}
                 </div>
             </div>
         </>

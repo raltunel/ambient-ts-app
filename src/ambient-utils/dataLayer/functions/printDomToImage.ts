@@ -17,16 +17,13 @@ export const printDomToImage = async (
                 transformOrigin: 'top left',
                 width: node.offsetWidth + 'px',
                 height: node.offsetHeight + 'px',
-                overflow: 'hidden',
                 ...additionalStyles,
             },
             features:{
                 copyScrollbar: true,
                 restoreScrollPosition: true
-            },
-            debug: true,
+            }
         });
-
         return blob;
     } catch (e) {
         console.error('oops, something went wrong!', e);
