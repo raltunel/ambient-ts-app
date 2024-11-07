@@ -30,6 +30,7 @@ import Footer from '../components/Futa/Footer/Footer';
 import { useModal } from '../components/Global/Modal/useModal';
 import CSSModal from '../pages/common/CSSDebug/CSSModal';
 import { useBottomSheet } from '../contexts/BottomSheetContext';
+import { ChartContext } from '../contexts';
 import ScreenCapture from '../components/Chat/ScreenCapture/ScreenCapture';
 
 /** ***** React Function *******/
@@ -37,6 +38,7 @@ export default function App() {
     const navigate = useNavigate();
     const location = useLocation();
     const currentLocation = location.pathname;
+    const { isFullScreen } = useContext(ChartContext);
 
     const {
         chat: {
@@ -115,7 +117,7 @@ export default function App() {
                 currentLocation !== '/privacy' &&
                 currentLocation !== '/faq' &&
                 !currentLocation.includes('/chat') &&
-                isChatEnabled && <ChatPanel isFullScreen={false} />}
+                isChatEnabled && !isFullScreen && <ChatPanel isFullScreen={false} />}
         </div>
     );
 

@@ -83,6 +83,10 @@ export interface TutorialStepIF {
     navigate?: { label: string; path: string };
 }
 
+export interface PageDataCountIF {
+    pair: string;
+    counts: number[];
+}
 export interface DomPositionInterface {
     x: number;
     y: number;
