@@ -6,7 +6,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import styles from './ScreenCapture.module.css';
 // import { domToImage } from 'modern-screenshot';
 import { BsCopy } from 'react-icons/bs';
-import { RiDownload2Line } from 'react-icons/ri';
+import { RiDownload2Line, RiScreenshot2Line } from 'react-icons/ri';
 import { printDomToImage } from '../../../ambient-utils/dataLayer';
 import useCopyToClipboard from '../../../utils/hooks/useCopyToClipboard';
 import { ScreenCaptureOverlayTypes, ScreenCaptureStates } from '../ChatEnums';
@@ -16,6 +16,7 @@ import { TextOnlyTooltip } from '../../Global/StyledTooltip/StyledTooltip';
 import { AppStateContext } from '../../../contexts';
 import useMediaQuery from '../../../utils/hooks/useMediaQuery';
 import { BiSend } from 'react-icons/bi';
+import { TbCapture } from 'react-icons/tb';
 
 interface propsIF {
     name?: string;
@@ -75,6 +76,9 @@ export default function ScreenCapture(props: propsIF) {
         setCaptureState(ScreenCaptureStates.Idle);
         setImageComp(undefined);
         setPreviewActive(false);
+        setMaskLT({x: 0, y: 0});
+        setMaskRB({x: 0, y: 0});
+        setOverlayRect({ lt: { x: 0, y: 0 }, rt: { x: 0, y: 0 }, rb: { x: 0, y: 0 }, lb: { x: 0, y: 0 } });
     };
     const debugBtnListener = async () => {
         setDebugMode(!debugMode);
@@ -331,6 +335,16 @@ export default function ScreenCapture(props: propsIF) {
                         />
                     </div>
                 )} 
+                {
+                    !imageComp && (
+                        <div className={styles.placeholder_wrapper}>
+                            <RiScreenshot2Line size={64}  />
+                            <div className={styles.placeholder_text}>The screen is being captured...</div>
+                            <div className={ styles.placeholder_loader + ' ' + styles.placeholder_loader_horizontal}></div>
+                            <div className={ styles.placeholder_loader + ' ' + styles.placeholder_loader_horizontal + ' ' + styles.reverse}></div>
+                        </div>
+                    )
+                }
                 <div className={styles.btn_section}>
                     <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={downloadImage}> <div className={styles.icon_wrapper_inner}><BiSend size={18} /></div> Chat </div>
                     <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Download Image</div>} placement='top' >
