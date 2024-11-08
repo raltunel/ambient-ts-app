@@ -1,0 +1,21 @@
+
+
+.input_wrapper{
+    width: 100%;
+    display: block;
+}
+
+.message_input{
+    width: 100%;
+    border-radius: .2rem;
+    border: 1px solid rgba(255,255,255, .2);
+    background-color: var(--dark2);
+    margin-top: 1rem;
+    font-size: .8rem;
+    padding: .2rem .5rem;
+    color: white;
+    
+}
+
+
+

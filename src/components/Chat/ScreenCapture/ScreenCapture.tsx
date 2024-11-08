@@ -5,18 +5,18 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import styles from './ScreenCapture.module.css';
 // import { domToImage } from 'modern-screenshot';
+import { BiSend } from 'react-icons/bi';
 import { BsCopy } from 'react-icons/bs';
 import { RiDownload2Line, RiScreenshot2Line } from 'react-icons/ri';
 import { printDomToImage } from '../../../ambient-utils/dataLayer';
+import { AppStateContext, UserDataContext } from '../../../contexts';
 import useCopyToClipboard from '../../../utils/hooks/useCopyToClipboard';
+import useMediaQuery from '../../../utils/hooks/useMediaQuery';
+import { TextOnlyTooltip } from '../../Global/StyledTooltip/StyledTooltip';
 import { ScreenCaptureOverlayTypes, ScreenCaptureStates } from '../ChatEnums';
 import { DomPositionInterface, DomRectIF } from '../ChatIFs';
 import { domDebug } from '../DomDebugger/DomDebuggerUtils';
-import { TextOnlyTooltip } from '../../Global/StyledTooltip/StyledTooltip';
-import { AppStateContext } from '../../../contexts';
-import useMediaQuery from '../../../utils/hooks/useMediaQuery';
-import { BiSend } from 'react-icons/bi';
-import { TbCapture } from 'react-icons/tb';
+import ScreenCaptureMessageInput from './ScreenCaptureMessageInput';
 
 interface propsIF {
     name?: string;
@@ -30,8 +30,11 @@ export default function ScreenCapture(props: propsIF) {
         }
     }, []);
 
+    const {isUserConnected} = useContext(UserDataContext);
+
     const {
         snackbar: { open: openSnackbar },
+        walletModal: { open: openWalletModal },
     } = useContext(AppStateContext);
 
     const isMobile = useMediaQuery('(max-width: 768px)');
@@ -250,7 +253,14 @@ export default function ScreenCapture(props: propsIF) {
         return { lt, rt, rb, lb};
     }
 
+
     
+
+    const chatBtnListener = () => {
+        console.log('chat');
+    };
+
+    console.log('isUserConnected', isUserConnected);
 
     return (
         <>
@@ -345,8 +355,18 @@ export default function ScreenCapture(props: propsIF) {
                         </div>
                     )
                 }
+                {isUserConnected && imageComp && <ScreenCaptureMessageInput />}
                 <div className={styles.btn_section}>
-                    <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={downloadImage}> <div className={styles.icon_wrapper_inner}><BiSend size={18} /></div> Chat </div>
+                    {isUserConnected ? (   
+                        <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={chatBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
+                        </div> Chat </div>
+                    ) : (
+                        <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Conect your wallet to send screenshot on chat</div>} placement='top' >
+                        <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={openWalletModal}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
+                        </div> Connect to send</div>
+                        </TextOnlyTooltip>
+                    )}
+
                     <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Download Image</div>} placement='top' >
                         <div className={styles.icon_btn_wrapper} onClick={downloadImage}>
                             <RiDownload2Line size={18} color='var(--text3)' />
