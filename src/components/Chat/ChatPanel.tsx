@@ -12,7 +12,6 @@ import {
 import { trimString } from '../../ambient-utils/dataLayer';
 import { PoolIF } from '../../ambient-utils/types';
 import { AppStateContext } from '../../contexts/AppStateContext';
-import { CrocEnvContext } from '../../contexts/CrocEnvContext';
 import { TradeDataContext } from '../../contexts/TradeDataContext';
 import { UserDataContext } from '../../contexts/UserDataContext';
 import NotFound from '../../pages/common/NotFound/NotFound';
@@ -38,9 +37,6 @@ import { Message } from './Model/MessageModel';
 import { UserSummaryModel } from './Model/UserSummaryModel';
 import useChatApi from './Service/ChatApi';
 import useChatSocket from './Service/useChatSocket';
-import { domDebug } from './DomDebugger/DomDebuggerUtils';
-import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
-import { getEmojiPack } from './ChatRenderUtils';
 
 interface propsIF {
     isFullScreen: boolean;
