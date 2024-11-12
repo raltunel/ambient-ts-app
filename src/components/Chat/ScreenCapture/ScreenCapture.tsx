@@ -255,7 +255,6 @@ export default function ScreenCapture(props: propsIF) {
         return { lt, rt, rb, lb};
     }
 
-
     
 
     const chatBtnListener = async () => {
