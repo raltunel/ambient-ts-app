@@ -246,7 +246,6 @@ export default function ScreenCapture(props: propsIF) {
         }
     };
 
-
     const getOverlayPoints = (first: DomPositionInterface, second: DomPositionInterface) => {
         const lt = { x: Math.min(first.x, second.x), y: Math.min(first.y, second.y) };
         const rt = { x: Math.max(first.x, second.x), y: Math.min(first.y, second.y) };
