@@ -1,11 +1,4 @@
-import { AnimateSharedLayout, motion } from 'framer-motion';
-import {
-    memo,
-    useCallback,
-    useContext,
-    useEffect,
-    useState,
-} from 'react';
+import { useEffect, useState, memo, useContext, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
     chainNumToString,
@@ -16,51 +9,80 @@ import {
 import logo from '../../../assets/images/logos/logo_mark.svg';
 import Button from '../../../components/Form/Button';
 import TradeNowButton from '../../../components/Home/Landing/TradeNowButton/TradeNowButton';
-import { AppStateContext } from '../../../contexts/AppStateContext';
-import { useBottomSheet } from '../../../contexts/BottomSheetContext';
-import { BrandContext, BrandContextIF } from '../../../contexts/BrandContext';
-import { CrocEnvContext } from '../../../contexts/CrocEnvContext';
-import { GraphDataContext } from '../../../contexts/GraphDataContext';
-import { PoolContext } from '../../../contexts/PoolContext';
-import { ReceiptContext } from '../../../contexts/ReceiptContext';
-import { SidebarContext } from '../../../contexts/SidebarContext';
-import { TokenBalanceContext } from '../../../contexts/TokenBalanceContext';
-import { TradeDataContext } from '../../../contexts/TradeDataContext';
-import { TradeTableContext } from '../../../contexts/TradeTableContext';
-import { TradeTokenContext } from '../../../contexts/TradeTokenContext';
-import { UserDataContext } from '../../../contexts/UserDataContext';
-import { FlexContainer } from '../../../styled/Common';
+import useMediaQuery from '../../../utils/hooks/useMediaQuery';
+import {
+    AppStateContext,
+    AppStateContextIF,
+} from '../../../contexts/AppStateContext';
+import {
+    CrocEnvContext,
+    CrocEnvContextIF,
+} from '../../../contexts/CrocEnvContext';
+import { PoolContext, PoolContextIF } from '../../../contexts/PoolContext';
+import {
+    SidebarContext,
+    SidebarContextIF,
+} from '../../../contexts/SidebarContext';
+import {
+    TradeTokenContext,
+    TradeTokenContextIF,
+} from '../../../contexts/TradeTokenContext';
+import {
+    TradeTableContext,
+    TradeTableContextIF,
+} from '../../../contexts/TradeTableContext';
+import {
+    getFormattedNumber,
+    chainNumToString,
+    trimString,
+    checkEoaHexAddress,
+} from '../../../ambient-utils/dataLayer';
 import {
     linkGenMethodsIF,
     swapParamsIF,
     useLinkGen,
 } from '../../../utils/hooks/useLinkGen';
-import useMediaQuery from '../../../utils/hooks/useMediaQuery';
-import NetworkSelector from './NetworkSelector/NetworkSelector';
+import { FlexContainer } from '../../../styled/Common';
+import Button from '../../../components/Form/Button';
+import {
+    UserDataContext,
+    UserDataContextIF,
+} from '../../../contexts/UserDataContext';
+import {
+    GraphDataContext,
+    GraphDataContextIF,
+} from '../../../contexts/GraphDataContext';
+import {
+    TokenBalanceContext,
+    TokenBalanceContextIF,
+} from '../../../contexts/TokenBalanceContext';
+import { TradeDataContext } from '../../../contexts/TradeDataContext';
+import {
+    ReceiptContext,
+    ReceiptContextIF,
+} from '../../../contexts/ReceiptContext';
 import styles from './PageHeader.module.css';
-import UserMenu from './UserMenu/UserMenu';
+import { useBottomSheet } from '../../../contexts/BottomSheetContext';
+import { BrandContext } from '../../../contexts';
 
 const PageHeader = function () {
     const {
-        crocEnv,
-        setCrocEnv,
-        chainData: { chainId, poolIndex: poolId },
-    } = useContext(CrocEnvContext);
-    const { headerImage } = useContext<BrandContextIF>(BrandContext);
-
-    const {
+        activeNetwork: { chainId, poolIndex: poolId },
         walletModal: { open: openWalletModal },
         appHeaderDropdown,
-    } = useContext(AppStateContext);
-    const { resetTokenBalances } = useContext(TokenBalanceContext);
-    const { resetUserGraphData } = useContext(GraphDataContext);
-    const {  isBottomSheetOpen } =
-    useBottomSheet();
-
+    } = useContext<AppStateContextIF>(AppStateContext);
+    const { headerImage } = useContext(BrandContext);
+    const { crocEnv, setCrocEnv } =
+        useContext<CrocEnvContextIF>(CrocEnvContext);
+    const { resetTokenBalances } =
+        useContext<TokenBalanceContextIF>(TokenBalanceContext);
+    const { resetUserGraphData } =
+        useContext<GraphDataContextIF>(GraphDataContext);
     const { poolPriceDisplay, isTradeDollarizationEnabled, usdPrice } =
-        useContext(PoolContext);
-    const { recentPools } = useContext(SidebarContext);
-    const { setShowAllData, activeTradeTab } = useContext(TradeTableContext);
+        useContext<PoolContextIF>(PoolContext);
+    const { recentPools } = useContext<SidebarContextIF>(SidebarContext);
+    const { setShowAllData, activeTradeTab } =
+        useContext<TradeTableContextIF>(TradeTableContext);
     const {
         baseToken: {
             setBalance: setBaseTokenBalance,
@@ -70,10 +92,11 @@ const PageHeader = function () {
             setBalance: setQuoteTokenBalance,
             setDexBalance: setQuoteTokenDexBalance,
         },
-    } = useContext(TradeTokenContext);
+    } = useContext<TradeTokenContextIF>(TradeTokenContext);
     const { userAddress, isUserConnected, disconnectUser, ensName } =
-        useContext(UserDataContext);
-    const { resetReceiptData } = useContext(ReceiptContext);
+        useContext<UserDataContextIF>(UserDataContext);
+    const { resetReceiptData } = useContext<ReceiptContextIF>(ReceiptContext);
+    const { isBottomSheetOpen } = useBottomSheet();
 
     // eslint-disable-next-line
     const [mobileNavToggle, setMobileNavToggle] = useState<boolean>(false);
@@ -211,6 +234,8 @@ const PageHeader = function () {
                 document.title = `${ensNameOrAddressTruncated} Wallet Balances ~ Ambient`;
             } else if (pathNoLeadingSlash.includes('exchange-balances')) {
                 document.title = `${ensNameOrAddressTruncated} Exchange Balances ~ Ambient`;
+            } else if (pathNoLeadingSlash.includes('xp')) {
+                document.title = `${ensNameOrAddressTruncated} XP ~ Ambient`;
             } else {
                 document.title = `${ensNameOrAddressTruncated} ~ Ambient`;
             }
@@ -233,6 +258,8 @@ const PageHeader = function () {
             } else {
                 document.title = 'Explore ~ Ambient';
             }
+        } else if (pathNoLeadingSlash.includes('xp-leaderboard')) {
+            document.title = 'XP Leaderboard ~ Ambient';
         } else if (location.pathname.includes('404')) {
             document.title = '404 ~ Ambient';
         } else {
@@ -349,11 +376,7 @@ const PageHeader = function () {
 
     const routeDisplay = (
         <AnimateSharedLayout>
-            <nav
-                className={styles.primaryNavigation}
-                id='primary_navigation'
-               
-            >
+            <nav className={styles.primaryNavigation} id='primary_navigation'>
                 {linkData.map((link, idx) =>
                     link.shouldDisplay ? (
                         <Link
@@ -415,7 +438,11 @@ const PageHeader = function () {
             <header
                 className={styles.primaryHeader}
                 data-testid={'page-header'}
-                style={{ position: 'sticky', top: 0, zIndex: isBottomSheetOpen ? 0.1 : 10 }}
+                style={{
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: isBottomSheetOpen ? 0.1 : 10,
+                }}
             >
                 <div
                     onClick={(event: React.MouseEvent) => {
@@ -424,6 +451,7 @@ const PageHeader = function () {
                             appHeaderDropdown.setIsActive(false);
                         }
                     }}
+                    className={styles.left_side}
                 >
                     <Link
                         to='/'
@@ -431,18 +459,22 @@ const PageHeader = function () {
                         aria-label='Home'
                     >
                         {desktopScreen ? (
-                            <img src={headerImage} alt='ambient' />
+                            <img
+                                src={headerImage}
+                                alt='ambient'
+                                style={{ marginRight: '20px' }}
+                            />
                         ) : (
                             <img
                                 className={styles.logoText}
                                 src={logo}
-                                    alt='ambient'
-                                    width='70px'
+                                alt='ambient'
+                                width='60px'
                             />
                         )}
                     </Link>
+                    {routeDisplay}
                 </div>
-                {routeDisplay}
                 <div className={styles.rightSide}>
                     {show ? (
                         <div className={styles.tradeNowDiv}>
@@ -466,7 +498,6 @@ const PageHeader = function () {
                     )}
                 </div>
             </header>
-            {/* {isDevMenuEnabled && showDevMenu && <MobileDropdown />} */}
         </>
     );
 };

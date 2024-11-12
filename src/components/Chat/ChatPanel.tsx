@@ -38,6 +38,9 @@ import { Message } from './Model/MessageModel';
 import { UserSummaryModel } from './Model/UserSummaryModel';
 import useChatApi from './Service/ChatApi';
 import useChatSocket from './Service/useChatSocket';
+import { domDebug } from './DomDebugger/DomDebuggerUtils';
+import useOnClickOutside from '../../utils/hooks/useOnClickOutside';
+import { getEmojiPack } from './ChatRenderUtils';
 
 interface propsIF {
     isFullScreen: boolean;
@@ -50,6 +53,7 @@ function ChatPanel(props: propsIF) {
     );
     const { isFullScreen } = props;
     const {
+        activeNetwork,
         chat: {
             isEnabled: isChatEnabled,
             isOpen: isChatOpen,
@@ -61,8 +65,6 @@ function ChatPanel(props: propsIF) {
     const { baseToken, quoteToken } = useContext(TradeDataContext);
 
     if (!isChatEnabled) return <NotFound />;
-
-    const { selectedNetwork } = useContext(CrocEnvContext);
 
     const messageListWrapper = useRef<HTMLDivElement>(null);
     const reactionsRef = useRef<HTMLDivElement>(null);
@@ -1222,7 +1224,7 @@ function ChatPanel(props: propsIF) {
             isChatOpen={isChatOpen}
             isMobile={isMobile}
             userMap={userMap}
-            chainId={selectedNetwork.chainId}
+            chainId={activeNetwork.chainId}
         />
     );
 

@@ -43,7 +43,7 @@
 .preview_modal{
     transition: all .3s ease-in-out;
     position: fixed;
-    max-width: 60vw;
+    max-width: 90vw;
     min-width: 30vw;
     left: 50%;
     top: 0;
@@ -73,6 +73,9 @@
     background-position: center;
     background-repeat: no-repeat;
     margin: 0 auto;
+}
+
+.image_preview_outer{
     border: 1px solid rgba(255,255,255, .2);
 }
 

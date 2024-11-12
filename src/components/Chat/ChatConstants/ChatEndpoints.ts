@@ -41,3 +41,6 @@ export const getTopRoomsEndpoint = apiBase + 'messages/getTopRooms';
 
 export const getVerificationMessageEndpoint =
     apiBase + 'auth/getVerificationMessage';
+
+export const getScreenshotEndpoint =
+    apiBase + 'messages/getScreenshot';

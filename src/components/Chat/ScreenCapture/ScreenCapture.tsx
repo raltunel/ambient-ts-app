@@ -30,15 +30,15 @@ export default function ScreenCapture(props: propsIF) {
         }
     }, []);
 
-    const {isUserConnected} = useContext(UserDataContext);
+    const {isUserConnected, setLastCapturedScreenShot} = useContext(UserDataContext);
 
     const {
         snackbar: { open: openSnackbar },
         walletModal: { open: openWalletModal },
+        chat: { isOpen: isChatOpen, setIsOpen: setIsChatOpen },
     } = useContext(AppStateContext);
 
     const isMobile = useMediaQuery('(max-width: 768px)');
-
 
     const [, copy] = useCopyToClipboard();
 
@@ -46,6 +46,7 @@ export default function ScreenCapture(props: propsIF) {
     const [captureState, setCaptureState] = useState<ScreenCaptureStates>(
         ScreenCaptureStates.Idle,
     );
+
     const captureStateRef = useRef<ScreenCaptureStates>();
     captureStateRef.current = captureState;
     const [maskLT, setMaskLT] = useState<DomPositionInterface>();
@@ -66,8 +67,6 @@ export default function ScreenCapture(props: propsIF) {
         // const image = await domToImage(document.body);
         const image = await printDomToImage(document.getElementById('root') as HTMLElement);
         setImageComp(image);
-
-        console.log(image);
     };
     const maskBtnListener = async () => {
         console.log('mask');
@@ -82,6 +81,8 @@ export default function ScreenCapture(props: propsIF) {
         setMaskLT({x: 0, y: 0});
         setMaskRB({x: 0, y: 0});
         setOverlayRect({ lt: { x: 0, y: 0 }, rt: { x: 0, y: 0 }, rb: { x: 0, y: 0 }, lb: { x: 0, y: 0 } });
+        setLastCapturedScreenShot(undefined);
+
     };
     const debugBtnListener = async () => {
         setDebugMode(!debugMode);
@@ -160,6 +161,7 @@ export default function ScreenCapture(props: propsIF) {
             setCaptureState(ScreenCaptureStates.PreviewReady);
         }
     };
+
 
     useEffect(() => {
         console.log(captureState);
@@ -256,11 +258,19 @@ export default function ScreenCapture(props: propsIF) {
 
     
 
-    const chatBtnListener = () => {
-        console.log('chat');
+    const chatBtnListener = async () => {
+
+
+        if(!isChatOpen){
+            setIsChatOpen(true);
+        }
+
+        if (croppedImageRef.current) {
+            const image = await printDomToImage(croppedImageRef.current);
+            setLastCapturedScreenShot(image);
+        }
     };
 
-    console.log('isUserConnected', isUserConnected);
 
     return (
         <>
@@ -333,6 +343,7 @@ export default function ScreenCapture(props: propsIF) {
                     <div className={styles.close_btn} onClick={resetBtnListener}>X</div>
                 </div>
                 {imageComp && (
+                    <span className={styles.image_preview_outer}>
                     <div ref={croppedImageRef}
                         className={styles.image_preview_wrapper}
                         style={getPreviewSize()}
@@ -344,6 +355,7 @@ export default function ScreenCapture(props: propsIF) {
                             className={styles.captured_raw_image}
                         />
                     </div>
+                    </span>
                 )} 
                 {
                     !imageComp && (
@@ -355,15 +367,15 @@ export default function ScreenCapture(props: propsIF) {
                         </div>
                     )
                 }
-                {isUserConnected && imageComp && <ScreenCaptureMessageInput />}
+                {/* {isUserConnected && imageComp && <ScreenCaptureMessageInput />} */}
                 <div className={styles.btn_section}>
                     {isUserConnected ? (   
                         <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={chatBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
-                        </div> Chat </div>
+                        </div> Send to Chat </div>
                     ) : (
                         <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Conect your wallet to send screenshot on chat</div>} placement='top' >
                         <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={openWalletModal}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
-                        </div> Connect to send</div>
+                        </div> Send to Chat</div>
                         </TextOnlyTooltip>
                     )}
 

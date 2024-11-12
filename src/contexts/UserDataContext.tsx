@@ -38,6 +38,8 @@ export interface UserDataContextIF {
         walletID: string,
         avatarData: UserAvatarDataIF,
     ) => void;
+    lastCapturedScreenShot: Blob | undefined;
+    setLastCapturedScreenShot: Dispatch<SetStateAction<Blob | undefined>>;
 }
 
 export interface UserXpDataIF {
@@ -130,6 +132,8 @@ export const UserDataContextProvider = (props: {
         }
     };
 
+    const [lastCapturedScreenShot, setLastCapturedScreenShot] = useState<Blob | undefined>(undefined);
+
     const userDataContext: UserDataContextIF = {
         isUserConnected,
         userAddress,
@@ -152,6 +156,8 @@ export const UserDataContextProvider = (props: {
         setNftTestWalletAddress,
         userAvatarData,
         updateUserAvatarData,
+        lastCapturedScreenShot,
+        setLastCapturedScreenShot,
     };
 
     return (

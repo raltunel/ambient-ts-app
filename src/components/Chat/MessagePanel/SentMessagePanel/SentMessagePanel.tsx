@@ -130,7 +130,7 @@ function SentMessagePanel(props: SentMessageProps) {
         ? props.message.dislikes.length
         : 0;
 
-    const { getRepliedMessageInfo } = useChatApi();
+    const { getRepliedMessageInfo, getScreenshotLink } = useChatApi();
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -455,6 +455,11 @@ function SentMessagePanel(props: SentMessageProps) {
                         (onlyEmoji ? styles.only_emoji : '')
                     }
                 >
+                    
+                    {props.message.screenshot && <div className={styles.screenshot_wrapper}>
+                        <img src={getScreenshotLink(props.message._id)} alt="screenshot" />
+                        </div>}
+                    
                     {messagesArray.map((e, i) => {
                         return (
                             <span key={i} className={styles.message_token}>
