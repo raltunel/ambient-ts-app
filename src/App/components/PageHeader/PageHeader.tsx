@@ -1,13 +1,9 @@
 import { useEffect, useState, memo, useContext, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-    chainNumToString,
-    checkEoaHexAddress,
-    getFormattedNumber,
-    trimString,
-} from '../../../ambient-utils/dataLayer';
+import { AnimateSharedLayout, motion } from 'framer-motion';
+import UserMenu from './UserMenu/UserMenu';
+import NetworkSelector from './NetworkSelector/NetworkSelector';
 import logo from '../../../assets/images/logos/logo_mark.svg';
-import Button from '../../../components/Form/Button';
 import TradeNowButton from '../../../components/Home/Landing/TradeNowButton/TradeNowButton';
 import useMediaQuery from '../../../utils/hooks/useMediaQuery';
 import {
