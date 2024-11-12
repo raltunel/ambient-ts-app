@@ -1011,6 +1011,24 @@
     margin-top: -6rem;
 }
 
+.screenshot_wrapper{
+
+    max-width: 80%;
+    overflow: hidden;
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+    padding: 0.2rem;
+    border-radius: .5rem;
+    background: var(--dark3);
+    box-shadow: 0 5px 0 -1px #00000077;
+}
+
+
+.screenshot_wrapper img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
 
 
 /* .replied_msg_wrapper{

@@ -455,6 +455,17 @@ const useChatSocket = (
         return data;
     }
 
+
+    function blobToBase64(blob: Blob) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result?.toString().split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob); // read as Base64
+        });
+      }
+      
+
     async function sendMsg(
         currentUser: string,
         msg: string,
@@ -466,7 +477,14 @@ const useChatSocket = (
         chainId: string | null,
         repliedMessage?: string | undefined,
         repliedMessageRoomInfo?: string | undefined,
+        screenshot?: Blob | undefined,
     ) {
+
+        let screenshotFile = undefined;
+        if (screenshot !== undefined) {
+            screenshotFile = await blobToBase64(screenshot);
+        }
+
         const payload = {
             from: currentUser,
             message: msg,
@@ -480,7 +498,11 @@ const useChatSocket = (
             repliedMessage: repliedMessage,
             repliedMessageRoomInfo: repliedMessageRoomInfo,
             senderToken: userVrfToken,
+            screenshot: screenshot !== undefined ? true : false,
+            screenshotFile: screenshotFile,
         };
+
+        console.log(payload);
 
         sendToSocket('send-msg', payload);
     }

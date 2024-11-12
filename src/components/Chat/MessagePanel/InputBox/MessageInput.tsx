@@ -35,6 +35,7 @@ import {
 import { domDebug } from '../../DomDebugger/DomDebuggerUtils';
 import { emojiMeta } from '../../EmojiMeta';
 import { getSingleEmoji } from '../../ChatRenderUtils';
+import { TextOnlyTooltip } from '../../../Global/StyledTooltip/StyledTooltip';
 
 interface MessageInputProps {
     currentUser: string;
@@ -53,6 +54,7 @@ interface MessageInputProps {
         chainId: string | null,
         replyMessageContent?: string | undefined,
         repliedMessageRoomInfo?: string | undefined,
+        screenshot?: Blob | undefined,
     ) => void;
     inputListener?: (e: string) => void;
     users: User[];
@@ -82,7 +84,8 @@ export default function MessageInput(props: MessageInputProps) {
     const [message, setMessage] = useState('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [isInfoPressed, setIsInfoPressed] = useState(false);
-    const { userAddress, isUserConnected } = useContext(UserDataContext);
+    const { userAddress, isUserConnected, lastCapturedScreenShot, setLastCapturedScreenShot } = useContext(UserDataContext);
+    console.log('lastCapturedScreenShot', lastCapturedScreenShot);
     const [isPosition, setIsPosition] = useState(false);
     const [tokenForEmojiSearch, setTokenForEmojiSearch] = useState('');
 
@@ -91,6 +94,7 @@ export default function MessageInput(props: MessageInputProps) {
     //     chat: { isOpen: isChatOpen },
     //     subscriptions: { isEnabled: isSubscriptionsEnabled },
     // } = useContext(AppStateContext);
+    
 
     const [mentPanelActive, setMentPanelActive] = useState(false);
     const [possibleMentUser, setPossibleMentUser] = useState<User | null>(null);
@@ -500,6 +504,9 @@ export default function MessageInput(props: MessageInputProps) {
                     props.selectedMessageForReply !== undefined
                         ? props.selectedMessageForReply?._id
                         : undefined,
+                    undefined,
+                    lastCapturedScreenShot
+                        
                 );
             } else {
                 props.sendMsg(
@@ -514,10 +521,13 @@ export default function MessageInput(props: MessageInputProps) {
                     props.selectedMessageForReply !== undefined
                         ? props.selectedMessageForReply?._id
                         : undefined,
+                    undefined,
+                    lastCapturedScreenShot
                 );
             }
             props.setIsReplyButtonPressed(false);
             props.setSelectedMessageForReply(undefined);
+            setLastCapturedScreenShot(undefined);
         }
         setInputLength(0);
         if (props.sendMessageListener) {
@@ -706,6 +716,12 @@ export default function MessageInput(props: MessageInputProps) {
         return shouldSkip;
     };
 
+    useEffect(() => {
+        if (lastCapturedScreenShot !== undefined) {
+            inputRef.current?.focus();
+        }
+    }, [lastCapturedScreenShot]);
+
     return (
         <>
             {props.isInputDisabled && (
@@ -747,6 +763,22 @@ export default function MessageInput(props: MessageInputProps) {
                             ''
                         )}
                     </>
+
+                        <div className={styles.image_to_send_wrapper}>
+                        {lastCapturedScreenShot && 
+                        
+                        <TextOnlyTooltip title='Cancel'>
+                        <div className={styles.cancel_image_button}>    <RiCloseFill
+                                    size={24}
+                                    title='Cancel'
+                                    onClick={() => setLastCapturedScreenShot(undefined)}
+                                    style={{ cursor: 'pointer' }}
+                                />
+                            </div>
+                            </TextOnlyTooltip>
+                            }
+                            {lastCapturedScreenShot && <img src={URL.createObjectURL(lastCapturedScreenShot)} alt="Screenshot" />}
+                        </div>
 
                     <div
                         className={

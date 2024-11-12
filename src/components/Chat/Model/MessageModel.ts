@@ -23,4 +23,5 @@ export interface Message {
     avatarImage: string;
     chainId?: string;
     isUnread?: boolean;
+    screenshot: boolean;
 }
