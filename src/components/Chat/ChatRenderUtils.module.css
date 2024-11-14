@@ -90,6 +90,17 @@
     cursor: pointer;
 }
 
+.message_card{
+    margin-bottom: .4rem;
+    padding: .4rem;
+    overflow: hidden;
+    background: var(--dark2);
+    border-radius: .6rem;
+    min-width: 10rem;
+    position: relative;
+    border: 1px solid rgba(255,255,255, .1);
+}
+
 @keyframes opaAnim{
 
     from{

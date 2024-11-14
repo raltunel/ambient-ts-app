@@ -1,3 +1,4 @@
+import { CHAT_BACKEND_URL } from '../../ambient-utils/constants';
 import { PoolIF } from '../../ambient-utils/types';
 import {
     AVATAR_TYPES_SET,
@@ -6,6 +7,7 @@ import {
     LS_USER_NON_VERIFIED_MESSAGES,
     LS_USER_VERIFY_TOKEN,
 } from './ChatConstants/ChatConstants';
+import { getScreenshotEndpoint } from './ChatConstants/ChatEndpoints';
 import {
     ChatRoomIF,
     ChatWsDecodedMessage,
@@ -420,3 +422,9 @@ export async function generateObjectHash(jsonObject: any) {
 
     return hashHex;
 }
+
+
+export function getScreenshotURL(messageId: string) {
+    return CHAT_BACKEND_URL + getScreenshotEndpoint + '/' + messageId;
+}
+

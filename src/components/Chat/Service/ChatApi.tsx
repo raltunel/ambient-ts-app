@@ -5,7 +5,6 @@ import { CHAT_BACKEND_URL } from '../../../ambient-utils/constants';
 import { UserDataContext } from '../../../contexts/UserDataContext';
 import { LS_USER_VERIFY_TOKEN } from '../ChatConstants/ChatConstants';
 import {
-    getScreenshotEndpoint,
     getTopRoomsEndpoint,
     getUserAvatarEndpoint,
     getUserAvatarImageByAccountEndpoint,
@@ -341,10 +340,6 @@ const useChatApi = () => {
         }
     }
 
-    function getScreenshotLink(messageId: string): string {
-        return CHAT_BACKEND_URL + getScreenshotEndpoint + '/' + messageId;
-    }
-
     return {
         getStatus,
         getID,
@@ -365,7 +360,6 @@ const useChatApi = () => {
         sendVerifyRequest,
         verifyWalletService,
         isUserVerified,
-        getScreenshotLink,
     };
 };
 export default useChatApi;

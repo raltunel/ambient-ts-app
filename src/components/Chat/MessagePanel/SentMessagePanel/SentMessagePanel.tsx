@@ -22,6 +22,7 @@ import { ChatVerificationTypes } from '../../ChatEnums';
 import { LikeDislikePayload, MentFoundParam } from '../../ChatIFs';
 import { getAvatarForChat } from '../../ChatRenderUtils';
 import {
+    getScreenshotURL,
     getShownName,
     hasEns,
     isChainNameTestnet,
@@ -106,6 +107,7 @@ interface SentMessageProps {
     setVerifyOldMessagesStartDate: Dispatch<SetStateAction<Date>>;
     isFocusMentions: boolean;
     isMobile: boolean;
+    setSelectedMessageForPreview: Dispatch<SetStateAction<Message | undefined>>;
 }
 
 function SentMessagePanel(props: SentMessageProps) {
@@ -130,7 +132,7 @@ function SentMessagePanel(props: SentMessageProps) {
         ? props.message.dislikes.length
         : 0;
 
-    const { getRepliedMessageInfo, getScreenshotLink } = useChatApi();
+    const { getRepliedMessageInfo } = useChatApi();
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -456,8 +458,10 @@ function SentMessagePanel(props: SentMessageProps) {
                     }
                 >
                     
-                    {props.message.screenshot && <div className={styles.screenshot_wrapper}>
-                        <img src={getScreenshotLink(props.message._id)} alt="screenshot" />
+                    {props.message.screenshot && <div className={styles.screenshot_wrapper} onClick={() => {
+                        props.setSelectedMessageForPreview(props.message);
+                    }}>
+                        <img src={getScreenshotURL(props.message._id)} alt="screenshot" />
                         </div>}
                     
                     {messagesArray.map((e, i) => {

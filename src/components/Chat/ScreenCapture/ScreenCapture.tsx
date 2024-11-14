@@ -266,6 +266,8 @@ export default function ScreenCapture(props: propsIF) {
         if (croppedImageRef.current) {
             const image = await printDomToImage(croppedImageRef.current);
             setLastCapturedScreenShot(image);
+            setCaptureState(ScreenCaptureStates.Idle);
+            setPreviewActive(false);
         }
     };
 

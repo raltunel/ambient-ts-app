@@ -30,6 +30,7 @@
     cursor: pointer;
 }
 .debug_btn{
+    display: none;
     position: fixed;
     background-color: rgb(225, 0, 255);
     left: 80%;

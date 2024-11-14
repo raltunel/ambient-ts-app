@@ -96,16 +96,7 @@ export const getMessageCard = (message: Message) => {
     return (
         <div
             key={message._id + 'card'}
-            style={{
-                marginBottom: '.4rem 0',
-                padding: '.4rem',
-                overflow: 'hidden',
-                background: '#171d27',
-                borderRadius: '0.6rem',
-                minWidth: '10rem',
-                position: 'relative',
-                border: '1px solid #7371fc85',
-            }}
+            className={styles.message_card}
         >
             <div
                 style={{

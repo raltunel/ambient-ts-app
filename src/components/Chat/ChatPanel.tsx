@@ -37,6 +37,7 @@ import { Message } from './Model/MessageModel';
 import { UserSummaryModel } from './Model/UserSummaryModel';
 import useChatApi from './Service/ChatApi';
 import useChatSocket from './Service/useChatSocket';
+import ChatImagePreview from './ChatImagePreview/ChatImagePreview';
 
 interface propsIF {
     isFullScreen: boolean;
@@ -98,6 +99,10 @@ function ChatPanel(props: propsIF) {
     const [selectedMessageforReply, setSelectedMessageForReply] = useState<
         Message | undefined
     >();
+
+    const [selectedMessageForPreview, setSelectedMessageForPreview] = useState<Message | undefined>();
+    const [showImagePreview, setShowImagePreview] = useState(false);
+
     const [selectedMessageIdForDeletion, setSelectedMessageIdForDeletion] =
         useState('');
 
@@ -560,6 +565,14 @@ function ChatPanel(props: propsIF) {
 
         if (messages.length == 0) return;
     }, [messages, setMessages]);
+
+    useEffect(() => {
+        if (selectedMessageForPreview) {
+            setShowImagePreview(true);
+        } else {
+            setShowImagePreview(false);
+        }
+    }, [selectedMessageForPreview]);
 
     function handleCloseChatPanel() {
         setIsChatOpen(false);
@@ -1047,6 +1060,7 @@ function ChatPanel(props: propsIF) {
                             }
                             isFocusMentions={isFocusMentions}
                             isMobile={isMobile}
+                            setSelectedMessageForPreview={setSelectedMessageForPreview} 
                         />
                     );
                 })}
@@ -1495,6 +1509,14 @@ function ChatPanel(props: propsIF) {
             />
 
             <DomDebugger />
+            <ChatImagePreview
+                isActive={showImagePreview}
+                closeListener={() => {
+                    setSelectedMessageForPreview(undefined);
+                }}
+                focusedMessage={selectedMessageForPreview}
+            />
+            
         </div>
     );
 }
