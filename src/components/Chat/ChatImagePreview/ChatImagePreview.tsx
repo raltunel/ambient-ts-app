@@ -32,7 +32,12 @@ export default function ChatImagePreview(props: propsIF) {
         <>
 
         <div className={`${styles.image_preview_wrapper} ${props.isActive ? styles.active : ''}`} ref={imagePreviewRef}>
+            <div className={styles.image_preview_content}>
             {props.focusedMessage && props.focusedMessage.screenshot && <img src={getScreenshotURL(props.focusedMessage._id)} alt="screenshot" />}
+
+
+
+            
             <div className={styles.close_button} onClick={props.closeListener}>
                 <AiOutlineClose />
             </div>
@@ -53,6 +58,7 @@ export default function ChatImagePreview(props: propsIF) {
             
             }
             <ChatBtn onClick={props.closeListener}>Close</ChatBtn>
+            </div>
             </div>
         </div>
         </>
