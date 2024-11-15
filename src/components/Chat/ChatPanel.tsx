@@ -1515,6 +1515,10 @@ function ChatPanel(props: propsIF) {
                     setSelectedMessageForPreview(undefined);
                 }}
                 focusedMessage={selectedMessageForPreview}
+                replyListener={() => {
+                    setIsReplyButtonPressed(true);
+                    setSelectedMessageForReply(selectedMessageForPreview);
+                }}
             />
             
         </div>
