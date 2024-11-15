@@ -210,6 +210,9 @@ function Ranges(props: propsIF) {
     const isAliveRef = useRef<boolean>(true);
     isAliveRef.current = true;
 
+    const matchedTxDivRef = useRef<HTMLDivElement | null>(null); // Initialize the ref with the correct type
+
+
     useEffect(() => {
         return () => {
             isAliveRef.current = false;
@@ -719,10 +722,11 @@ function Ranges(props: propsIF) {
         const uniqueSortedPositions = getUniqueSortedPositions(
             sortedPositions.filter(
                 (e) =>
-                    e.positionLiq !== 0 &&
-                    !unindexedUpdatedPositions.some(
-                        (p) => p.positionId === e.positionId,
-                    ),
+                    e.positionLiq !== 0
+                    //  &&
+                    // !unindexedUpdatedPositions.some(
+                    //     (p) => p.positionId === e.positionId,
+                    // ),
             ),
         );
 
@@ -736,7 +740,7 @@ function Ranges(props: propsIF) {
         sortedPositions,
         pagesVisible,
         isAccountView,
-        unindexedUpdatedPositions,
+        // unindexedUpdatedPositions,
     ]);
 
     // -----------------------------------------------------------------------------------------------------------------------------
@@ -992,6 +996,21 @@ function Ranges(props: propsIF) {
             tx.txDetails?.poolIdx === poolIndex,
     );
 
+    // useEffect(() => {
+    //     console.log('>>> unindexedUpdatedPositions', unindexedUpdatedPositions);
+    //     if(unindexedUpdatedPositions.length === 0){
+    //         matchedTxDivRef.current?.classList.remove('txRowAnimation');
+    //     }
+    // }, [unindexedUpdatedPositions]);
+
+    useEffect(() => {
+        // console.log('>>> relevantTransactionsByType', relevantTransactionsByType);
+        if(relevantTransactionsByType.length === 0){
+            matchedTxDivRef.current?.classList.remove('txRowAnimation');
+        }
+    }, [relevantTransactionsByType]);
+
+
     useEffect(() => {
         (async () => {
             if (relevantTransactionsByType.length === 0) {
@@ -1096,6 +1115,22 @@ function Ranges(props: propsIF) {
                         activeUserPositionsByPool.find(
                             (position) => position.positionId === posHash,
                         );
+
+                    if (matchingExistingPosition) {
+                        const txID = matchingExistingPosition.positionId;
+                        console.log('>>> txID', txID);
+                        const span = Array.from(document.querySelectorAll('div > div[data-label="hidden-id"] > span'))
+                            .find(el => el.textContent?.trim() === txID);
+                        if (span) {
+                            const row = span.closest('div[data-type="infinite-scroll-row"]');
+                            console.log('>>> row', row);
+                            row?.classList.add('txRowAnimation');
+                            if(row){
+                                matchedTxDivRef.current = row as HTMLDivElement;
+                            }
+                        }
+                    }
+
 
                     const onChainLiqGreaterThanMatchingPositionLiq =
                         liqBigInt >
@@ -1374,9 +1409,10 @@ function Ranges(props: propsIF) {
                 {showInfiniteScroll ? (
                     <TableRowsInfiniteScroll
                         type='Range'
-                        data={unindexedUpdatedPositions.concat(
-                            sortedPositionDataToDisplay,
-                        )}
+                        // data={unindexedUpdatedPositions.concat(
+                        //     sortedPositionDataToDisplay,
+                        // )}
+                        data={sortedPositionDataToDisplay}
                         tableView={tableView}
                         isAccountView={isAccountView}
                         fetcherFunction={addMoreData}
