@@ -98,3 +98,5 @@ export interface DomRectIF{
     rb: DomPositionInterface;
     lb: DomPositionInterface;
 }
+
+export const DomRectDefault: DomRectIF = { lt: { x: 0, y: 0 }, rt: { x: 0, y: 0 }, rb: { x: 0, y: 0 }, lb: { x: 0, y: 0 } };

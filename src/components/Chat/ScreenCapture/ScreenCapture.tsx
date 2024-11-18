@@ -14,7 +14,7 @@ import useCopyToClipboard from '../../../utils/hooks/useCopyToClipboard';
 import useMediaQuery from '../../../utils/hooks/useMediaQuery';
 import { TextOnlyTooltip } from '../../Global/StyledTooltip/StyledTooltip';
 import { ScreenCaptureOverlayTypes, ScreenCaptureStates } from '../ChatEnums';
-import { DomPositionInterface, DomRectIF } from '../ChatIFs';
+import { DomPositionInterface, DomRectDefault, DomRectIF } from '../ChatIFs';
 import { domDebug } from '../DomDebugger/DomDebuggerUtils';
 import ScreenCaptureMessageInput from './ScreenCaptureMessageInput';
 
@@ -58,7 +58,9 @@ export default function ScreenCapture(props: propsIF) {
 
     const [previewActive, setPreviewActive] = useState<boolean>(false);
 
-    const [overlayRect, setOverlayRect] = useState<DomRectIF>({ lt: { x: 0, y: 0 }, rt: { x: 0, y: 0 }, rb: { x: 0, y: 0 }, lb: { x: 0, y: 0 } });
+    const [overlayRect, setOverlayRect] = useState<DomRectIF>(DomRectDefault);
+    const overlayRectRef = useRef<DomRectIF>(DomRectDefault);
+    overlayRectRef.current = overlayRect;
 
     const croppedImageRef = useRef<HTMLDivElement>(null);
 
@@ -80,7 +82,7 @@ export default function ScreenCapture(props: propsIF) {
         setPreviewActive(false);
         setMaskLT({x: 0, y: 0});
         setMaskRB({x: 0, y: 0});
-        setOverlayRect({ lt: { x: 0, y: 0 }, rt: { x: 0, y: 0 }, rb: { x: 0, y: 0 }, lb: { x: 0, y: 0 } });
+        setOverlayRect(DomRectDefault);
         setLastCapturedScreenShot(undefined);
 
     };
@@ -108,7 +110,7 @@ export default function ScreenCapture(props: propsIF) {
 
     const maskStarter = (x: number, y:number) => {
         setMaskLT({ x: x, y: y });
-        captureDom();
+        // captureDom();
         setTimeout(() => {
             setCaptureState(ScreenCaptureStates.Masking);
         }, 300);
@@ -155,6 +157,7 @@ export default function ScreenCapture(props: propsIF) {
 
     const maskEndClickListener = () => {
         console.log('mask End click listener')
+        captureDom();
         if (captureStateRef.current == ScreenCaptureStates.Masking) {
             setPreviewActive(true);
             // copyCroppedImageToClipboard();
@@ -168,7 +171,9 @@ export default function ScreenCapture(props: propsIF) {
     }, [captureState]);
 
     const getPosForOverlayRect = (type: ScreenCaptureOverlayTypes) => {
-        if (maskLTRef.current == undefined || maskRBRef.current == undefined)
+
+        const oRect = overlayRectRef.current;
+        if (!oRect)
             return;
         const maskOverlayOffset = 10;
         switch (type) {
@@ -178,29 +183,29 @@ export default function ScreenCapture(props: propsIF) {
                     top: 0,
                     // right: window.innerWidth - maskRBRef.current.x,
                     // bottom: window.innerHeight - maskLTRef.current.y,
-                    right: window.innerWidth - maskRBRef.current.x,
-                    bottom: window.innerHeight - maskLTRef.current.y,
+                    right: window.innerWidth - oRect.lt.x + maskOverlayOffset,
+                    bottom: 0,
                 };
             case ScreenCaptureOverlayTypes.RightTop:
                 return {
-                    left: maskRBRef.current.x,
+                    left: oRect.lt.x - maskOverlayOffset,
                     top: 0,
                     right: 0,
-                    bottom: 0,
+                    bottom: window.innerHeight - oRect.lt.y + maskOverlayOffset,
                 };
             case ScreenCaptureOverlayTypes.RightBottom:
                 return {
-                    left: 0,
-                    top: maskRBRef.current.y,
-                    right: window.innerWidth - maskRBRef.current.x,
+                    left: oRect.rt.x + maskOverlayOffset,
+                    top: oRect.rt.y - maskOverlayOffset,
+                    right: 0,
                     bottom: 0,
                 };
             case ScreenCaptureOverlayTypes.LeftBottom:
                 return {
-                    left: 0,
-                    top: maskLTRef.current.y,
-                    right: window.innerWidth - maskLTRef.current.x,
-                    bottom: window.innerHeight - maskRBRef.current.y,
+                    left: oRect.lb.x - maskOverlayOffset,
+                    top: oRect.lb.y + maskOverlayOffset,
+                    right: window.innerWidth - oRect.rb.x - maskOverlayOffset,
+                    bottom: 0,
                 };
             case ScreenCaptureOverlayTypes.MaskArea:
                 return {
@@ -254,7 +259,12 @@ export default function ScreenCapture(props: propsIF) {
         return { lt, rt, rb, lb};
     }
 
-    
+    const overlayOnDrag = (e: React.MouseEvent) => {
+        console.log('overlay drag');
+        if(isMobile) return;
+
+        console.log(e);
+    }
 
     const chatBtnListener = async () => {
 
@@ -293,8 +303,9 @@ export default function ScreenCapture(props: propsIF) {
 
             {(captureState == ScreenCaptureStates.MaskReady || isMobile === true) && (
                 <div
-                    className={`${styles.overlay_effect} ${styles.full}`}
+                    className={`${styles.overlay_effect} ${styles.full} ${styles.mask_ready_overlay}`}
                     onClick={overlayOnClick}
+                    onMouseDown={overlayOnClick}
                     onTouchStart={overlayOnTouch}
                     onTouchMove={touchMoveListener}
                     onTouchEnd={maskEndClickListener}
@@ -330,6 +341,7 @@ export default function ScreenCapture(props: propsIF) {
 
                     <div
                         onClick={maskEndClickListener}
+                        onMouseUp={maskEndClickListener}
                         style={getPosForOverlayRect(
                             ScreenCaptureOverlayTypes.MaskArea,
                         )}
@@ -337,6 +349,20 @@ export default function ScreenCapture(props: propsIF) {
                     ></div>
                 </>
             )}
+
+            {
+                previewActive && (
+                    <>
+                    <div
+                    style={getPosForOverlayRect(
+                        ScreenCaptureOverlayTypes.MaskArea,
+                    )}
+                    className={`${styles.overlay_effect} ${styles.mask}`}
+                    onDrag={overlayOnDrag}
+                    ></div>
+                    </>
+                )
+            }
 
             <div  className={`${styles.preview_modal} ${previewActive ? styles.active : ''}`}>
                 <div className={styles.modal_title}>Share Image
