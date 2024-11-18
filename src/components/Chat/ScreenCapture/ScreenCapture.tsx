@@ -64,6 +64,8 @@ export default function ScreenCapture(props: propsIF) {
     const maskMoveGapRef = useRef<DomPositionInterface>();
     maskMoveGapRef.current = maskMoveGap;
 
+    const [renderOverlayRect, setRenderOverlayRect] = useState<boolean>(true);
+
     const captureStateRef = useRef<ScreenCaptureStates>();
     captureStateRef.current = captureState;
     const [maskLT, setMaskLT] = useState<DomPositionInterface>();
@@ -167,11 +169,15 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const maskEndClickListener = () => {
+        setRenderOverlayRect(false);
         captureDom();
         if (captureStateRef.current == ScreenCaptureStates.Masking) {
             setPreviewActive(true);
             // copyCroppedImageToClipboard();
             setCaptureState(ScreenCaptureStates.PreviewReady);
+            setTimeout(() => {
+                setRenderOverlayRect(true);
+            }, 400);
         }
     };
 
@@ -235,6 +241,7 @@ export default function ScreenCapture(props: propsIF) {
                     right: window.innerWidth - overlayRect.rt.x - maskOverlayOffset,
                     bottom: window.innerHeight - overlayRect.rb.y - maskOverlayOffset,
                     transform: transform,
+                    display: renderOverlayRect ? 'block' : 'none',
                 };
         }
     };
