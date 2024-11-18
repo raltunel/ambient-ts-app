@@ -359,6 +359,34 @@
 }   
 
 
+.start_capture_btn{
+    position: fixed;
+    right: 27rem;
+    z-index: 9999;
+    top: .8rem;
+    padding: .5rem;
+    background-color: var(--dark2);
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: .2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.start_capture_btn.not_connected{
+    right: 24.6rem;
+}
+
+.start_capture_btn.active{
+    background-color: var(--accent1);
+}
+
+.start_capture_btn.active svg{
+    fill: white;
+}
+
 @media (max-width: 768px) {
 
     .placeholder_wrapper{
@@ -395,3 +423,4 @@
     }
 
 }
+

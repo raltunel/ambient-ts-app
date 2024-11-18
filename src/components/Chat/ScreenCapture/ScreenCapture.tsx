@@ -5,7 +5,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import styles from './ScreenCapture.module.css';
 // import { domToImage } from 'modern-screenshot';
-import { BiSend } from 'react-icons/bi';
+import { BiScreenshot, BiSend } from 'react-icons/bi';
 import { BsCopy } from 'react-icons/bs';
 import { RiDownload2Line, RiScreenshot2Line } from 'react-icons/ri';
 import { printDomToImage } from '../../../ambient-utils/dataLayer';
@@ -360,6 +360,7 @@ export default function ScreenCapture(props: propsIF) {
                 {' '}
                 Mask
             </div>
+
             <div className={styles.reset_btn} onClick={resetBtnListener}>
                 {' '}
                 Reset
@@ -368,6 +369,17 @@ export default function ScreenCapture(props: propsIF) {
                 {' '}
                 Debug Overlays
             </div>
+
+            <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Take Screenshot</div>} placement='bottom' >
+                <div className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} ${captureState != ScreenCaptureStates.Idle ? styles.active : ''}` } onClick={maskBtnListener}>  
+                    <BiScreenshot size={18} />
+                </div>
+            </TextOnlyTooltip>
+
+            {/* <div className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} ${captureState != ScreenCaptureStates.Idle ? styles.active : ''}` } onClick={maskBtnListener}>  
+                <BiScreenshot size={18} />
+            </div>
+             */}
 
             {(captureState == ScreenCaptureStates.MaskReady || isMobile === true) && (
                 <div
