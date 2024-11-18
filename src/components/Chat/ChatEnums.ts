@@ -17,3 +17,8 @@ export enum ScreenCaptureOverlayTypes {
     LeftBottom,
     MaskArea,
 }
+
+export enum ScreenCaptureEditStates {
+    Idle,
+    MaskMoving,
+}

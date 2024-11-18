@@ -122,6 +122,16 @@
     background-color: color-mix(in srgb, var(--accent1) 10%, transparent);
 }
 
+.mask_move_overlay{
+    position: fixed;
+    z-index: 10;
+    background-color: transparent;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+}
+
 .overlay_effect.full{
     width: 100vw;
     height: 100vh;
@@ -155,6 +165,11 @@
     position: fixed;
 }
 
+.overlay_effect.mask_move{
+    animation: none;
+    cursor: move;
+
+}
 
 .captured_raw_image{
     width: 100vw;

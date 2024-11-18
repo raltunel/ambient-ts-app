@@ -13,7 +13,7 @@ import { AppStateContext, UserDataContext } from '../../../contexts';
 import useCopyToClipboard from '../../../utils/hooks/useCopyToClipboard';
 import useMediaQuery from '../../../utils/hooks/useMediaQuery';
 import { TextOnlyTooltip } from '../../Global/StyledTooltip/StyledTooltip';
-import { ScreenCaptureOverlayTypes, ScreenCaptureStates } from '../ChatEnums';
+import { ScreenCaptureEditStates, ScreenCaptureOverlayTypes, ScreenCaptureStates } from '../ChatEnums';
 import { DomPositionInterface, DomRectDefault, DomRectIF } from '../ChatIFs';
 import { domDebug } from '../DomDebugger/DomDebuggerUtils';
 import ScreenCaptureMessageInput from './ScreenCaptureMessageInput';
@@ -24,7 +24,6 @@ interface propsIF {
 
 export default function ScreenCapture(props: propsIF) {
     useEffect(() => {
-        console.log(props);
         if(!isMobile){
             document.addEventListener('mousemove', mouseMoveListener);
         }
@@ -46,6 +45,24 @@ export default function ScreenCapture(props: propsIF) {
     const [captureState, setCaptureState] = useState<ScreenCaptureStates>(
         ScreenCaptureStates.Idle,
     );
+
+    const [captureEditState, setCaptureEditState] = useState<ScreenCaptureEditStates>(
+        ScreenCaptureEditStates.Idle,
+    );
+    const captureEditStateRef = useRef<ScreenCaptureEditStates>();
+    captureEditStateRef.current = captureEditState;
+
+    const [maskMoveStartPoint, setMaskMoveStartPoint] = useState<DomPositionInterface>();
+    const maskMoveStartPointRef = useRef<DomPositionInterface>();
+    maskMoveStartPointRef.current = maskMoveStartPoint;
+
+    const [maskMoveEndPoint, setMaskMoveEndPoint] = useState<DomPositionInterface>();
+    const maskMoveEndPointRef = useRef<DomPositionInterface>();
+    maskMoveEndPointRef.current = maskMoveEndPoint;
+
+    const [maskMoveGap, setMaskMoveGap] = useState<DomPositionInterface>();
+    const maskMoveGapRef = useRef<DomPositionInterface>();
+    maskMoveGapRef.current = maskMoveGap;
 
     const captureStateRef = useRef<ScreenCaptureStates>();
     captureStateRef.current = captureState;
@@ -71,7 +88,6 @@ export default function ScreenCapture(props: propsIF) {
         setImageComp(image);
     };
     const maskBtnListener = async () => {
-        console.log('mask');
         setTimeout(() => {
             setCaptureState(ScreenCaptureStates.MaskReady);
         }, 200);
@@ -82,6 +98,7 @@ export default function ScreenCapture(props: propsIF) {
         setPreviewActive(false);
         setMaskLT({x: 0, y: 0});
         setMaskRB({x: 0, y: 0});
+        setMaskMoveGap(undefined);
         setOverlayRect(DomRectDefault);
         setLastCapturedScreenShot(undefined);
 
@@ -97,13 +114,11 @@ export default function ScreenCapture(props: propsIF) {
 
 
     const overlayOnClick = (e: React.MouseEvent) => {
-        console.log('overlay click');
         if(isMobile) return;
         maskStarter(e.clientX, e.clientY);
     }
 
     const overlayOnTouch = (e: React.TouchEvent) => {
-        console.log('touch');
         if(!isMobile) return;
         maskStarter(e.touches[0].clientX, e.touches[0].clientY);
     }
@@ -119,20 +134,16 @@ export default function ScreenCapture(props: propsIF) {
 
     const mouseMoveListener = (e: MouseEvent) => {
         if(isMobile) return;
-
-        maskMoveListener(e.clientX, e.clientY);
+        maskingMouseMoveListener(e.clientX, e.clientY);
     }
 
     const touchMoveListener = (e: React.TouchEvent<HTMLDivElement>) => {
-        console.log('touch move');
         if(!isMobile) return;
 
-        console.log(e.touches[0].clientX, e.touches[0].clientY);
-
-        maskMoveListener(e.touches[0].clientX, e.touches[0].clientY);
+        maskingMouseMoveListener(e.touches[0].clientX, e.touches[0].clientY);
     }
 
-    const maskMoveListener = (x: number, y: number) => {
+    const maskingMouseMoveListener = (x: number, y: number) => {
         
         if( captureStateRef.current == ScreenCaptureStates.PreviewReady) return;
         if (captureStateRef.current != ScreenCaptureStates.Masking) return;
@@ -156,7 +167,6 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const maskEndClickListener = () => {
-        console.log('mask End click listener')
         captureDom();
         if (captureStateRef.current == ScreenCaptureStates.Masking) {
             setPreviewActive(true);
@@ -176,6 +186,13 @@ export default function ScreenCapture(props: propsIF) {
         if (!oRect)
             return;
         const maskOverlayOffset = 10;
+        
+        let transform = '';
+
+        if(maskMoveGapRef.current){
+            transform = `translate(${maskMoveGapRef.current?.x}px, ${maskMoveGapRef.current?.y}px)`;
+        }
+
         switch (type) {
             case ScreenCaptureOverlayTypes.LeftTop:
                 return {
@@ -217,14 +234,22 @@ export default function ScreenCapture(props: propsIF) {
                     top: overlayRect.lt.y - maskOverlayOffset,
                     right: window.innerWidth - overlayRect.rt.x - maskOverlayOffset,
                     bottom: window.innerHeight - overlayRect.rb.y - maskOverlayOffset,
+                    transform: transform,
                 };
         }
     };
 
     const getImageOffset = () => {
+
+            let gap = {x: 0, y: 0};
+            if(maskMoveGapRef.current){
+                gap = maskMoveGapRef.current;
+            }
+
+
             return {
-                left: -1 * overlayRect.lt.x,
-                top: -1 * overlayRect.lt.y,
+                left: -1 * overlayRect.lt.x - gap.x,
+                top: -1 * overlayRect.lt.y - gap.y,
             };
     };
 
@@ -260,10 +285,7 @@ export default function ScreenCapture(props: propsIF) {
     }
 
     const overlayOnDrag = (e: React.MouseEvent) => {
-        console.log('overlay drag');
         if(isMobile) return;
-
-        console.log(e);
     }
 
     const chatBtnListener = async () => {
@@ -280,7 +302,46 @@ export default function ScreenCapture(props: propsIF) {
             setPreviewActive(false);
         }
     };
+    
+    const previewMaskClickListener = (e: React.MouseEvent) => {
+        setCaptureEditState(ScreenCaptureEditStates.MaskMoving);
+        setMaskMoveStartPoint({x: e.clientX, y: e.clientY});
+    }
 
+    const previewMaskMoveListener = (e: React.MouseEvent) => {
+
+        if(captureEditStateRef.current != ScreenCaptureEditStates.MaskMoving) return;
+
+        const currentPoint = {x: e.clientX, y: e.clientY};
+        
+        if(maskMoveStartPointRef.current){
+
+            const gap = {
+                x: currentPoint.x - maskMoveStartPointRef.current.x,
+                y: currentPoint.y - maskMoveStartPointRef.current.y,
+            }
+            setMaskMoveGap(gap);
+        }
+
+    }
+
+    const previewMaskMoveEndListener = () => {
+        setCaptureEditState(ScreenCaptureEditStates.Idle);
+        if(maskMoveGapRef.current){
+            const gap = maskMoveGapRef.current;
+        setOverlayRect(
+            (prev) => {
+                return {
+                    lt: {x: prev.lt.x + gap.x, y: prev.lt.y + gap.y},
+                    rt: {x: prev.rt.x + gap.x, y: prev.rt.y + gap.y},
+                    rb: {x: prev.rb.x + gap.x, y: prev.rb.y + gap.y},
+                    lb: {x: prev.lb.x + gap.x, y: prev.lb.y + gap.y},
+                }
+            }
+        )
+        setMaskMoveGap(undefined);
+        }
+    }
 
     return (
         <>
@@ -357,9 +418,19 @@ export default function ScreenCapture(props: propsIF) {
                     style={getPosForOverlayRect(
                         ScreenCaptureOverlayTypes.MaskArea,
                     )}
-                    className={`${styles.overlay_effect} ${styles.mask}`}
+                    className={`${styles.overlay_effect} ${styles.mask} ${styles.mask_move}`}
                     onDrag={overlayOnDrag}
+                    onClick={previewMaskClickListener}
+                    onMouseDown={previewMaskClickListener}
+                    onMouseUp={previewMaskMoveEndListener}
                     ></div>
+
+                    <div className={styles.mask_move_overlay}
+                        onMouseMove={previewMaskMoveListener}
+                        onMouseUp={previewMaskMoveEndListener}
+                        onMouseDown={previewMaskClickListener}
+                    >
+                    </div>
                     </>
                 )
             }
