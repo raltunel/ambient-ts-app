@@ -30,6 +30,7 @@ export default function ScreenCapture(props: propsIF) {
     }, []);
 
     const {isUserConnected, setLastCapturedScreenShot} = useContext(UserDataContext);
+    const editMasking = false;
 
     const {
         snackbar: { open: openSnackbar },
@@ -84,6 +85,7 @@ export default function ScreenCapture(props: propsIF) {
     const croppedImageRef = useRef<HTMLDivElement>(null);
 
     const [debugMode, setDebugMode] = useState<boolean>(false);
+    const [scaleFactor, setScaleFactor] = useState<number>(1);
     const btnListener = async () => {
         // const image = await domToImage(document.body);
         const image = await printDomToImage(document.getElementById('root') as HTMLElement);
@@ -110,7 +112,7 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const captureDom = async () => {
-        const image = await printDomToImage(document.getElementById('root') as HTMLElement);
+        const image = await printDomToImage(document.getElementById('root') as HTMLElement, undefined, undefined, undefined, undefined, 1);
         setImageComp(image);
     };
 
@@ -170,6 +172,7 @@ export default function ScreenCapture(props: propsIF) {
 
     const maskEndClickListener = () => {
         setRenderOverlayRect(false);
+        bindScaleFactor();
         captureDom();
         if (captureStateRef.current == ScreenCaptureStates.Masking) {
             setPreviewActive(true);
@@ -180,7 +183,26 @@ export default function ScreenCapture(props: propsIF) {
             }, 400);
         }
     };
+    
+    const bindScaleFactor = () => {
 
+        const rectWidth = overlayRectRef.current.rt.x - overlayRectRef.current.lt.x;
+        const rectHeight = overlayRectRef.current.lb.y - overlayRectRef.current.lt.y;
+        const maxWidth = window.innerWidth * .6;
+        const maxHeight = window.innerHeight * .6;
+
+        if(rectWidth > maxWidth || rectHeight > maxHeight){
+            const scale = Math.min(maxWidth / rectWidth, maxHeight / rectHeight);
+            setScaleFactor(scale);
+        }else{
+            setScaleFactor(1);
+        }
+
+
+
+    }
+
+    console.log('scaleFactor', scaleFactor);
 
     useEffect(() => {
         console.log(captureState);
@@ -253,17 +275,20 @@ export default function ScreenCapture(props: propsIF) {
                 gap = maskMoveGapRef.current;
             }
 
+            const width = scaleFactor * 100;
+
 
             return {
-                left: -1 * overlayRect.lt.x - gap.x,
-                top: -1 * overlayRect.lt.y - gap.y,
+                left: scaleFactor * -1 * overlayRect.lt.x - gap.x,
+                top: scaleFactor * -1 * overlayRect.lt.y - gap.y,
+                width: width + 'vw',
             };
     };
 
     const getPreviewSize = () => {
             return {
-                width: overlayRect.rt.x - overlayRect.lt.x,
-                height: overlayRect.lb.y - overlayRect.lt.y,
+                width: scaleFactor * (overlayRect.rt.x - overlayRect.lt.x),
+                height: scaleFactor * (overlayRect.lb.y - overlayRect.lt.y),
             };
     };
 
@@ -347,6 +372,14 @@ export default function ScreenCapture(props: propsIF) {
             }
         )
         setMaskMoveGap(undefined);
+        }
+    }
+
+    const getPlaceholderSize = () => {
+        
+        return {
+            width: (overlayRect.rt.x - overlayRect.lt.x) * scaleFactor + 'px',
+            height: (overlayRect.lb.y - overlayRect.lt.y) * scaleFactor + 'px',
         }
     }
 
@@ -437,22 +470,23 @@ export default function ScreenCapture(props: propsIF) {
                     style={getPosForOverlayRect(
                         ScreenCaptureOverlayTypes.MaskArea,
                     )}
-                    className={`${styles.overlay_effect} ${styles.mask} ${styles.mask_move}`}
-                    onDrag={overlayOnDrag}
-                    onClick={previewMaskClickListener}
-                    onMouseDown={previewMaskClickListener}
-                    onMouseUp={previewMaskMoveEndListener}
+                    className={`${styles.overlay_effect} ${styles.mask}`}
+                    onDrag={editMasking ? overlayOnDrag : undefined}
+                    onClick={editMasking ? previewMaskClickListener : undefined}
+                    onMouseDown={editMasking ? previewMaskClickListener : undefined}
+                    onMouseUp={editMasking ? previewMaskMoveEndListener : undefined}
                     ></div>
 
-                    <div className={styles.mask_move_overlay}
-                        onMouseMove={previewMaskMoveListener}
-                        onMouseUp={previewMaskMoveEndListener}
-                        onMouseDown={previewMaskClickListener}
-                    >
-                    </div>
+                    { editMasking && <div className={styles.mask_move_overlay}
+                            onMouseMove={previewMaskMoveListener}
+                            onMouseUp={previewMaskMoveEndListener}
+                            onMouseDown={previewMaskClickListener}
+                        >
+                    </div>}
                     </>
                 )
             }
+
 
             <div  className={`${styles.preview_modal} ${previewActive ? styles.active : ''}`}>
                 <div className={styles.modal_title}>Share Image
@@ -475,7 +509,7 @@ export default function ScreenCapture(props: propsIF) {
                 )} 
                 {
                     !imageComp && (
-                        <div className={styles.placeholder_wrapper}>
+                        <div className={styles.placeholder_wrapper} style={getPlaceholderSize()}>
                             <RiScreenshot2Line size={64}  />
                             <div className={styles.placeholder_text}>The screen is being captured...</div>
                             <div className={ styles.placeholder_loader + ' ' + styles.placeholder_loader_horizontal}></div>

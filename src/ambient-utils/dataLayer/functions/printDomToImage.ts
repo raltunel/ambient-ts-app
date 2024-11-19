@@ -6,6 +6,7 @@ export const printDomToImage = async (
     additionalStyles?: Partial<CSSStyleDeclaration>,
     height?: number,
     filterNode?:((el: Node) => boolean),
+    imgScale?: number,
 ) => {
     const scale = 2;
     try {
@@ -24,7 +25,9 @@ export const printDomToImage = async (
             features:{
                 copyScrollbar: true,
                 restoreScrollPosition: true
-            }
+                
+            },
+            scale: imgScale || 1,
         });
         return blob;
     } catch (e) {
