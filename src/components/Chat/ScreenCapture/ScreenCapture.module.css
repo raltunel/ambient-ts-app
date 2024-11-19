@@ -62,14 +62,13 @@ color-mix(in srgb, var(--dark2) 60%, transparent);
 }
 
 .preview_modal.active{
-    padding: 1rem;
     z-index: 99;
     opacity: 1;
     top: 50%;
     transform: translate(-50%, -50%);
     backdrop-filter: blur(10px);
     border-radius: .5rem;
-    padding-bottom: 0;
+    padding-bottom: 0 1rem;
 }
 
 .image_preview_wrapper{
@@ -259,20 +258,23 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
     width: 100%;
     text-align: center;
     position: relative;
-    background: black;
+    background: var(--dark1);
     position: relative;
     border-bottom: 1px solid 
 color-mix(in srgb, var(--accent1) 30%, transparent);
     margin-bottom: 2rem;
-    padding-bottom: 1rem;
+    width: 120%;
+    margin-left: -10%;
+    padding: 1rem;
 }
 
 .close_btn{
     position: absolute;
-    right: 0;
-    top: -.5rem;
+    right: calc(10% + .5rem);
+    top: .5rem;
     cursor: pointer;
     padding: .5rem;
+    color:rgba(255,255,255, .5);
 }
 
 .icon_btn_wrapper{
@@ -428,7 +430,6 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
     }
     
     .preview_modal.active{
-        padding: 1rem;
         z-index: 99;
         backdrop-filter: blur(10px);
         border-radius: .5rem;

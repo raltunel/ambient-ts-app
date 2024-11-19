@@ -17,15 +17,27 @@ import { ScreenCaptureEditStates, ScreenCaptureOverlayTypes, ScreenCaptureStates
 import { DomPositionInterface, DomRectDefault, DomRectIF } from '../ChatIFs';
 import { domDebug } from '../DomDebugger/DomDebuggerUtils';
 import ScreenCaptureMessageInput from './ScreenCaptureMessageInput';
+import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 
 interface propsIF {
     name?: string;
 }
 
 export default function ScreenCapture(props: propsIF) {
+
+
+
+    const keyDownListener = (e: KeyboardEvent) => {
+        if(e.key === 'Escape'){
+            resetBtnListener();
+            e.preventDefault();
+        }
+    }
+
     useEffect(() => {
         if(!isMobile){
             document.addEventListener('mousemove', mouseMoveListener);
+            document.addEventListener('keydown', keyDownListener);
         }
     }, []);
 
@@ -39,6 +51,8 @@ export default function ScreenCapture(props: propsIF) {
     } = useContext(AppStateContext);
 
     const isMobile = useMediaQuery('(max-width: 768px)');
+
+    const previewModalRef = useRef<HTMLDivElement>(null);
 
     const [, copy] = useCopyToClipboard();
 
@@ -107,6 +121,14 @@ export default function ScreenCapture(props: propsIF) {
         setLastCapturedScreenShot(undefined);
 
     };
+
+    const closePreviewModal = () => {
+        setPreviewActive(false);
+    }
+
+    useOnClickOutside(previewModalRef, closePreviewModal);
+
+
     const debugBtnListener = async () => {
         setDebugMode(!debugMode);
     };
@@ -488,7 +510,7 @@ export default function ScreenCapture(props: propsIF) {
             }
 
 
-            <div  className={`${styles.preview_modal} ${previewActive ? styles.active : ''}`}>
+            <div  className={`${styles.preview_modal} ${previewActive ? styles.active : ''}`} ref={previewModalRef}>
                 <div className={styles.modal_title}>Share Image
                     <div className={styles.close_btn} onClick={resetBtnListener}>X</div>
                 </div>
