@@ -139,7 +139,7 @@ export default function UserMenu(props: propsIF) {
                 aria-label={ariaLabel}
             >
                 <MdAccountBalanceWallet color='var(--text1)' />
-                <p className={styles.walletName}>
+                <p id='ambient-header-wallet-name' className={styles.walletName}>
                     {connectedEnsOrAddressTruncated || '...'}
                 </p>
             </button>

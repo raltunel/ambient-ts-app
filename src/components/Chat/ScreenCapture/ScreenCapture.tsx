@@ -50,6 +50,7 @@ export default function ScreenCapture(props: propsIF) {
         chat: { isOpen: isChatOpen, setIsOpen: setIsChatOpen },
     } = useContext(AppStateContext);
 
+
     const isMobile = useMediaQuery('(max-width: 768px)');
 
     const previewModalRef = useRef<HTMLDivElement>(null);
@@ -134,7 +135,10 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const captureDom = async () => {
-        const image = await printDomToImage(document.getElementById('root') as HTMLElement, undefined, undefined, undefined, undefined, 1);
+        const image = await printDomToImage(document.getElementById('root') as HTMLElement, undefined, undefined, undefined, 
+        (el: Node) => {
+            return (el as HTMLElement).id !== 'ambient-header-wallet-name';
+        }, 1);
         setImageComp(image);
     };
 
@@ -357,6 +361,16 @@ export default function ScreenCapture(props: propsIF) {
         }
     };
     
+
+    const connectBtnListener = async () => {
+        if(croppedImageRef.current){
+            const image = await printDomToImage(croppedImageRef.current);
+            setLastCapturedScreenShot(image);
+            setIsChatOpen(true);
+        }
+        openWalletModal();
+    }
+
     const previewMaskClickListener = (e: React.MouseEvent) => {
         setCaptureEditState(ScreenCaptureEditStates.MaskMoving);
         setMaskMoveStartPoint({x: e.clientX, y: e.clientY});
@@ -485,7 +499,7 @@ export default function ScreenCapture(props: propsIF) {
                 </>
             )}
 
-            {
+            {/* {
                 previewActive && (
                     <>
                     <div
@@ -507,7 +521,7 @@ export default function ScreenCapture(props: propsIF) {
                     </div>}
                     </>
                 )
-            }
+            } */}
 
 
             <div  className={`${styles.preview_modal} ${previewActive ? styles.active : ''}`} ref={previewModalRef}>
@@ -546,7 +560,7 @@ export default function ScreenCapture(props: propsIF) {
                         </div> Send to Chat </div>
                     ) : (
                         <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Conect your wallet to send screenshot on chat</div>} placement='top' >
-                        <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={openWalletModal}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
+                        <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={connectBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
                         </div> Send to Chat</div>
                         </TextOnlyTooltip>
                     )}

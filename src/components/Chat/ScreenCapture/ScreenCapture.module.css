@@ -47,7 +47,7 @@
     max-width: 90vw;
     min-width: 30vw;
     left: 50%;
-    top: 0;
+    top: -100%;
     z-index: -1;
     opacity: 0;
     
@@ -203,7 +203,8 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
 
 
 .btn_section{
-    display: flex;
+
+    display: none;
     justify-content: center;
     gap: .4rem;
     margin: 0 auto;
@@ -218,6 +219,10 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
     width: 120%;
     margin-left: -10%;
     border: 1px solid color-mix(in srgb, var(--accent1) 30%, transparent);
+}
+
+.preview_modal.active .btn_section{
+    display: flex;
 }
 
 .btn_wrapper{
