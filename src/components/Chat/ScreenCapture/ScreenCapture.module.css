@@ -454,3 +454,8 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
 
 }
 
+
+.hidden{
+    display: none !important;
+}
+

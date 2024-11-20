@@ -27,6 +27,8 @@ export default function ScreenCapture(props: propsIF) {
 
 
 
+    const chatOnDom = document.getElementById('ambient-chat-on-dom');
+
     const keyDownListener = (e: KeyboardEvent) => {
         if(e.key === 'Escape'){
             resetBtnListener();
@@ -555,12 +557,14 @@ export default function ScreenCapture(props: propsIF) {
                 }
                 {/* {isUserConnected && imageComp && <ScreenCaptureMessageInput />} */}
                 <div className={styles.btn_section}>
+                    
+                    
                     {isUserConnected ? (   
-                        <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={chatBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
+                        <div className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom ? styles.hidden : ''}`} onClick={chatBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
                         </div> Send to Chat </div>
                     ) : (
                         <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Conect your wallet to send screenshot on chat</div>} placement='top' >
-                        <div className={styles.btn_wrapper + ' ' + styles.primary_btn} onClick={connectBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
+                        <div className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom ? styles.hidden : ''}`} onClick={connectBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
                         </div> Send to Chat</div>
                         </TextOnlyTooltip>
                     )}

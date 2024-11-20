@@ -1520,7 +1520,8 @@ function ChatPanel(props: propsIF) {
                     setSelectedMessageForReply(selectedMessageForPreview);
                 }}
             />
-            
+            <div id='ambient-chat-on-dom' style={{display: 'none'}}>
+            </div>
         </div>
     );
 }
