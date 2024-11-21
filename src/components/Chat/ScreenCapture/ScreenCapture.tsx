@@ -18,6 +18,7 @@ import { DomPositionInterface, DomRectDefault, DomRectIF } from '../ChatIFs';
 import { domDebug } from '../DomDebugger/DomDebuggerUtils';
 import ScreenCaptureMessageInput from './ScreenCaptureMessageInput';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
+import { useNavigate } from 'react-router-dom';
 
 interface propsIF {
     name?: string;
@@ -26,6 +27,7 @@ interface propsIF {
 export default function ScreenCapture(props: propsIF) {
 
 
+    const navigate = useNavigate();
 
     const chatOnDom = document.getElementById('ambient-chat-on-dom');
 
@@ -151,6 +153,7 @@ export default function ScreenCapture(props: propsIF) {
     }
 
     const overlayOnTouch = (e: React.TouchEvent) => {
+        console.log('overlayOnTouch', e.touches[0].clientX, e.touches[0].clientY);
         if(!isMobile) return;
         maskStarter(e.touches[0].clientX, e.touches[0].clientY);
     }
@@ -214,10 +217,14 @@ export default function ScreenCapture(props: propsIF) {
     
     const bindScaleFactor = () => {
 
+
+        const ratio = isMobile ? 0.9 : 0.6;
+
+
         const rectWidth = overlayRectRef.current.rt.x - overlayRectRef.current.lt.x;
         const rectHeight = overlayRectRef.current.lb.y - overlayRectRef.current.lt.y;
-        const maxWidth = window.innerWidth * .6;
-        const maxHeight = window.innerHeight * .6;
+        const maxWidth = window.innerWidth * ratio;
+        const maxHeight = window.innerHeight * ratio;
 
         if(rectWidth > maxWidth || rectHeight > maxHeight){
             const scale = Math.min(maxWidth / rectWidth, maxHeight / rectHeight);
@@ -233,7 +240,8 @@ export default function ScreenCapture(props: propsIF) {
     console.log('scaleFactor', scaleFactor);
 
     useEffect(() => {
-        console.log(captureState);
+        console.log('maskReady', captureState === ScreenCaptureStates.MaskReady);
+        console.log('masking ', captureState === ScreenCaptureStates.Masking);
     }, [captureState]);
 
     const getPosForOverlayRect = (type: ScreenCaptureOverlayTypes) => {
@@ -351,7 +359,7 @@ export default function ScreenCapture(props: propsIF) {
     const chatBtnListener = async () => {
 
 
-        if(!isChatOpen){
+        if(!isChatOpen && !isMobile){
             setIsChatOpen(true);
         }
 
@@ -360,6 +368,10 @@ export default function ScreenCapture(props: propsIF) {
             setLastCapturedScreenShot(image);
             setCaptureState(ScreenCaptureStates.Idle);
             setPreviewActive(false);
+        }
+
+        if(isMobile){
+            navigate('/chat');
         }
     };
     
@@ -452,9 +464,9 @@ export default function ScreenCapture(props: propsIF) {
             </div>
              */}
 
-            {(captureState == ScreenCaptureStates.MaskReady || isMobile === true) && (
+            {(captureState == ScreenCaptureStates.MaskReady || (captureState == ScreenCaptureStates.Masking && isMobile)) && (
                 <div
-                    className={`${styles.overlay_effect} ${styles.full} ${styles.mask_ready_overlay}`}
+                    className={`${styles.overlay_effect} ${styles.full} ${styles.mask_ready_overlay} ${captureState == ScreenCaptureStates.Masking && isMobile ? styles.transparent : ''}`}
                     onClick={overlayOnClick}
                     onMouseDown={overlayOnClick}
                     onTouchStart={overlayOnTouch}
@@ -560,11 +572,11 @@ export default function ScreenCapture(props: propsIF) {
                     
                     
                     {isUserConnected ? (   
-                        <div className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom ? styles.hidden : ''}`} onClick={chatBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
+                        <div className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom && !isMobile ? styles.hidden : ''}`} onClick={chatBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
                         </div> Send to Chat </div>
                     ) : (
                         <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Conect your wallet to send screenshot on chat</div>} placement='top' >
-                        <div className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom ? styles.hidden : ''}`} onClick={connectBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
+                        <div className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom && !isMobile ? styles.hidden : ''}`} onClick={connectBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
                         </div> Send to Chat</div>
                         </TextOnlyTooltip>
                     )}

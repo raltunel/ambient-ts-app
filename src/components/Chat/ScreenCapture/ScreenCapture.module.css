@@ -21,6 +21,7 @@
 }
 .reset_btn{
     position: fixed;
+    display: none;
     background-color: rgb(38, 0, 255);
     left: 60%;
     z-index: 9999;
@@ -30,7 +31,7 @@
     cursor: pointer;
 }
 .debug_btn{
-    /* display: none; */
+    display: none;
     position: fixed;
     background-color: rgb(225, 0, 255);
     left: 80%;
@@ -430,7 +431,7 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
     .preview_modal{
         max-width: 100vw;
         min-width: 60vw;
-        top: 0;
+        top: -100%;
         box-shadow: 0 0px 50px 0 color-mix(in srgb, var(--accent1) 30%, transparent);
     }
     
@@ -438,6 +439,14 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
         z-index: 99;
         backdrop-filter: blur(10px);
         border-radius: .5rem;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+
+
+    .overlay_effect.transparent{
+        background-color: transparent !important;
     }
 
 

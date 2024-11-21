@@ -3,7 +3,7 @@ import { AiOutlineCheck } from 'react-icons/ai';
 import { GrClose } from 'react-icons/gr';
 import { TextOnlyTooltip } from '../../../Global/StyledTooltip/StyledTooltip';
 import { getAvatarForChat } from '../../ChatRenderUtils';
-import { formatMessageTime, getShownName } from '../../ChatUtils';
+import { formatMessageTime, getScreenshotURL, getShownName } from '../../ChatUtils';
 import { Message } from '../../Model/MessageModel';
 import { User } from '../../Model/UserModel';
 import styles from './ReplyMessage.module.css';
@@ -43,6 +43,15 @@ export default function ReplyMessage(props: propsIF) {
     // />
 
     const renderMsgContent = (shorten: boolean) => {
+
+        let screenshot = <></>;
+
+        if(props.messageObj?.screenshot){
+            screenshot = <div className={styles.screenshot_wrapper}>
+                <img src={getScreenshotURL(props.messageObj._id)} alt='screenshot' />
+            </div>
+        }
+
         if (props.messageObj?.isDeleted) {
             return (
                 <>
@@ -54,15 +63,21 @@ export default function ReplyMessage(props: propsIF) {
         } else {
             if (shorten) {
                 return (
+                <>
                     <div className={styles.message}>
+                    {screenshot}
                         <p>{truncateText(props.messageObj?.message, 25)}</p>
                     </div>
+                </>
                 );
             } else {
                 return (
-                    <div className={styles.message_content}>
-                        {props.messageObj?.message}
+                    <>
+                        <div className={styles.message_content}>
+                        {screenshot}
+                            {props.messageObj?.message}
                     </div>
+                    </>
                 );
             }
         }

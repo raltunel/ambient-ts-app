@@ -106,3 +106,22 @@
     display: inline-block;
     margin-left: .2rem;
 }
+
+.screenshot_wrapper{
+
+    margin-right: .5rem;
+    width: 3rem;
+    max-height: 2rem;
+    position: absolute;
+    right: 0;
+    top: 0;
+    border-radius: .2rem;
+    overflow: hidden;
+    border: 1px solid var(--dark3);
+}
+
+.screenshot_wrapper img{
+    max-height: 100%;
+    max-width: 100% ;
+    background-size: contain;
+}

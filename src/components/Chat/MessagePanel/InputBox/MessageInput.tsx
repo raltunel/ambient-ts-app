@@ -602,6 +602,8 @@ export default function MessageInput(props: MessageInputProps) {
     }, [message]);
 
     useEffect(() => {
+
+        console.log('tokenForEmojiSearch', tokenForEmojiSearch);
         filterEmojisForCustomPicker(tokenForEmojiSearch);
         setCustomEmojiPickerSelectedIndex(0);
     }, [tokenForEmojiSearch]);
