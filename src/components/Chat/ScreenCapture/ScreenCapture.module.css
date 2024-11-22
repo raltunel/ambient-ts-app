@@ -438,7 +438,7 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
 
     .preview_modal{
         max-width: 100vw;
-        min-width: 60vw;
+        min-width: 80vw;
         top: -100%;
         box-shadow: 0 0px 50px 0 color-mix(in srgb, var(--accent1) 30%, transparent);
     }
@@ -472,8 +472,7 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
     .start_capture_btn{
         position: fixed;
         bottom: 5rem;
-        right: 1.5rem;
-        left: auto;
+        left: 80%;
         top: auto;
         padding: .5rem;
         width: 3rem;
