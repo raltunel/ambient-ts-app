@@ -483,6 +483,10 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
         border: 100vw;
         border: 1px solid color-mix(in srgb, var(--accent1) 30%, transparent);
     }
+
+    .start_capture_btn.chat_page{
+        bottom: 10rem;
+    }
     
     .start_capture_btn svg{
         fill: white !important;
