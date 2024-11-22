@@ -457,7 +457,6 @@ function SentMessagePanel(props: SentMessageProps) {
                         (onlyEmoji ? styles.only_emoji : '')
                     }
                 >
-                    
                     {props.message.screenshot && <div className={styles.screenshot_wrapper} onClick={() => {
                         props.setSelectedMessageForPreview(props.message);
                     }}>

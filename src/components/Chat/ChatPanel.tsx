@@ -1519,6 +1519,7 @@ function ChatPanel(props: propsIF) {
                     setIsReplyButtonPressed(true);
                     setSelectedMessageForReply(selectedMessageForPreview);
                 }}
+                userMap={userMap}
             />
             <div id='ambient-chat-on-dom' style={{display: 'none'}}>
             </div>

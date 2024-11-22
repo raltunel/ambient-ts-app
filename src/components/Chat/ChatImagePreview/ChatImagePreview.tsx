@@ -9,6 +9,8 @@ import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import { getMessageCard } from '../ChatRenderUtils';
 import ChatBtn from '../ChatBtn/ChatBtn';
 import { AppStateContext, UserDataContext } from '../../../contexts';
+import { UserSummaryModel } from '../Model/UserSummaryModel';
+import { User } from '../Model/UserModel';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 interface propsIF {
@@ -16,6 +18,7 @@ interface propsIF {
     focusedMessage: Message | undefined;
     closeListener: () => void;
     replyListener: () => void;
+    userMap: Map<string, User | UserSummaryModel> | undefined;
 }
 
 export default function ChatImagePreview(props: propsIF) {
@@ -44,7 +47,7 @@ export default function ChatImagePreview(props: propsIF) {
 
             <div className={styles.image_preview_info}> 
                 {
-                    props.focusedMessage && getMessageCard(props.focusedMessage)
+                    props.focusedMessage && getMessageCard(props.focusedMessage, 24, props.userMap)
                 }
 
             </div>

@@ -92,7 +92,7 @@ export const getAvatarForType = (
 //     return ret;
 // };
 
-export const getMessageCard = (message: Message) => {
+export const getMessageCard = (message: Message, avatarSize = 16, userMap?: Map<string, User | UserSummaryModel>) => {
     return (
         <div
             key={message._id + 'card'}
@@ -103,7 +103,11 @@ export const getMessageCard = (message: Message) => {
                     display: 'inline-block',
                 }}
             >
-                {getAvatarFromMessageWithSize(message, 16)}
+                {userMap ?
+                 getAvatarForChat(message.walletID, userMap.get(message.sender), avatarSize) 
+                 :
+                 getAvatarFromMessageWithSize(message, avatarSize)
+                }
             </div>
             <div
                 style={{
