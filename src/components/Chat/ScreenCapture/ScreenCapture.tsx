@@ -38,7 +38,9 @@ export default function ScreenCapture(props: propsIF) {
         }
     }
 
+
     useEffect(() => {
+
         if(!isMobile){
             document.addEventListener('mousemove', mouseMoveListener);
             document.addEventListener('keydown', keyDownListener);
@@ -242,6 +244,7 @@ export default function ScreenCapture(props: propsIF) {
     useEffect(() => {
         console.log('maskReady', captureState === ScreenCaptureStates.MaskReady);
         console.log('masking ', captureState === ScreenCaptureStates.Masking);
+
     }, [captureState]);
 
     const getPosForOverlayRect = (type: ScreenCaptureOverlayTypes) => {
@@ -435,14 +438,16 @@ export default function ScreenCapture(props: propsIF) {
 
     return (
         <>
+
+
             <div className={styles.capture_btn} onClick={btnListener}>
                 {' '}
                 Capture
             </div>
-            <div className={styles.mask_btn} onClick={maskBtnListener}>
+            {/* <div className={styles.mask_btn} onClick={maskBtnListener}>
                 {' '}
                 Mask
-            </div>
+            </div> */}
 
             <div className={styles.reset_btn} onClick={resetBtnListener}>
                 {' '}

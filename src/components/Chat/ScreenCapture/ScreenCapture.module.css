@@ -1,3 +1,7 @@
+.wrapper_span div{
+    user-select: none !important;
+}
+
 .capture_btn{
     position: fixed;
     background-color: red;
@@ -126,6 +130,7 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
     height: 100vh;
     left: 0;
     top: 0;
+    user-select: none !important;
 
 }
 
@@ -133,6 +138,7 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
     position: fixed;
     z-index: 10;
     background-color: color-mix(in srgb, var(--accent1) 10%, transparent);
+    user-select: none !important;
 }
 
 .mask_move_overlay{
@@ -154,6 +160,7 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
 
 .mask_ready_overlay{
     background-color: color-mix(in srgb, var(--accent1) 10%, transparent);
+  user-select: none !important;
 }
 
 
@@ -394,6 +401,7 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
 
 
 .start_capture_btn{
+    transition: all .2s ease-in-out;
     position: fixed;
     right: 27rem;
     z-index: 9999;
@@ -461,6 +469,37 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
         left: 80%;
     }
 
+    .start_capture_btn{
+        position: fixed;
+        bottom: 5rem;
+        right: 1.5rem;
+        top: auto;
+        padding: .5rem;
+        width: 3rem;
+        height: 3rem;
+        border-radius: .5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        background: var(--dark3);
+        box-shadow: 0px 0px 30px 0px color-mix(in srgb, var(--accent1) 50%, transparent);
+        border: 100vw;
+        border: 1px solid color-mix(in srgb, var(--accent1) 30%, transparent);
+    }
+    
+    .start_capture_btn svg{
+        fill: white !important;
+        color: white !important;
+    }
+    
+    
+    
+    .start_capture_btn.active{
+        background-color: var(--dark3);
+        border: 1px solid color-mix(in srgb, var(--accent1) 70%, transparent);
+        box-shadow: 0px 0px 30px 0px color-mix(in srgb, var(--accent1) 80%, transparent);
+    }
 }
 
 
@@ -468,3 +507,15 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
     display: none !important;
 }
 
+
+
+.debugText{
+    color: white;
+    background-color: var(--dark2);
+    padding: .5rem;
+    border-radius: .2rem;
+    position: fixed;
+    left: 50%;
+    top: 4rem;
+    z-index: 9999;
+}
