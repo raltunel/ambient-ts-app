@@ -39,6 +39,11 @@ export default function ScreenCapture(props: propsIF) {
     }
 
 
+
+    const setBodyOverflow = (overflow: string) => {
+        document.body.style.overflow = overflow;
+    }
+
     useEffect(() => {
 
         if(!isMobile){
@@ -244,6 +249,16 @@ export default function ScreenCapture(props: propsIF) {
     useEffect(() => {
         console.log('maskReady', captureState === ScreenCaptureStates.MaskReady);
         console.log('masking ', captureState === ScreenCaptureStates.Masking);
+
+
+        if(isMobile){
+            if(captureState === ScreenCaptureStates.Masking){
+                setBodyOverflow('hidden');
+            }else{
+                setBodyOverflow('auto');
+            }
+        }
+
 
     }, [captureState]);
 
