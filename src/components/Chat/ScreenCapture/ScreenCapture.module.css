@@ -1,3 +1,11 @@
+
+.page_on_crop{
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+    overscroll-behavior: none;
+}
+
 .wrapper_span div{
     user-select: none !important;
 }
@@ -159,9 +167,10 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
 }
 
 .mask_ready_overlay{
-    background-color: color-mix(in srgb, var(--accent1) 10%, transparent);
+    background-color: color-mix(in srgb, var(--accent1) 20%, transparent);
   user-select: none !important;
 }
+
 
 
 @keyframes maskAnim{

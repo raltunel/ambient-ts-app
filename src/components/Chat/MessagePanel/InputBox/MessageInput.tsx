@@ -75,8 +75,6 @@ interface MessageInputProps {
     userMap?: Map<string, User>;
 }
 
-
-
 export default function MessageInput(props: MessageInputProps) {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [cursorPosition, setCursorPosition] = useState<number | null>(null);
@@ -84,7 +82,12 @@ export default function MessageInput(props: MessageInputProps) {
     const [message, setMessage] = useState('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [isInfoPressed, setIsInfoPressed] = useState(false);
-    const { userAddress, isUserConnected, lastCapturedScreenShot, setLastCapturedScreenShot } = useContext(UserDataContext);
+    const {
+        userAddress,
+        isUserConnected,
+        lastCapturedScreenShot,
+        setLastCapturedScreenShot,
+    } = useContext(UserDataContext);
     console.log('lastCapturedScreenShot', lastCapturedScreenShot);
     const [isPosition, setIsPosition] = useState(false);
     const [tokenForEmojiSearch, setTokenForEmojiSearch] = useState('');
@@ -94,7 +97,6 @@ export default function MessageInput(props: MessageInputProps) {
     //     chat: { isOpen: isChatOpen },
     //     subscriptions: { isEnabled: isSubscriptionsEnabled },
     // } = useContext(AppStateContext);
-    
 
     const [mentPanelActive, setMentPanelActive] = useState(false);
     const [possibleMentUser, setPossibleMentUser] = useState<User | null>(null);
@@ -505,8 +507,7 @@ export default function MessageInput(props: MessageInputProps) {
                         ? props.selectedMessageForReply?._id
                         : undefined,
                     undefined,
-                    lastCapturedScreenShot
-                        
+                    lastCapturedScreenShot,
                 );
             } else {
                 props.sendMsg(
@@ -522,7 +523,7 @@ export default function MessageInput(props: MessageInputProps) {
                         ? props.selectedMessageForReply?._id
                         : undefined,
                     undefined,
-                    lastCapturedScreenShot
+                    lastCapturedScreenShot,
                 );
             }
             props.setIsReplyButtonPressed(false);
@@ -588,13 +589,15 @@ export default function MessageInput(props: MessageInputProps) {
         const needToShowCustomEmojiPanel =
             filteredEmojis.length > 0 && message.includes(':');
         setShowCustomEmojiPanel(needToShowCustomEmojiPanel);
-        domDebug('filteredEmojis', filteredEmojis.length)
+        domDebug('filteredEmojis', filteredEmojis.length);
     }, [filteredEmojis]);
 
     useEffect(() => {
         if (message.includes(':')) {
             setTokenForEmojiSearch(
-                message.split(':')[message.split(':').length - 1].toLocaleLowerCase('en-US'),
+                message
+                    .split(':')
+                    [message.split(':').length - 1].toLocaleLowerCase('en-US'),
             );
         } else {
             setTokenForEmojiSearch('');
@@ -602,16 +605,13 @@ export default function MessageInput(props: MessageInputProps) {
     }, [message]);
 
     useEffect(() => {
-
         console.log('tokenForEmojiSearch', tokenForEmojiSearch);
         filterEmojisForCustomPicker(tokenForEmojiSearch);
         setCustomEmojiPickerSelectedIndex(0);
     }, [tokenForEmojiSearch]);
 
     useEffect(() => {
-        const emojis = document.querySelectorAll(
-            '#chatCustomEmojiPicker span',
-        );
+        const emojis = document.querySelectorAll('#chatCustomEmojiPicker span');
         emojis.forEach((emoji, index) => {
             if (index == customEmojiPickerSelectedIndex) {
                 emoji.classList.add(styles.focused);
@@ -646,16 +646,12 @@ export default function MessageInput(props: MessageInputProps) {
         );
     }, [customEmojiPickerSelectedIndex, filteredEmojis]);
 
-
     const resetCustomEmojiPickerStates = () => {
         setCustomEmojiPickerSelectedIndex(0);
         setFilteredEmojis([]);
     };
 
-
-
     const filterEmojisForCustomPicker = (word: string) => {
-
         const filteredElements: JSX.Element[] = [];
         let searchToken = word.split(' ')[0];
 
@@ -668,19 +664,25 @@ export default function MessageInput(props: MessageInputProps) {
             return;
         }
 
-
         let foundEmojis = 0;
 
         emojiMeta.forEach((meta) => {
-            if (meta.ariaLabel.includes(searchToken) && foundEmojis < customEmojiPanelLimit) {
+            if (
+                meta.ariaLabel.includes(searchToken) &&
+                foundEmojis < customEmojiPanelLimit
+            ) {
                 foundEmojis++;
-                const emojiEl = getSingleEmoji(meta.unifiedChar, 
-                    () => {  const emoji = getEmojiFromUnifiedCode(meta.unifiedChar);
-                            handleEmojiClick(emoji, true)}, -1);
+                const emojiEl = getSingleEmoji(
+                    meta.unifiedChar,
+                    () => {
+                        const emoji = getEmojiFromUnifiedCode(meta.unifiedChar);
+                        handleEmojiClick(emoji, true);
+                    },
+                    -1,
+                );
                 filteredElements.push(emojiEl);
             }
-        })
-
+        });
 
         domDebug('filtered emojis', filteredElements.length);
         setFilteredEmojis([...filteredElements]);
@@ -704,10 +706,14 @@ export default function MessageInput(props: MessageInputProps) {
         } else if (e.key === 'Enter' || e.key === 'Tab') {
             if (filteredEmojis.length > 0) {
                 const emoji = filteredEmojis[customEmojiPickerSelectedIndex];
-                if (emoji && emoji.props && emoji.props.children && emoji.props.children.props) {
+                if (
+                    emoji &&
+                    emoji.props &&
+                    emoji.props.children &&
+                    emoji.props.children.props
+                ) {
                     const unifiedCode = emoji.props.children.props.unified;
-                    const emojiCharacter =
-                    getEmojiFromUnifiedCode(unifiedCode);
+                    const emojiCharacter = getEmojiFromUnifiedCode(unifiedCode);
                     handleEmojiClick(emojiCharacter, true);
                     resetCustomEmojiPickerStates();
                 }
@@ -766,21 +772,31 @@ export default function MessageInput(props: MessageInputProps) {
                         )}
                     </>
 
-                        <div className={styles.image_to_send_wrapper}>
-                        {lastCapturedScreenShot && 
-                        
-                        <TextOnlyTooltip title='Cancel'>
-                        <div className={styles.cancel_image_button}>    <RiCloseFill
-                                    size={24}
-                                    title='Cancel'
-                                    onClick={() => setLastCapturedScreenShot(undefined)}
-                                    style={{ cursor: 'pointer' }}
-                                />
-                            </div>
+                    <div className={styles.image_to_send_wrapper}>
+                        {lastCapturedScreenShot && (
+                            <TextOnlyTooltip title='Cancel'>
+                                <div className={styles.cancel_image_button}>
+                                    {' '}
+                                    <RiCloseFill
+                                        size={24}
+                                        title='Cancel'
+                                        onClick={() =>
+                                            setLastCapturedScreenShot(undefined)
+                                        }
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                </div>
                             </TextOnlyTooltip>
-                            }
-                            {lastCapturedScreenShot && <img src={URL.createObjectURL(lastCapturedScreenShot)} alt="Screenshot" />}
-                        </div>
+                        )}
+                        {lastCapturedScreenShot && (
+                            <img
+                                src={URL.createObjectURL(
+                                    lastCapturedScreenShot,
+                                )}
+                                alt='Screenshot'
+                            />
+                        )}
+                    </div>
 
                     <div
                         className={
@@ -925,7 +941,9 @@ export default function MessageInput(props: MessageInputProps) {
                         ref={customEmojiPickerRef}
                         id='chatCustomEmojiPicker'
                         className={`${styles.custom_emoji_picker_wrapper} ${showCustomEmojiPanel ? styles.active : ' '}`}
-                    >{...filteredEmojis}</div>
+                    >
+                        {...filteredEmojis}
+                    </div>
 
                     {props.isChatOpen && ALLOW_MENTIONS && mentionAutoComplete}
                 </div>

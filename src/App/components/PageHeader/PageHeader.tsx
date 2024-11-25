@@ -71,7 +71,6 @@ const PageHeader = function () {
         isUserConnected && userAddress ? trimString(userAddress, 6, 6) : '';
 
     const clickLogout = useCallback(async () => {
-        setCrocEnv(undefined);
         setBaseTokenBalance('');
         setQuoteTokenBalance('');
         setBaseTokenDexBalance('');
@@ -81,6 +80,7 @@ const PageHeader = function () {
         resetTokenBalances();
         setShowAllData(true);
         disconnectUser();
+        setCrocEnv(undefined);
     }, []);
 
     const userMenuProps = {
@@ -90,9 +90,9 @@ const PageHeader = function () {
         isUserLoggedIn: isUserConnected,
         clickLogout: clickLogout,
     };
-    const desktopScreen = useMediaQuery('(min-width: 1020px)');
+    const desktopScreen = useMediaQuery('(min-width: 1250px)');
 
-    const connectWagmiButton = (
+    const connectWalletButton = (
         <Button
             idForDOM='connect_wallet_button_page_header'
             title={desktopScreen ? 'Connect Wallet' : 'Connect'}
@@ -462,7 +462,7 @@ const PageHeader = function () {
                                 overflow='visible'
                             >
                                 <NetworkSelector />
-                                {!isUserConnected && connectWagmiButton}
+                                {!isUserConnected && connectWalletButton}
                                 <UserMenu {...userMenuProps} />
                             </FlexContainer>
                         </div>

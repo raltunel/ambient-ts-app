@@ -56,10 +56,9 @@ export interface UserAvatarDataIF {
     avatarCompressed: string;
 }
 
-
-export interface TutorialStepExternalComponent{
+export interface TutorialStepExternalComponent {
     component: JSX.Element;
-    placement?: 'nav-end'|'nav-before'|'nav-after' 
+    placement?: 'nav-end' | 'nav-before' | 'nav-after';
 }
 
 export interface TutorialIF {
@@ -79,7 +78,7 @@ export interface TutorialStepIF {
     assignment?: string;
     actionTrigger?: string;
     actionOnComplete?: string;
-    component? : JSX.Element;
+    component?: JSX.Element;
     navigate?: { label: string; path: string };
 }
 
@@ -92,11 +91,16 @@ export interface DomPositionInterface {
     y: number;
 }
 
-export interface DomRectIF{
+export interface DomRectIF {
     lt: DomPositionInterface;
     rt: DomPositionInterface;
     rb: DomPositionInterface;
     lb: DomPositionInterface;
 }
 
-export const DomRectDefault: DomRectIF = { lt: { x: 0, y: 0 }, rt: { x: 0, y: 0 }, rb: { x: 0, y: 0 }, lb: { x: 0, y: 0 } };
+export const DomRectDefault: DomRectIF = {
+    lt: { x: 0, y: 0 },
+    rt: { x: 0, y: 0 },
+    rb: { x: 0, y: 0 },
+    lb: { x: 0, y: 0 },
+};

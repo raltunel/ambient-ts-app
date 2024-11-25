@@ -92,22 +92,25 @@ export const getAvatarForType = (
 //     return ret;
 // };
 
-export const getMessageCard = (message: Message, avatarSize = 16, userMap?: Map<string, User | UserSummaryModel>) => {
+export const getMessageCard = (
+    message: Message,
+    avatarSize = 16,
+    userMap?: Map<string, User | UserSummaryModel>,
+) => {
     return (
-        <div
-            key={message._id + 'card'}
-            className={styles.message_card}
-        >
+        <div key={message._id + 'card'} className={styles.message_card}>
             <div
                 style={{
                     display: 'inline-block',
                 }}
             >
-                {userMap ?
-                 getAvatarForChat(message.walletID, userMap.get(message.sender), avatarSize) 
-                 :
-                 getAvatarFromMessageWithSize(message, avatarSize)
-                }
+                {userMap
+                    ? getAvatarForChat(
+                          message.walletID,
+                          userMap.get(message.sender),
+                          avatarSize,
+                      )
+                    : getAvatarFromMessageWithSize(message, avatarSize)}
             </div>
             <div
                 style={{
@@ -273,11 +276,11 @@ export const getSingleEmoji = (
                 }
             }}
         >
-            {size && size == -1 ? 
-            (<Emoji unified={unified} />) 
-            : 
-            (<Emoji unified={unified} size={size ? size : 25} />)} 
-            
+            {size && size == -1 ? (
+                <Emoji unified={unified} />
+            ) : (
+                <Emoji unified={unified} size={size ? size : 25} />
+            )}
         </span>
     );
 };
@@ -305,9 +308,12 @@ export const getEmojiPack = (
     );
 };
 
-
-export const getActionTrigger = ( id: string, action: () => void) => {
+export const getActionTrigger = (id: string, action: () => void) => {
     return (
-        <span id={id} onClick={() => action()} style={{display: 'none'}}></span>
+        <span
+            id={id}
+            onClick={() => action()}
+            style={{ display: 'none' }}
+        ></span>
     );
 };

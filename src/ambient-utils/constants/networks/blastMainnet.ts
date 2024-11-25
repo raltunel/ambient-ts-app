@@ -1,16 +1,16 @@
+import { bigIntToFloat } from '@crocswap-libs/sdk';
 import { lookupChain } from '@crocswap-libs/sdk/dist/context';
+import { Provider } from 'ethers';
+import { NetworkIF } from '../../types/NetworkIF';
 import {
-    blastETH,
-    blastUSDB,
     blastBLAST,
+    blastETH,
     blastEzETH,
+    blastUSDB,
     blastUSDPLUS,
 } from '../defaultTokens';
-import { NetworkIF } from '../../types/NetworkIF';
-import { TopPool } from './TopPool';
-import { Provider } from 'ethers';
 import { GCGO_BLAST_URL } from '../gcgo';
-import { bigIntToFloat } from '@crocswap-libs/sdk';
+import { TopPool } from './TopPool';
 
 export const BLAST_RPC_URL =
     import.meta.env.VITE_BLAST_RPC_URL !== undefined
@@ -25,7 +25,7 @@ const chainSpecForWalletConnector = {
     name: 'Blast',
     currency: 'ETH',
     rpcUrl: BLAST_RPC_URL,
-    explorerUrl: 'https://blastscan.io',
+    explorerUrl: 'https://blastscan.io/',
 };
 
 export const blast: NetworkIF = {
@@ -41,9 +41,9 @@ export const blast: NetworkIF = {
     displayName: chainSpecForWalletConnector.name,
     topPools: [
         new TopPool(blastETH, blastUSDB, chainSpecFromSDK.poolIndex),
-        new TopPool(blastEzETH, blastETH, chainSpecFromSDK.poolIndex),
         new TopPool(blastBLAST, blastETH, chainSpecFromSDK.poolIndex),
         new TopPool(blastUSDPLUS, blastUSDB, chainSpecFromSDK.poolIndex),
+        new TopPool(blastEzETH, blastUSDB, chainSpecFromSDK.poolIndex),
     ],
     getGasPriceInGwei: async (provider?: Provider) => {
         if (!provider) return 0;

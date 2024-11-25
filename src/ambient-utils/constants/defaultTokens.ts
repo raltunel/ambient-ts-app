@@ -461,7 +461,7 @@ export const scrollWeETH: TokenIF = {
         'https://tokenlogo.xyz/assets/token/0x7e7d4467112689329f7e06571ed0e8cbad4910ee.svg',
 };
 
-export const scrollScroll: TokenIF = {
+export const scrollSCR: TokenIF = {
     name: 'Scroll',
     address: '0xd29687c813d741e2f938f4ac377128810e217b1b',
     symbol: 'SCR',
@@ -534,6 +534,24 @@ export const scrollWrsETH: TokenIF = {
     decimals: 18,
     chainId: 534352,
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/29242.png',
+};
+
+export const scrollRswETH: TokenIF = {
+    name: 'Restaked Swell ETH',
+    address: '0x89f17aB70cAFB1468D633056161573efEfeA0713',
+    symbol: 'rswETH',
+    decimals: 18,
+    chainId: 534352,
+    logoURI: 'https://etherscan.io/token/images/rsweth_32.png?=v3',
+};
+
+export const scrollRsETH: TokenIF = {
+    name: 'KelpDao Restaked ETH',
+    address: '0x65421ba909200b81640d98b979d07487c9781b66',
+    symbol: 'rsETH',
+    decimals: 18,
+    chainId: 534352,
+    logoURI: '',
 };
 
 export const scrollSTONE: TokenIF = {
@@ -808,13 +826,15 @@ export const defaultTokens: TokenIF[] = [
     scrollWrappedETH,
     scrollWstETH,
     scrollWeETH,
-    scrollScroll,
+    scrollSCR,
     scrollSCROLLY,
     scrollSTG,
     scrollSCRIBES,
     scrollSKY,
     scrollSOL,
     scrollWrsETH,
+    scrollRswETH,
+    scrollRsETH,
     scrollSTONE,
     scrollUniETH,
     sepoliaETH,

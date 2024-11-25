@@ -1,4 +1,3 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -13,7 +12,11 @@ import { AppStateContext, UserDataContext } from '../../../contexts';
 import useCopyToClipboard from '../../../utils/hooks/useCopyToClipboard';
 import useMediaQuery from '../../../utils/hooks/useMediaQuery';
 import { TextOnlyTooltip } from '../../Global/StyledTooltip/StyledTooltip';
-import { ScreenCaptureEditStates, ScreenCaptureOverlayTypes, ScreenCaptureStates } from '../ChatEnums';
+import {
+    ScreenCaptureEditStates,
+    ScreenCaptureOverlayTypes,
+    ScreenCaptureStates,
+} from '../ChatEnums';
 import { DomPositionInterface, DomRectDefault, DomRectIF } from '../ChatIFs';
 import { domDebug } from '../DomDebugger/DomDebuggerUtils';
 import ScreenCaptureMessageInput from './ScreenCaptureMessageInput';
@@ -25,39 +28,34 @@ interface propsIF {
 }
 
 export default function ScreenCapture(props: propsIF) {
-
-
     console.log(window.location.pathname);
 
     const isChatPage = window.location.pathname === '/chat/';
-
 
     const navigate = useNavigate();
 
     const chatOnDom = document.getElementById('ambient-chat-on-dom');
 
     const keyDownListener = (e: KeyboardEvent) => {
-        if(e.key === 'Escape'){
+        if (e.key === 'Escape') {
             resetBtnListener();
             e.preventDefault();
         }
-    }
+    };
 
-
-
-    const setBodyOverflow = (overflow: string) => {
-        document.body.style.overflow = overflow;
-    }
+    const setDocumentMode = (capturing: boolean) => {
+        document.body.classList.toggle(styles.page_on_crop, capturing);
+    };
 
     useEffect(() => {
-
-        if(!isMobile){
+        if (!isMobile) {
             document.addEventListener('mousemove', mouseMoveListener);
             document.addEventListener('keydown', keyDownListener);
         }
     }, []);
 
-    const {isUserConnected, setLastCapturedScreenShot} = useContext(UserDataContext);
+    const { isUserConnected, setLastCapturedScreenShot } =
+        useContext(UserDataContext);
     const editMasking = false;
 
     const {
@@ -65,7 +63,6 @@ export default function ScreenCapture(props: propsIF) {
         walletModal: { open: openWalletModal },
         chat: { isOpen: isChatOpen, setIsOpen: setIsChatOpen },
     } = useContext(AppStateContext);
-
 
     const isMobile = useMediaQuery('(max-width: 768px)');
 
@@ -78,17 +75,18 @@ export default function ScreenCapture(props: propsIF) {
         ScreenCaptureStates.Idle,
     );
 
-    const [captureEditState, setCaptureEditState] = useState<ScreenCaptureEditStates>(
-        ScreenCaptureEditStates.Idle,
-    );
+    const [captureEditState, setCaptureEditState] =
+        useState<ScreenCaptureEditStates>(ScreenCaptureEditStates.Idle);
     const captureEditStateRef = useRef<ScreenCaptureEditStates>();
     captureEditStateRef.current = captureEditState;
 
-    const [maskMoveStartPoint, setMaskMoveStartPoint] = useState<DomPositionInterface>();
+    const [maskMoveStartPoint, setMaskMoveStartPoint] =
+        useState<DomPositionInterface>();
     const maskMoveStartPointRef = useRef<DomPositionInterface>();
     maskMoveStartPointRef.current = maskMoveStartPoint;
 
-    const [maskMoveEndPoint, setMaskMoveEndPoint] = useState<DomPositionInterface>();
+    const [maskMoveEndPoint, setMaskMoveEndPoint] =
+        useState<DomPositionInterface>();
     const maskMoveEndPointRef = useRef<DomPositionInterface>();
     maskMoveEndPointRef.current = maskMoveEndPoint;
 
@@ -119,7 +117,9 @@ export default function ScreenCapture(props: propsIF) {
     const [scaleFactor, setScaleFactor] = useState<number>(1);
     const btnListener = async () => {
         // const image = await domToImage(document.body);
-        const image = await printDomToImage(document.getElementById('root') as HTMLElement);
+        const image = await printDomToImage(
+            document.getElementById('root') as HTMLElement,
+        );
         setImageComp(image);
     };
     const maskBtnListener = async () => {
@@ -131,46 +131,54 @@ export default function ScreenCapture(props: propsIF) {
         setCaptureState(ScreenCaptureStates.Idle);
         setImageComp(undefined);
         setPreviewActive(false);
-        setMaskLT({x: 0, y: 0});
-        setMaskRB({x: 0, y: 0});
+        setMaskLT({ x: 0, y: 0 });
+        setMaskRB({ x: 0, y: 0 });
         setMaskMoveGap(undefined);
         setOverlayRect(DomRectDefault);
         setLastCapturedScreenShot(undefined);
-
     };
 
     const closePreviewModal = () => {
         setPreviewActive(false);
-    }
+    };
 
     useOnClickOutside(previewModalRef, closePreviewModal);
-
 
     const debugBtnListener = async () => {
         setDebugMode(!debugMode);
     };
 
     const captureDom = async () => {
-        const image = await printDomToImage(document.getElementById('root') as HTMLElement, undefined, undefined, undefined, 
-        (el: Node) => {
-            return (el as HTMLElement).id !== 'ambient-header-wallet-name';
-        }, 1);
+        const image = await printDomToImage(
+            document.getElementById('root') as HTMLElement,
+            undefined,
+            undefined,
+            undefined,
+            (el: Node) => {
+                return (el as HTMLElement).id !== 'ambient-header-wallet-name';
+            },
+            1,
+        );
         setImageComp(image);
     };
 
-
     const overlayOnClick = (e: React.MouseEvent) => {
-        if(isMobile) return;
+        if (isMobile) return;
         maskStarter(e.clientX, e.clientY);
-    }
+    };
 
     const overlayOnTouch = (e: React.TouchEvent) => {
-        console.log('overlayOnTouch', e.touches[0].clientX, e.touches[0].clientY);
-        if(!isMobile) return;
+        console.log(
+            'overlayOnTouch',
+            e.touches[0].clientX,
+            e.touches[0].clientY,
+        );
+        if (!isMobile) return;
         maskStarter(e.touches[0].clientX, e.touches[0].clientY);
-    }
+        e.preventDefault();
+    };
 
-    const maskStarter = (x: number, y:number) => {
+    const maskStarter = (x: number, y: number) => {
         setMaskLT({ x: x, y: y });
         // captureDom();
         setTimeout(() => {
@@ -180,23 +188,23 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const mouseMoveListener = (e: MouseEvent) => {
-        if(isMobile) return;
+        if (isMobile) return;
         maskingMouseMoveListener(e.clientX, e.clientY);
-    }
+    };
 
     const touchMoveListener = (e: React.TouchEvent<HTMLDivElement>) => {
-        if(!isMobile) return;
+        if (!isMobile) return;
 
         maskingMouseMoveListener(e.touches[0].clientX, e.touches[0].clientY);
-    }
+        e.preventDefault();
+    };
 
     const maskingMouseMoveListener = (x: number, y: number) => {
-        
-        if( captureStateRef.current == ScreenCaptureStates.PreviewReady) return;
+        if (captureStateRef.current == ScreenCaptureStates.PreviewReady) return;
         if (captureStateRef.current != ScreenCaptureStates.Masking) return;
 
         setMaskRB({ x: x, y: y });
-        if(maskLTRef.current){
+        if (maskLTRef.current) {
             setOverlayRect(getOverlayPoints(maskLTRef.current, { x: x, y: y }));
         }
 
@@ -226,57 +234,54 @@ export default function ScreenCapture(props: propsIF) {
             }, 400);
         }
     };
-    
+
     const bindScaleFactor = () => {
-
-
         const ratio = isMobile ? 0.9 : 0.6;
 
-
-        const rectWidth = overlayRectRef.current.rt.x - overlayRectRef.current.lt.x;
-        const rectHeight = overlayRectRef.current.lb.y - overlayRectRef.current.lt.y;
+        const rectWidth =
+            overlayRectRef.current.rt.x - overlayRectRef.current.lt.x;
+        const rectHeight =
+            overlayRectRef.current.lb.y - overlayRectRef.current.lt.y;
         const maxWidth = window.innerWidth * ratio;
         const maxHeight = window.innerHeight * ratio;
 
-        if(rectWidth > maxWidth || rectHeight > maxHeight){
-            const scale = Math.min(maxWidth / rectWidth, maxHeight / rectHeight);
+        if (rectWidth > maxWidth || rectHeight > maxHeight) {
+            const scale = Math.min(
+                maxWidth / rectWidth,
+                maxHeight / rectHeight,
+            );
             setScaleFactor(scale);
-        }else{
+        } else {
             setScaleFactor(1);
         }
-
-
-
-    }
+    };
 
     console.log('scaleFactor', scaleFactor);
 
     useEffect(() => {
-        console.log('maskReady', captureState === ScreenCaptureStates.MaskReady);
+        console.log(
+            'maskReady',
+            captureState === ScreenCaptureStates.MaskReady,
+        );
         console.log('masking ', captureState === ScreenCaptureStates.Masking);
 
-
-        if(isMobile){
-            if(captureState === ScreenCaptureStates.Masking){
-                setBodyOverflow('hidden');
-            }else{
-                setBodyOverflow('auto');
+        if (isMobile) {
+            if (captureState === ScreenCaptureStates.Idle) {
+                setDocumentMode(false);
+            } else {
+                setDocumentMode(true);
             }
         }
-
-
     }, [captureState]);
 
     const getPosForOverlayRect = (type: ScreenCaptureOverlayTypes) => {
-
         const oRect = overlayRectRef.current;
-        if (!oRect)
-            return;
+        if (!oRect) return;
         const maskOverlayOffset = 10;
-        
+
         let transform = '';
 
-        if(maskMoveGapRef.current){
+        if (maskMoveGapRef.current) {
             transform = `translate(${maskMoveGapRef.current?.x}px, ${maskMoveGapRef.current?.y}px)`;
         }
 
@@ -319,8 +324,14 @@ export default function ScreenCapture(props: propsIF) {
                     // bottom: window.innerHeight - maskRBRef.current.y - 10,
                     left: overlayRect.lt.x - maskOverlayOffset,
                     top: overlayRect.lt.y - maskOverlayOffset,
-                    right: window.innerWidth - overlayRect.rt.x - maskOverlayOffset,
-                    bottom: window.innerHeight - overlayRect.rb.y - maskOverlayOffset,
+                    right:
+                        window.innerWidth -
+                        overlayRect.rt.x -
+                        maskOverlayOffset,
+                    bottom:
+                        window.innerHeight -
+                        overlayRect.rb.y -
+                        maskOverlayOffset,
                     transform: transform,
                     display: renderOverlayRect ? 'block' : 'none',
                 };
@@ -328,27 +339,25 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const getImageOffset = () => {
+        let gap = { x: 0, y: 0 };
+        if (maskMoveGapRef.current) {
+            gap = maskMoveGapRef.current;
+        }
 
-            let gap = {x: 0, y: 0};
-            if(maskMoveGapRef.current){
-                gap = maskMoveGapRef.current;
-            }
+        const width = scaleFactor * 100;
 
-            const width = scaleFactor * 100;
-
-
-            return {
-                left: scaleFactor * -1 * overlayRect.lt.x - gap.x,
-                top: scaleFactor * -1 * overlayRect.lt.y - gap.y,
-                width: width + 'vw',
-            };
+        return {
+            left: scaleFactor * -1 * overlayRect.lt.x - gap.x,
+            top: scaleFactor * -1 * overlayRect.lt.y - gap.y,
+            width: width + 'vw',
+        };
     };
 
     const getPreviewSize = () => {
-            return {
-                width: scaleFactor * (overlayRect.rt.x - overlayRect.lt.x),
-                height: scaleFactor * (overlayRect.lb.y - overlayRect.lt.y),
-            };
+        return {
+            width: scaleFactor * (overlayRect.rt.x - overlayRect.lt.x),
+            height: scaleFactor * (overlayRect.lb.y - overlayRect.lt.y),
+        };
     };
 
     const downloadBlob = async (image: Blob) => {
@@ -360,29 +369,42 @@ export default function ScreenCapture(props: propsIF) {
 
     const downloadImage = async () => {
         if (croppedImageRef.current) {
-        const image = await printDomToImage(croppedImageRef.current);
-        if(image) {
-            downloadBlob(image);
-        }
+            const image = await printDomToImage(croppedImageRef.current);
+            if (image) {
+                downloadBlob(image);
+            }
         }
     };
 
-    const getOverlayPoints = (first: DomPositionInterface, second: DomPositionInterface) => {
-        const lt = { x: Math.min(first.x, second.x), y: Math.min(first.y, second.y) };
-        const rt = { x: Math.max(first.x, second.x), y: Math.min(first.y, second.y) };
-        const lb = { x: Math.min(first.x, second.x), y: Math.max(first.y, second.y) };
-        const rb = { x: Math.max(first.x, second.x), y: Math.max(first.y, second.y) };
-        return { lt, rt, rb, lb};
-    }
+    const getOverlayPoints = (
+        first: DomPositionInterface,
+        second: DomPositionInterface,
+    ) => {
+        const lt = {
+            x: Math.min(first.x, second.x),
+            y: Math.min(first.y, second.y),
+        };
+        const rt = {
+            x: Math.max(first.x, second.x),
+            y: Math.min(first.y, second.y),
+        };
+        const lb = {
+            x: Math.min(first.x, second.x),
+            y: Math.max(first.y, second.y),
+        };
+        const rb = {
+            x: Math.max(first.x, second.x),
+            y: Math.max(first.y, second.y),
+        };
+        return { lt, rt, rb, lb };
+    };
 
     const overlayOnDrag = (e: React.MouseEvent) => {
-        if(isMobile) return;
-    }
+        if (isMobile) return;
+    };
 
     const chatBtnListener = async () => {
-
-
-        if(!isChatOpen && !isMobile){
+        if (!isChatOpen && !isMobile) {
             setIsChatOpen(true);
         }
 
@@ -393,73 +415,65 @@ export default function ScreenCapture(props: propsIF) {
             setPreviewActive(false);
         }
 
-        if(isMobile){
+        if (isMobile) {
             navigate('/chat');
         }
     };
-    
 
     const connectBtnListener = async () => {
-        if(croppedImageRef.current){
+        if (croppedImageRef.current) {
             const image = await printDomToImage(croppedImageRef.current);
             setLastCapturedScreenShot(image);
             setIsChatOpen(true);
         }
         openWalletModal();
-    }
+    };
 
     const previewMaskClickListener = (e: React.MouseEvent) => {
         setCaptureEditState(ScreenCaptureEditStates.MaskMoving);
-        setMaskMoveStartPoint({x: e.clientX, y: e.clientY});
-    }
+        setMaskMoveStartPoint({ x: e.clientX, y: e.clientY });
+    };
 
     const previewMaskMoveListener = (e: React.MouseEvent) => {
+        if (captureEditStateRef.current != ScreenCaptureEditStates.MaskMoving)
+            return;
 
-        if(captureEditStateRef.current != ScreenCaptureEditStates.MaskMoving) return;
+        const currentPoint = { x: e.clientX, y: e.clientY };
 
-        const currentPoint = {x: e.clientX, y: e.clientY};
-        
-        if(maskMoveStartPointRef.current){
-
+        if (maskMoveStartPointRef.current) {
             const gap = {
                 x: currentPoint.x - maskMoveStartPointRef.current.x,
                 y: currentPoint.y - maskMoveStartPointRef.current.y,
-            }
+            };
             setMaskMoveGap(gap);
         }
-
-    }
+    };
 
     const previewMaskMoveEndListener = () => {
         setCaptureEditState(ScreenCaptureEditStates.Idle);
-        if(maskMoveGapRef.current){
+        if (maskMoveGapRef.current) {
             const gap = maskMoveGapRef.current;
-        setOverlayRect(
-            (prev) => {
+            setOverlayRect((prev) => {
                 return {
-                    lt: {x: prev.lt.x + gap.x, y: prev.lt.y + gap.y},
-                    rt: {x: prev.rt.x + gap.x, y: prev.rt.y + gap.y},
-                    rb: {x: prev.rb.x + gap.x, y: prev.rb.y + gap.y},
-                    lb: {x: prev.lb.x + gap.x, y: prev.lb.y + gap.y},
-                }
-            }
-        )
-        setMaskMoveGap(undefined);
+                    lt: { x: prev.lt.x + gap.x, y: prev.lt.y + gap.y },
+                    rt: { x: prev.rt.x + gap.x, y: prev.rt.y + gap.y },
+                    rb: { x: prev.rb.x + gap.x, y: prev.rb.y + gap.y },
+                    lb: { x: prev.lb.x + gap.x, y: prev.lb.y + gap.y },
+                };
+            });
+            setMaskMoveGap(undefined);
         }
-    }
+    };
 
     const getPlaceholderSize = () => {
-        
         return {
             width: (overlayRect.rt.x - overlayRect.lt.x) * scaleFactor + 'px',
             height: (overlayRect.lb.y - overlayRect.lt.y) * scaleFactor + 'px',
-        }
-    }
+        };
+    };
 
     return (
         <>
-
-
             <div className={styles.capture_btn} onClick={btnListener}>
                 {' '}
                 Capture
@@ -478,9 +492,19 @@ export default function ScreenCapture(props: propsIF) {
                 Debug Overlays
             </div>
 
-            <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Take Screenshot</div>} placement='bottom' >
-                <div className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} 
-                ${captureState != ScreenCaptureStates.Idle ? styles.active : ''} ${isChatPage ? styles.chat_page : ''}` } onClick={maskBtnListener}>  
+            <TextOnlyTooltip
+                title={
+                    <div className={styles.tooltip_wrapper}>
+                        Take Screenshot
+                    </div>
+                }
+                placement='bottom'
+            >
+                <div
+                    className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} 
+                ${captureState != ScreenCaptureStates.Idle ? styles.active : ''} ${isChatPage ? styles.chat_page : ''}`}
+                    onClick={maskBtnListener}
+                >
                     <BiScreenshot size={18} />
                 </div>
             </TextOnlyTooltip>
@@ -490,7 +514,8 @@ export default function ScreenCapture(props: propsIF) {
             </div>
              */}
 
-            {(captureState == ScreenCaptureStates.MaskReady || (captureState == ScreenCaptureStates.Masking && isMobile)) && (
+            {(captureState == ScreenCaptureStates.MaskReady ||
+                (captureState == ScreenCaptureStates.Masking && isMobile)) && (
                 <div
                     className={`${styles.overlay_effect} ${styles.full} ${styles.mask_ready_overlay} ${captureState == ScreenCaptureStates.Masking && isMobile ? styles.transparent : ''}`}
                     onClick={overlayOnClick}
@@ -563,63 +588,131 @@ export default function ScreenCapture(props: propsIF) {
                 )
             } */}
 
-
-            <div  className={`${styles.preview_modal} ${previewActive ? styles.active : ''}`} ref={previewModalRef}>
-                <div className={styles.modal_title}>Share Image
-                    <div className={styles.close_btn} onClick={resetBtnListener}>X</div>
+            <div
+                className={`${styles.preview_modal} ${previewActive ? styles.active : ''}`}
+                ref={previewModalRef}
+            >
+                <div className={styles.modal_title}>
+                    Share Image
+                    <div
+                        className={styles.close_btn}
+                        onClick={resetBtnListener}
+                    >
+                        X
+                    </div>
                 </div>
                 {imageComp && (
                     <span className={styles.image_preview_outer}>
-                    <div ref={croppedImageRef}
-                        className={styles.image_preview_wrapper}
-                        style={getPreviewSize()}
-                    >
-                        <img
-                            src={URL.createObjectURL(imageComp)}
-                            alt='screenshot'
-                            style={getImageOffset()}
-                            className={styles.captured_raw_image}
-                        />
-                    </div>
-                    </span>
-                )} 
-                {
-                    !imageComp && (
-                        <div className={styles.placeholder_wrapper} style={getPlaceholderSize()}>
-                            <RiScreenshot2Line size={64}  />
-                            <div className={styles.placeholder_text}>The screen is being captured...</div>
-                            <div className={ styles.placeholder_loader + ' ' + styles.placeholder_loader_horizontal}></div>
-                            <div className={ styles.placeholder_loader + ' ' + styles.placeholder_loader_horizontal + ' ' + styles.reverse}></div>
+                        <div
+                            ref={croppedImageRef}
+                            className={styles.image_preview_wrapper}
+                            style={getPreviewSize()}
+                        >
+                            <img
+                                src={URL.createObjectURL(imageComp)}
+                                alt='screenshot'
+                                style={getImageOffset()}
+                                className={styles.captured_raw_image}
+                            />
                         </div>
-                    )
-                }
+                    </span>
+                )}
+                {!imageComp && (
+                    <div
+                        className={styles.placeholder_wrapper}
+                        style={getPlaceholderSize()}
+                    >
+                        <RiScreenshot2Line size={64} />
+                        <div className={styles.placeholder_text}>
+                            The screen is being captured...
+                        </div>
+                        <div
+                            className={
+                                styles.placeholder_loader +
+                                ' ' +
+                                styles.placeholder_loader_horizontal
+                            }
+                        ></div>
+                        <div
+                            className={
+                                styles.placeholder_loader +
+                                ' ' +
+                                styles.placeholder_loader_horizontal +
+                                ' ' +
+                                styles.reverse
+                            }
+                        ></div>
+                    </div>
+                )}
                 {/* {isUserConnected && imageComp && <ScreenCaptureMessageInput />} */}
                 <div className={styles.btn_section}>
-                    
-                    
-                    {isUserConnected ? (   
-                        <div className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom && !isMobile ? styles.hidden : ''}`} onClick={chatBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
-                        </div> Send to Chat </div>
+                    {isUserConnected ? (
+                        <div
+                            className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom && !isMobile ? styles.hidden : ''}`}
+                            onClick={chatBtnListener}
+                        >
+                            {' '}
+                            <div className={styles.icon_wrapper_inner}>
+                                <BiSend size={18} />
+                            </div>{' '}
+                            Send to Chat{' '}
+                        </div>
                     ) : (
-                        <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Conect your wallet to send screenshot on chat</div>} placement='top' >
-                        <div className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom && !isMobile ? styles.hidden : ''}`} onClick={connectBtnListener}> <div className={styles.icon_wrapper_inner}><BiSend size={18} />
-                        </div> Send to Chat</div>
+                        <TextOnlyTooltip
+                            title={
+                                <div className={styles.tooltip_wrapper}>
+                                    Conect your wallet to send screenshot on
+                                    chat
+                                </div>
+                            }
+                            placement='top'
+                        >
+                            <div
+                                className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom && !isMobile ? styles.hidden : ''}`}
+                                onClick={connectBtnListener}
+                            >
+                                {' '}
+                                <div className={styles.icon_wrapper_inner}>
+                                    <BiSend size={18} />
+                                </div>{' '}
+                                Send to Chat
+                            </div>
                         </TextOnlyTooltip>
                     )}
 
-                    <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Download Image</div>} placement='top' >
-                        <div className={styles.icon_btn_wrapper} onClick={downloadImage}>
+                    <TextOnlyTooltip
+                        title={
+                            <div className={styles.tooltip_wrapper}>
+                                Download Image
+                            </div>
+                        }
+                        placement='top'
+                    >
+                        <div
+                            className={styles.icon_btn_wrapper}
+                            onClick={downloadImage}
+                        >
                             <RiDownload2Line size={18} color='var(--text3)' />
                         </div>
                     </TextOnlyTooltip>
-                    
-                    <TextOnlyTooltip title={<div className={styles.tooltip_wrapper}>Copy to Clipboard</div>} placement='top' >
-                        <div className={styles.icon_btn_wrapper} onClick={copyCroppedImageToClipboard}>
+
+                    <TextOnlyTooltip
+                        title={
+                            <div className={styles.tooltip_wrapper}>
+                                Copy to Clipboard
+                            </div>
+                        }
+                        placement='top'
+                    >
+                        <div
+                            className={styles.icon_btn_wrapper}
+                            onClick={copyCroppedImageToClipboard}
+                        >
                             <BsCopy size={18} color='var(--text3)' />
                         </div>
                     </TextOnlyTooltip>
                 </div>
-            </div> 
+            </div>
         </>
     );
 }

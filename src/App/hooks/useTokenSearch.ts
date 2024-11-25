@@ -86,8 +86,10 @@ export const useTokenSearch = (
         // fn to run a token search by name or symbol
         function searchAsNameOrSymbol(): TokenIF[] {
             // check tokens in `allTokenLists` for tokens that match validated input
-            const foundTokens: TokenIF[] =
-                tokens.getTokensByNameOrSymbol(validatedInput);
+            const foundTokens: TokenIF[] = tokens.getTokensByNameOrSymbol(
+                validatedInput,
+                chainId,
+            );
             // return tokens with wrapped native from current chain removed
             return removeWrappedNative(chainId, foundTokens);
         }
