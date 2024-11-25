@@ -36,6 +36,11 @@ export default function ScreenCapture(props: propsIF) {
 
     const navigate = useNavigate();
 
+    useEffect(() => {
+        setCaptureState(ScreenCaptureStates.Idle);
+        setImageComp(null);
+    }, [window.location.pathname]);
+
     const chatOnDom = document.getElementById('ambient-chat-on-dom');
 
     const keyDownListener = (e: KeyboardEvent) => {
@@ -477,8 +482,27 @@ export default function ScreenCapture(props: propsIF) {
         };
     };
 
+    const getCaptureStateDebugger = () => {
+        switch (captureState) {
+            case ScreenCaptureStates.Idle:
+                return 'Idle';
+            case ScreenCaptureStates.MaskReady:
+                return 'Mask Ready';
+            case ScreenCaptureStates.Masking:
+                return 'Masking';
+            case ScreenCaptureStates.PreviewReady:
+                return 'Preview Ready';
+            default:
+                return 'Unknown';
+        }
+    };
+
     return (
         <>
+            <div className={styles.screenshot_state_debugger}>
+                {getCaptureStateDebugger()}
+            </div>
+
             <div className={styles.capture_btn} onClick={btnListener}>
                 {' '}
                 Capture

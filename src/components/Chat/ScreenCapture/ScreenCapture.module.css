@@ -1,4 +1,16 @@
 
+
+.screenshot_state_debugger{
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+    z-index: 9999;
+    background-color: var(--dark2);
+    color: rgba(0,255,0,1);
+    font-size: .8rem;
+    font-family: monospace;
+}
+
 .page_on_crop{
     overflow: hidden;
     touch-action: none;
