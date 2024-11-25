@@ -5,7 +5,7 @@
     left: 1rem;
     top: 1rem;
     z-index: 9999;
-    background-color: var(--dark2);
+    background-color: var(--şşşşşşşşşşşşşşşşşşşdark2);
     color: rgba(0,255,0,1);
     font-size: .8rem;
     font-family: monospace;
@@ -539,4 +539,23 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
     left: 50%;
     top: 4rem;
     z-index: 9999;
+}
+
+.preview_backdrop{
+    transition: all .3s ease-in-out;
+    position: fixed;
+    z-index: -1;
+    opacity: 0;
+    background-color: transparent;
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    backdrop-filter: blur(10px);
+}
+
+.preview_backdrop.active{
+    z-index: 8;
+    opacity: 1;
 }

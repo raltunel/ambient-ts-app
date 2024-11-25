@@ -37,8 +37,7 @@ export default function ScreenCapture(props: propsIF) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        setCaptureState(ScreenCaptureStates.Idle);
-        setImageComp(null);
+        setPreviewActive(false);
     }, [window.location.pathname]);
 
     const chatOnDom = document.getElementById('ambient-chat-on-dom');
@@ -122,13 +121,7 @@ export default function ScreenCapture(props: propsIF) {
 
     const [debugMode, setDebugMode] = useState<boolean>(false);
     const [scaleFactor, setScaleFactor] = useState<number>(1);
-    const btnListener = async () => {
-        // const image = await domToImage(document.body);
-        const image = await printDomToImage(
-            document.getElementById('root') as HTMLElement,
-        );
-        setImageComp(image);
-    };
+
     const maskBtnListener = async () => {
         setTimeout(() => {
             setCaptureState(ScreenCaptureStates.MaskReady);
@@ -187,7 +180,6 @@ export default function ScreenCapture(props: propsIF) {
     const overlayOnTouch = (e: React.TouchEvent) => {
         if (!isMobile) return;
         maskStarter(e.touches[0].clientX, e.touches[0].clientY);
-        e.preventDefault();
     };
 
     const maskStarter = (x: number, y: number) => {
@@ -208,7 +200,6 @@ export default function ScreenCapture(props: propsIF) {
         if (!isMobile) return;
 
         maskingMouseMoveListener(e.touches[0].clientX, e.touches[0].clientY);
-        e.preventDefault();
     };
 
     const maskingMouseMoveListener = (x: number, y: number) => {
@@ -372,7 +363,9 @@ export default function ScreenCapture(props: propsIF) {
 
     const downloadBlob = async (image: Blob) => {
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(image);
+        const blobUrl = URL.createObjectURL(image);
+        a.href = blobUrl;
+        console.log(blobUrl);
         a.download = 'screenshot-' + new Date().toISOString() + '.png';
         a.click();
     };
@@ -420,10 +413,13 @@ export default function ScreenCapture(props: propsIF) {
 
         if (croppedImageRef.current) {
             const image = await printDomToImage(croppedImageRef.current);
-            setTimeout(() => {
-                setLastCapturedScreenShot(image);
+            setLastCapturedScreenShot(image);
+            if (!isMobile) {
                 setCaptureState(ScreenCaptureStates.Idle);
                 setPreviewActive(false);
+            }
+
+            setTimeout(() => {
                 if (isMobile) {
                     setTimeout(() => {
                         navigate('/chat');
@@ -506,10 +502,6 @@ export default function ScreenCapture(props: propsIF) {
                 {getCaptureStateDebugger()}
             </div>
 
-            <div className={styles.capture_btn} onClick={btnListener}>
-                {' '}
-                Capture
-            </div>
             {/* <div className={styles.mask_btn} onClick={maskBtnListener}>
                 {' '}
                 Mask
@@ -747,6 +739,9 @@ export default function ScreenCapture(props: propsIF) {
                     </TextOnlyTooltip>
                 </div>
             </div>
+            <div
+                className={`${styles.preview_backdrop} ${previewActive ? styles.active : ''}`}
+            ></div>
         </>
     );
 }
