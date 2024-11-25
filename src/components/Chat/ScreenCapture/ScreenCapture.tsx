@@ -420,15 +420,16 @@ export default function ScreenCapture(props: propsIF) {
 
         if (croppedImageRef.current) {
             const image = await printDomToImage(croppedImageRef.current);
-            setLastCapturedScreenShot(image);
-            setCaptureState(ScreenCaptureStates.Idle);
-            setPreviewActive(false);
-
-            if (isMobile) {
-                setTimeout(() => {
-                    navigate('/chat');
-                }, 1000);
-            }
+            setTimeout(() => {
+                setLastCapturedScreenShot(image);
+                setCaptureState(ScreenCaptureStates.Idle);
+                setPreviewActive(false);
+                if (isMobile) {
+                    setTimeout(() => {
+                        navigate('/chat');
+                    }, 300);
+                }
+            }, 1000);
         }
     };
 
