@@ -416,10 +416,12 @@ export default function ScreenCapture(props: propsIF) {
             setLastCapturedScreenShot(image);
             setCaptureState(ScreenCaptureStates.Idle);
             setPreviewActive(false);
-        }
 
-        if (isMobile) {
-            navigate('/chat');
+            if (isMobile) {
+                setTimeout(() => {
+                    navigate('/chat');
+                }, 300);
+            }
         }
     };
 
