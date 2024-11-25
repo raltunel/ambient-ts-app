@@ -234,7 +234,6 @@ export default function ScreenCapture(props: propsIF) {
     const maskEndClickListener = () => {
         setRenderOverlayRect(false);
         bindScaleFactor();
-        captureDom();
         if (captureStateRef.current == ScreenCaptureStates.Masking) {
             setPreviewActive(true);
             // copyCroppedImageToClipboard();
@@ -243,6 +242,7 @@ export default function ScreenCapture(props: propsIF) {
                 setRenderOverlayRect(true);
             }, 400);
         }
+        captureDom();
     };
 
     const bindScaleFactor = () => {
@@ -425,7 +425,7 @@ export default function ScreenCapture(props: propsIF) {
             if (isMobile) {
                 setTimeout(() => {
                     navigate('/chat');
-                }, 300);
+                }, 1000);
             }
         }
     };
