@@ -154,7 +154,9 @@ export default function ScreenCapture(props: propsIF) {
     }, [previewActive]);
 
     const closePreviewModal = () => {
-        setPreviewActive(false);
+        if (!isMobile) {
+            setPreviewActive(false);
+        }
     };
 
     useOnClickOutside(previewModalRef, closePreviewModal);
