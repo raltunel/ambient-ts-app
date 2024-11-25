@@ -100,7 +100,9 @@ function ChatPanel(props: propsIF) {
         Message | undefined
     >();
 
-    const [selectedMessageForPreview, setSelectedMessageForPreview] = useState<Message | undefined>();
+    const [selectedMessageForPreview, setSelectedMessageForPreview] = useState<
+        Message | undefined
+    >();
     const [showImagePreview, setShowImagePreview] = useState(false);
 
     const [selectedMessageIdForDeletion, setSelectedMessageIdForDeletion] =
@@ -1060,7 +1062,9 @@ function ChatPanel(props: propsIF) {
                             }
                             isFocusMentions={isFocusMentions}
                             isMobile={isMobile}
-                            setSelectedMessageForPreview={setSelectedMessageForPreview} 
+                            setSelectedMessageForPreview={
+                                setSelectedMessageForPreview
+                            }
                         />
                     );
                 })}
@@ -1314,6 +1318,21 @@ function ChatPanel(props: propsIF) {
         );
     };
 
+    const chatImagePreview = (
+        <ChatImagePreview
+            isActive={showImagePreview}
+            closeListener={() => {
+                setSelectedMessageForPreview(undefined);
+            }}
+            focusedMessage={selectedMessageForPreview}
+            replyListener={() => {
+                setIsReplyButtonPressed(true);
+                setSelectedMessageForReply(selectedMessageForPreview);
+            }}
+            userMap={userMap}
+        />
+    );
+
     const contentHeight = isChatOpen ? '479px' : '30px';
     if (props.appPage)
         return (
@@ -1376,6 +1395,7 @@ function ChatPanel(props: propsIF) {
                     setSelectedMessageForReply={setSelectedMessageForReply}
                     setIsReplyButtonPressed={setIsReplyButtonPressed}
                     reactionPicker={reactionPicker}
+                    chatImagePreview={chatImagePreview}
                 />
             </>
         );
@@ -1509,20 +1529,8 @@ function ChatPanel(props: propsIF) {
             />
 
             <DomDebugger />
-            <ChatImagePreview
-                isActive={showImagePreview}
-                closeListener={() => {
-                    setSelectedMessageForPreview(undefined);
-                }}
-                focusedMessage={selectedMessageForPreview}
-                replyListener={() => {
-                    setIsReplyButtonPressed(true);
-                    setSelectedMessageForReply(selectedMessageForPreview);
-                }}
-                userMap={userMap}
-            />
-            <div id='ambient-chat-on-dom' style={{display: 'none'}}>
-            </div>
+            {chatImagePreview}
+            <div id='ambient-chat-on-dom' style={{ display: 'none' }}></div>
         </div>
     );
 }

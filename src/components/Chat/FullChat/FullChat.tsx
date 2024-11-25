@@ -100,6 +100,7 @@ interface FullChatPropsIF {
         SetStateAction<Message | undefined>
     >;
     reactionPicker: JSX.Element;
+    chatImagePreview?: JSX.Element;
 }
 
 interface ChannelDisplayPropsIF {
@@ -910,6 +911,7 @@ function FullChat(props: FullChatPropsIF) {
             />
             {props.rndShowPreviousMessages()}
             {props.isChatOpen && props.showPicker && props.reactionPicker}
+            {props.chatImagePreview}
         </div>
     );
 }

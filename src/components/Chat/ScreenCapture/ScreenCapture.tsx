@@ -138,7 +138,15 @@ export default function ScreenCapture(props: propsIF) {
         setMaskMoveGap(undefined);
         setOverlayRect(DomRectDefault);
         setLastCapturedScreenShot(undefined);
+        setImageComp(null);
     };
+
+    useEffect(() => {
+        if (!previewActive) {
+            setImageComp(null);
+            setCaptureState(ScreenCaptureStates.Idle);
+        }
+    }, [previewActive]);
 
     const closePreviewModal = () => {
         setPreviewActive(false);
@@ -170,11 +178,6 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const overlayOnTouch = (e: React.TouchEvent) => {
-        console.log(
-            'overlayOnTouch',
-            e.touches[0].clientX,
-            e.touches[0].clientY,
-        );
         if (!isMobile) return;
         maskStarter(e.touches[0].clientX, e.touches[0].clientY);
         e.preventDefault();
@@ -257,8 +260,6 @@ export default function ScreenCapture(props: propsIF) {
             setScaleFactor(1);
         }
     };
-
-    console.log('scaleFactor', scaleFactor);
 
     useEffect(() => {
         console.log(

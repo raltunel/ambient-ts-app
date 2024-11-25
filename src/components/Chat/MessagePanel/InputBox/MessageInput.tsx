@@ -88,7 +88,6 @@ export default function MessageInput(props: MessageInputProps) {
         lastCapturedScreenShot,
         setLastCapturedScreenShot,
     } = useContext(UserDataContext);
-    console.log('lastCapturedScreenShot', lastCapturedScreenShot);
     const [isPosition, setIsPosition] = useState(false);
     const [tokenForEmojiSearch, setTokenForEmojiSearch] = useState('');
 
@@ -605,7 +604,6 @@ export default function MessageInput(props: MessageInputProps) {
     }, [message]);
 
     useEffect(() => {
-        console.log('tokenForEmojiSearch', tokenForEmojiSearch);
         filterEmojisForCustomPicker(tokenForEmojiSearch);
         setCustomEmojiPickerSelectedIndex(0);
     }, [tokenForEmojiSearch]);

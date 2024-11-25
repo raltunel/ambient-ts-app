@@ -55,3 +55,12 @@
     gap: .4rem;
 }
 
+
+
+
+@media (max-width: 768px) {
+    .image_preview_wrapper{
+        width: 90%;
+    }
+
+}
