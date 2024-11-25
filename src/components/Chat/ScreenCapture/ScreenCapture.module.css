@@ -145,7 +145,7 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
 .overlay_effect{
     position: fixed;
     z-index: 10;
-    background-color: color-mix(in srgb, var(--accent1) 10%, transparent);
+    background-color: color-mix(in srgb, var(--accent1) 15%, transparent);
     user-select: none !important;
 }
 
@@ -167,7 +167,7 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
 }
 
 .mask_ready_overlay{
-    background-color: color-mix(in srgb, var(--accent1) 20%, transparent);
+    background-color: color-mix(in srgb, var(--accent1) 15%, transparent);
   user-select: none !important;
 }
 
@@ -481,7 +481,7 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
     .start_capture_btn{
         position: fixed;
         bottom: 5rem;
-        left: 80%;
+        left: calc(100vw - 4rem);
         top: auto;
         padding: .5rem;
         width: 3rem;
@@ -494,7 +494,7 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
     }
 
     .start_capture_btn.chat_page{
-        bottom: 10rem;
+        bottom: 14rem;
     }
     
     .start_capture_btn svg{

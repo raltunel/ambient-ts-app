@@ -30,7 +30,9 @@ interface propsIF {
 export default function ScreenCapture(props: propsIF) {
     console.log(window.location.pathname);
 
-    const isChatPage = window.location.pathname === '/chat/';
+    const isChatPage =
+        window.location.pathname === '/chat/' ||
+        window.location.pathname === '/chat';
 
     const navigate = useNavigate();
 
@@ -492,22 +494,24 @@ export default function ScreenCapture(props: propsIF) {
                 Debug Overlays
             </div>
 
-            <TextOnlyTooltip
-                title={
-                    <div className={styles.tooltip_wrapper}>
-                        Take Screenshot
-                    </div>
-                }
-                placement='bottom'
-            >
-                <div
-                    className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} 
-                ${captureState != ScreenCaptureStates.Idle ? styles.active : ''} ${isChatPage ? styles.chat_page : ''}`}
-                    onClick={maskBtnListener}
+            {captureState === ScreenCaptureStates.Idle && (
+                <TextOnlyTooltip
+                    title={
+                        <div className={styles.tooltip_wrapper}>
+                            Take Screenshot
+                        </div>
+                    }
+                    placement='bottom'
                 >
-                    <BiScreenshot size={18} />
-                </div>
-            </TextOnlyTooltip>
+                    <div
+                        className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} 
+                ${captureState != ScreenCaptureStates.Idle ? styles.active : ''} ${isChatPage ? styles.chat_page : ''}`}
+                        onClick={maskBtnListener}
+                    >
+                        <BiScreenshot size={18} />
+                    </div>
+                </TextOnlyTooltip>
+            )}
 
             {/* <div className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} ${captureState != ScreenCaptureStates.Idle ? styles.active : ''}` } onClick={maskBtnListener}>  
                 <BiScreenshot size={18} />
