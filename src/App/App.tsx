@@ -110,7 +110,11 @@ export default function App() {
 
     const showMobileVersion = useMediaQuery('(max-width: 800px)');
     const ambientFooter = (
-        <div data-theme={skin.active} className='footer_container'>
+        <div
+            id='chat-wrapper'
+            data-theme={skin.active}
+            className='footer_container'
+        >
             {currentLocation !== '/' &&
                 currentLocation !== '/404' &&
                 currentLocation !== '/terms' &&

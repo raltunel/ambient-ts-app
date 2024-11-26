@@ -5,8 +5,18 @@
     left: 1rem;
     top: 1rem;
     z-index: 9999;
-    background-color: var(--şşşşşşşşşşşşşşşşşşşdark2);
+    background-color: var(--dark2);
     color: rgba(0,255,0,1);
+    font-size: .8rem;
+    font-family: monospace;
+}
+.screenshot_state_debugger2{
+    position: fixed;
+    left: 1rem;
+    top: 3rem;
+    z-index: 9999;
+    background-color: var(--dark2);
+    color: rgb(251, 255, 0);
     font-size: .8rem;
     font-family: monospace;
 }
@@ -558,4 +568,9 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
 .preview_backdrop.active{
     z-index: 8;
     opacity: 1;
+}
+
+
+.ignored_element{
+    border: 1px solid red;
 }

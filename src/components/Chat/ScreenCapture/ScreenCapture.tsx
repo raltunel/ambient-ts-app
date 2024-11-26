@@ -28,13 +28,17 @@ interface propsIF {
 }
 
 export default function ScreenCapture(props: propsIF) {
-    console.log(window.location.pathname);
-
     const isChatPage =
         window.location.pathname === '/chat/' ||
         window.location.pathname === '/chat';
 
     const navigate = useNavigate();
+
+    const blackListDomElements = [
+        'current_row_scroll',
+        'ambient-header-wallet-name',
+        'chat-wrapper',
+    ];
 
     useEffect(() => {
         setPreviewActive(false);
@@ -158,14 +162,44 @@ export default function ScreenCapture(props: propsIF) {
         setDebugMode(!debugMode);
     };
 
+    const isCollidingWithBBox = (el: HTMLElement) => {
+        const elBBox = el.getBoundingClientRect();
+        const maskBBox = overlayRectRef.current;
+
+        return (
+            elBBox.left < maskBBox.rt.x &&
+            elBBox.right > maskBBox.lt.x &&
+            elBBox.top < maskBBox.lb.y &&
+            elBBox.bottom > maskBBox.lt.y
+        );
+    };
+
+    const ignoredBlackListElements = () => {
+        const ret: string[] = [];
+
+        blackListDomElements.forEach((e) => {
+            const el = document.getElementById(e) as HTMLElement;
+            if (!isCollidingWithBBox(el)) {
+                el.classList.add(styles.ignored_element);
+                ret.push(e);
+            } else {
+                el.classList.remove(styles.ignored_element);
+            }
+        });
+
+        return new Set(ret);
+    };
+
     const captureDom = async () => {
+        const ignoredElements = ignoredBlackListElements();
+
         const image = await printDomToImage(
             document.getElementById('root') as HTMLElement,
             undefined,
             undefined,
             undefined,
             (el: Node) => {
-                return (el as HTMLElement).id !== 'ambient-header-wallet-name';
+                return !ignoredElements.has((el as HTMLElement).id);
             },
             1,
         );
@@ -260,12 +294,6 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     useEffect(() => {
-        console.log(
-            'maskReady',
-            captureState === ScreenCaptureStates.MaskReady,
-        );
-        console.log('masking ', captureState === ScreenCaptureStates.Masking);
-
         if (isMobile) {
             if (captureState === ScreenCaptureStates.Idle) {
                 setDocumentMode(false);
@@ -365,7 +393,6 @@ export default function ScreenCapture(props: propsIF) {
         const a = document.createElement('a');
         const blobUrl = URL.createObjectURL(image);
         a.href = blobUrl;
-        console.log(blobUrl);
         a.download = 'screenshot-' + new Date().toISOString() + '.png';
         a.click();
     };
@@ -496,10 +523,37 @@ export default function ScreenCapture(props: propsIF) {
         }
     };
 
+    const getDebugger2Content = () => {
+        return (
+            <>
+                <div>dom elements: {document.querySelectorAll('*').length}</div>
+                <div>
+                    table dom elements:{' '}
+                    {
+                        document
+                            .getElementById('current_row_scroll')
+                            ?.querySelectorAll('*').length
+                    }
+                </div>
+                <div>
+                    table rows:{' '}
+                    {
+                        document.querySelectorAll(
+                            '#current_row_scroll > div > div',
+                        ).length
+                    }
+                </div>
+            </>
+        );
+    };
+
     return (
         <>
             <div className={styles.screenshot_state_debugger}>
                 {getCaptureStateDebugger()}
+            </div>
+            <div className={styles.screenshot_state_debugger2}>
+                {getDebugger2Content()}
             </div>
 
             {/* <div className={styles.mask_btn} onClick={maskBtnListener}>
