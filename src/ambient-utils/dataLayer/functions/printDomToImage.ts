@@ -95,7 +95,7 @@ export const printDomToCanvas = async (
             filter: filterNode,
             features: {
                 copyScrollbar: true,
-                // restoreScrollPosition: true
+                restoreScrollPosition: true,
             },
             scale: imgScale || 1,
             // font: {

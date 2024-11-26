@@ -338,7 +338,6 @@ export default function ScreenCapture(props: propsIF) {
                 //     element.classList.add(styles.has_text_content);
                 // }
 
-                element.classList.remove(styles.outside_bbox);
                 element.classList.remove('will_be_excluded');
                 element.classList.add(styles.inside_bbox);
                 element.setAttribute('will_be_captured', 'true');
@@ -352,19 +351,6 @@ export default function ScreenCapture(props: propsIF) {
                 element.classList.remove(styles.inside_bbox);
                 element.classList.add('will_be_excluded');
                 element.removeAttribute('will_be_captured');
-                element.removeAttribute('data-text-content');
-                element.removeAttribute('data-font-size');
-                element.classList.remove(styles.no_child);
-            }
-
-            if (
-                element.tagName.toLowerCase() === 'head' ||
-                element.tagName.toLowerCase() === 'script' ||
-                element.tagName.toLowerCase() === 'link' ||
-                element.tagName.toLowerCase() === 'meta' ||
-                element.tagName.toLowerCase() === 'section'
-            ) {
-                element.classList.add('will_be_captured');
             }
         });
 
