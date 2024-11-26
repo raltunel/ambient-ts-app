@@ -7,7 +7,10 @@ import styles from './ScreenCapture.module.css';
 import { BiScreenshot, BiSend } from 'react-icons/bi';
 import { BsCopy } from 'react-icons/bs';
 import { RiDownload2Line, RiScreenshot2Line } from 'react-icons/ri';
-import { printDomToImage } from '../../../ambient-utils/dataLayer';
+import {
+    printDomToCanvas,
+    printDomToDataUrl,
+} from '../../../ambient-utils/dataLayer';
 import { AppStateContext, UserDataContext } from '../../../contexts';
 import useCopyToClipboard from '../../../utils/hooks/useCopyToClipboard';
 import useMediaQuery from '../../../utils/hooks/useMediaQuery';
@@ -21,15 +24,13 @@ import { DomPositionInterface, DomRectDefault, DomRectIF } from '../ChatIFs';
 import { domDebug } from '../DomDebugger/DomDebuggerUtils';
 import ScreenCaptureMessageInput from './ScreenCaptureMessageInput';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface propsIF {
     name?: string;
 }
 
 export default function ScreenCapture(props: propsIF) {
-    console.log(window.location.pathname);
-
     const isChatPage =
         window.location.pathname === '/chat/' ||
         window.location.pathname === '/chat';
@@ -60,8 +61,7 @@ export default function ScreenCapture(props: propsIF) {
         }
     }, []);
 
-    const { isUserConnected, setLastCapturedScreenShot } =
-        useContext(UserDataContext);
+    const { isUserConnected } = useContext(UserDataContext);
     const editMasking = false;
 
     const {
@@ -76,7 +76,7 @@ export default function ScreenCapture(props: propsIF) {
 
     const [, copy] = useCopyToClipboard();
 
-    const [imageComp, setImageComp] = useState<any>(null);
+    const [imageComp, setImageComp] = useState<string | undefined>();
     const [captureState, setCaptureState] = useState<ScreenCaptureStates>(
         ScreenCaptureStates.Idle,
     );
@@ -122,6 +122,17 @@ export default function ScreenCapture(props: propsIF) {
     const [debugMode, setDebugMode] = useState<boolean>(false);
     const [scaleFactor, setScaleFactor] = useState<number>(1);
 
+    const imageCompRef = useRef<string | undefined>();
+    imageCompRef.current = imageComp;
+
+    const [debugingDataUrl, setDebugingDataUrl] = useState<
+        string | undefined
+    >();
+
+    const [lastCapturedScreenshot, setLastCapturedScreenshot] = useState<
+        string | undefined
+    >(undefined);
+
     const maskBtnListener = async () => {
         setTimeout(() => {
             setCaptureState(ScreenCaptureStates.MaskReady);
@@ -129,19 +140,17 @@ export default function ScreenCapture(props: propsIF) {
     };
     const resetBtnListener = async () => {
         setCaptureState(ScreenCaptureStates.Idle);
-        setImageComp(undefined);
+        assignImgComp(undefined);
         setPreviewActive(false);
         setMaskLT({ x: 0, y: 0 });
         setMaskRB({ x: 0, y: 0 });
         setMaskMoveGap(undefined);
         setOverlayRect(DomRectDefault);
-        setLastCapturedScreenShot(undefined);
-        setImageComp(null);
     };
 
     useEffect(() => {
         if (!previewActive) {
-            setImageComp(null);
+            assignImgComp(undefined);
             setCaptureState(ScreenCaptureStates.Idle);
         }
     }, [previewActive]);
@@ -159,17 +168,31 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const captureDom = async () => {
-        const image = await printDomToImage(
-            document.getElementById('root') as HTMLElement,
+        printDomToCanvas;
+        const dataUrl = await printDomToCanvas(
+            // document.getElementById('root') as HTMLElement,
+            document.documentElement,
             undefined,
             undefined,
             undefined,
             (el: Node) => {
-                return (el as HTMLElement).id !== 'ambient-header-wallet-name';
+                return (
+                    (el as Element).id !== 'ambient-header-wallet-name' &&
+                    (!(el as Element).classList ||
+                        ((el as Element).classList &&
+                            !(el as Element).classList.contains(
+                                'will_be_excluded',
+                            )))
+                );
+                // (el as HTMLElement).id !== 'ambient-header-wallet-name' &&
+                // && (el as HTMLElement).classList && (el as HTMLElement).classList.contains('will_be_excluded') === false;
             },
             1,
         );
-        setImageComp(image);
+        assignImgComp(dataUrl?.toDataURL());
+        if (dataUrl) {
+            URL.revokeObjectURL(dataUrl?.toDataURL());
+        }
     };
 
     const overlayOnClick = (e: React.MouseEvent) => {
@@ -216,26 +239,36 @@ export default function ScreenCapture(props: propsIF) {
 
     const copyCroppedImageToClipboard = async () => {
         if (croppedImageRef.current) {
-            const image = await printDomToImage(croppedImageRef.current);
-            if (image) {
-                copy(image);
+            const dataUrl = await printDomToDataUrl(croppedImageRef.current);
+            if (dataUrl) {
+                copy(dataUrl);
             }
             openSnackbar('Copied to clipboard!', 'success');
         }
     };
 
+    const [elementsInsideBBox, setElementsInsideBBox] = useState<number>(0);
+
     const maskEndClickListener = () => {
         setRenderOverlayRect(false);
         bindScaleFactor();
         if (captureStateRef.current == ScreenCaptureStates.Masking) {
-            setPreviewActive(true);
-            // copyCroppedImageToClipboard();
-            setCaptureState(ScreenCaptureStates.PreviewReady);
             setTimeout(() => {
-                setRenderOverlayRect(true);
-            }, 400);
+                setPreviewActive(true);
+                // copyCroppedImageToClipboard();
+                setCaptureState(ScreenCaptureStates.PreviewReady);
+                setTimeout(() => {
+                    setRenderOverlayRect(true);
+                }, 400);
+            }, 300);
         }
-        captureDom();
+        const disableCaptureDom = false;
+
+        if (!disableCaptureDom) {
+            captureDom();
+        }
+
+        maskBBoxElements();
     };
 
     const bindScaleFactor = () => {
@@ -260,12 +293,6 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     useEffect(() => {
-        console.log(
-            'maskReady',
-            captureState === ScreenCaptureStates.MaskReady,
-        );
-        console.log('masking ', captureState === ScreenCaptureStates.Masking);
-
         if (isMobile) {
             if (captureState === ScreenCaptureStates.Idle) {
                 setDocumentMode(false);
@@ -274,6 +301,77 @@ export default function ScreenCapture(props: propsIF) {
             }
         }
     }, [captureState]);
+
+    const maskBBoxElements = () => {
+        // const root = document.getElementById('root');
+        // if(!root) return;
+
+        // const allElements = root.querySelectorAll('*');
+
+        const allElements = document.querySelectorAll('*');
+
+        // Create a list to store elements inside the bbox
+        const elementsInsideBBox: Element[] = [];
+
+        // Loop through elements and check their positions
+        allElements.forEach((element) => {
+            const rect = element.getBoundingClientRect();
+
+            // Check if the element's bounding box intersects with the defined bbox
+            const isInside =
+                rect.right >= overlayRect.lt.x &&
+                rect.left <= overlayRect.rt.x &&
+                rect.bottom >= overlayRect.lt.y &&
+                rect.top <= overlayRect.rb.y;
+
+            if (isInside) {
+                // if(element.children.length === 0){
+                //     const textContent = element.textContent?.trim();
+                //     const fontSize = (element as HTMLElement).style.fontSize;
+                //     element.setAttribute('data-text-content', textContent || '');
+                //     element.setAttribute('data-font-size', fontSize || '1rem');
+                //     element.classList.add(styles.no_child);
+                // }
+
+                // element.children
+                // if (textContent) {
+                //     element.classList.add(styles.has_text_content);
+                // }
+
+                element.classList.remove(styles.outside_bbox);
+                element.classList.remove('will_be_excluded');
+                element.classList.add(styles.inside_bbox);
+                element.setAttribute('will_be_captured', 'true');
+                elementsInsideBBox.push(element);
+                // const clonedArea = document.getElementById('cloned-area') as HTMLElement;
+                // if(clonedArea){
+                //     clonedArea.appendChild(element.cloneNode(true) as Node);
+                // }
+            } else {
+                // element.classList.add(styles.outside_bbox);
+                element.classList.remove(styles.inside_bbox);
+                element.classList.add('will_be_excluded');
+                element.removeAttribute('will_be_captured');
+                element.removeAttribute('data-text-content');
+                element.removeAttribute('data-font-size');
+                element.classList.remove(styles.no_child);
+            }
+
+            if (
+                element.tagName.toLowerCase() === 'head' ||
+                element.tagName.toLowerCase() === 'script' ||
+                element.tagName.toLowerCase() === 'link' ||
+                element.tagName.toLowerCase() === 'meta' ||
+                element.tagName.toLowerCase() === 'section'
+            ) {
+                element.classList.add('will_be_captured');
+            }
+        });
+
+        console.log('masking els', elementsInsideBBox.length);
+        console.log(elementsInsideBBox);
+        setElementsInsideBBox(elementsInsideBBox.length);
+    };
 
     const getPosForOverlayRect = (type: ScreenCaptureOverlayTypes) => {
         const oRect = overlayRectRef.current;
@@ -346,11 +444,14 @@ export default function ScreenCapture(props: propsIF) {
         }
 
         const width = scaleFactor * 100;
+        const height = scaleFactor * 100;
 
         return {
             left: scaleFactor * -1 * overlayRect.lt.x - gap.x,
             top: scaleFactor * -1 * overlayRect.lt.y - gap.y,
             width: width + 'vw',
+            height: height + 'vh',
+            display: 'block',
         };
     };
 
@@ -361,21 +462,28 @@ export default function ScreenCapture(props: propsIF) {
         };
     };
 
-    const downloadBlob = async (image: Blob) => {
+    const downloadBlob = async (dataUrl: string) => {
         const a = document.createElement('a');
-        const blobUrl = URL.createObjectURL(image);
-        a.href = blobUrl;
-        console.log(blobUrl);
+        a.href = dataUrl;
         a.download = 'screenshot-' + new Date().toISOString() + '.png';
         a.click();
     };
 
     const downloadImage = async () => {
-        if (croppedImageRef.current) {
-            const image = await printDomToImage(croppedImageRef.current);
-            if (image) {
-                downloadBlob(image);
-            }
+        // if (croppedImageRef.current) {
+        //     const dataUrl = await printDomToDataUrl(croppedImageRef.current);
+        //     if (dataUrl) {
+        //         downloadBlob(dataUrl);
+        //     }
+        // }
+        const dataUrl = await printDomToDataUrl(
+            document.getElementById(
+                'screen-capture-cropped-image',
+            ) as HTMLElement,
+        );
+        if (dataUrl) {
+            downloadBlob(dataUrl);
+            setDebugingDataUrl(dataUrl);
         }
     };
 
@@ -412,8 +520,10 @@ export default function ScreenCapture(props: propsIF) {
         }
 
         if (croppedImageRef.current) {
-            const image = await printDomToImage(croppedImageRef.current);
-            setLastCapturedScreenShot(image);
+            const dataUrl = await printDomToDataUrl(croppedImageRef.current);
+            if (dataUrl) {
+                assignLastCapturedScreenshot(dataUrl);
+            }
             if (!isMobile) {
                 setCaptureState(ScreenCaptureStates.Idle);
                 setPreviewActive(false);
@@ -421,9 +531,12 @@ export default function ScreenCapture(props: propsIF) {
 
             setTimeout(() => {
                 if (isMobile) {
-                    setTimeout(() => {
-                        navigate('/chat');
-                    }, 300);
+                    const link = document.getElementById(
+                        'screen-capture-link-to-chat',
+                    ) as HTMLElement;
+                    if (link) {
+                        link.click();
+                    }
                 }
             }, 1000);
         }
@@ -431,8 +544,10 @@ export default function ScreenCapture(props: propsIF) {
 
     const connectBtnListener = async () => {
         if (croppedImageRef.current) {
-            const image = await printDomToImage(croppedImageRef.current);
-            setLastCapturedScreenShot(image);
+            const dataUrl = await printDomToDataUrl(croppedImageRef.current);
+            if (dataUrl) {
+                assignLastCapturedScreenshot(dataUrl);
+            }
             setIsChatOpen(true);
         }
         openWalletModal();
@@ -496,11 +611,33 @@ export default function ScreenCapture(props: propsIF) {
         }
     };
 
+    const assignImgComp = (dataUrl: string | undefined) => {
+        if (imageCompRef.current) {
+            URL.revokeObjectURL(imageCompRef.current);
+        }
+        setImageComp(dataUrl);
+    };
+
+    const assignLastCapturedScreenshot = (dataUrl: string | undefined) => {
+        setLastCapturedScreenshot(dataUrl);
+    };
+
     return (
         <>
             <div className={styles.screenshot_state_debugger}>
                 {getCaptureStateDebugger()}
             </div>
+
+            <div className={styles.screenshot_filtered_elements}>
+                {elementsInsideBBox} / {document.querySelectorAll('*').length}
+            </div>
+
+            {debugingDataUrl?.length && (
+                <div className={styles.debugging_data_url}>
+                    <span>{debugingDataUrl.length}</span>
+                    <img src={debugingDataUrl} alt='debugging data url' />
+                </div>
+            )}
 
             {/* <div className={styles.mask_btn} onClick={maskBtnListener}>
                 {' '}
@@ -511,29 +648,32 @@ export default function ScreenCapture(props: propsIF) {
                 {' '}
                 Reset
             </div>
-            <div className={styles.debug_btn} onClick={debugBtnListener}>
+            <div
+                className={`${styles.debug_btn} ${debugMode ? styles.active : ''}`}
+                onClick={debugBtnListener}
+            >
                 {' '}
-                Debug Overlays
+                Debug
             </div>
 
-            {captureState === ScreenCaptureStates.Idle && (
-                <TextOnlyTooltip
-                    title={
-                        <div className={styles.tooltip_wrapper}>
-                            Take Screenshot
-                        </div>
-                    }
-                    placement='bottom'
-                >
-                    <div
-                        className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} 
-                ${captureState != ScreenCaptureStates.Idle ? styles.active : ''} ${isChatPage ? styles.chat_page : ''}`}
-                        onClick={maskBtnListener}
-                    >
-                        <BiScreenshot size={18} />
+            {/* {captureState === ScreenCaptureStates.Idle && ( */}
+            <TextOnlyTooltip
+                title={
+                    <div className={styles.tooltip_wrapper}>
+                        Take Screenshot
                     </div>
-                </TextOnlyTooltip>
-            )}
+                }
+                placement='bottom'
+            >
+                <div
+                    className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} 
+                ${captureState != ScreenCaptureStates.Idle ? styles.active : ''} ${isChatPage ? styles.chat_page : ''}`}
+                    onClick={maskBtnListener}
+                >
+                    <BiScreenshot size={18} />
+                </div>
+            </TextOnlyTooltip>
+            {/* )} */}
 
             {/* <div className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} ${captureState != ScreenCaptureStates.Idle ? styles.active : ''}` } onClick={maskBtnListener}>  
                 <BiScreenshot size={18} />
@@ -627,21 +767,55 @@ export default function ScreenCapture(props: propsIF) {
                         X
                     </div>
                 </div>
+                {imageComp?.length}
                 {imageComp && (
-                    <span className={styles.image_preview_outer}>
-                        <div
-                            ref={croppedImageRef}
-                            className={styles.image_preview_wrapper}
-                            style={getPreviewSize()}
-                        >
-                            <img
-                                src={URL.createObjectURL(imageComp)}
-                                alt='screenshot'
-                                style={getImageOffset()}
-                                className={styles.captured_raw_image}
-                            />
-                        </div>
-                    </span>
+                    <>
+                        {debugMode ? (
+                            <span className={styles.image_preview_outer}>
+                                <div
+                                    id='screen-capture-cropped-image'
+                                    ref={croppedImageRef}
+                                    className={
+                                        styles.image_preview_wrapper +
+                                        ' ' +
+                                        styles.debug_mode
+                                    }
+                                >
+                                    <img
+                                        src={imageComp}
+                                        alt='screenshot'
+                                        className={
+                                            styles.captured_raw_image +
+                                            ' ' +
+                                            styles.debug_mode
+                                        }
+                                    />
+                                </div>
+                            </span>
+                        ) : (
+                            <>
+                                (
+                                <span className={styles.image_preview_outer}>
+                                    <div
+                                        id='screen-capture-cropped-image'
+                                        ref={croppedImageRef}
+                                        className={styles.image_preview_wrapper}
+                                        style={getPreviewSize()}
+                                    >
+                                        <img
+                                            src={imageComp}
+                                            alt='screenshot'
+                                            style={getImageOffset()}
+                                            className={
+                                                styles.captured_raw_image
+                                            }
+                                        />
+                                    </div>
+                                </span>
+                                )
+                            </>
+                        )}
+                    </>
                 )}
                 {!imageComp && (
                     <div
@@ -742,6 +916,19 @@ export default function ScreenCapture(props: propsIF) {
             <div
                 className={`${styles.preview_backdrop} ${previewActive ? styles.active : ''}`}
             ></div>
+
+            <Link to='/chat/'>
+                <span id='screen-capture-link-to-chat'></span>
+            </Link>
+
+            <img
+                id='screen-capture-cropped-image'
+                className={styles.ready_to_send_image}
+                src={lastCapturedScreenshot}
+                alt='screenshot'
+            />
+
+            <div id='cloned-area' className={styles.cloned_area}></div>
         </>
     );
 }

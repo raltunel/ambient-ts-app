@@ -82,12 +82,7 @@ export default function MessageInput(props: MessageInputProps) {
     const [message, setMessage] = useState('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [isInfoPressed, setIsInfoPressed] = useState(false);
-    const {
-        userAddress,
-        isUserConnected,
-        lastCapturedScreenShot,
-        setLastCapturedScreenShot,
-    } = useContext(UserDataContext);
+    const { userAddress, isUserConnected } = useContext(UserDataContext);
     const [isPosition, setIsPosition] = useState(false);
     const [tokenForEmojiSearch, setTokenForEmojiSearch] = useState('');
 
@@ -109,6 +104,41 @@ export default function MessageInput(props: MessageInputProps) {
 
     const messageRef = useRef<string>();
     messageRef.current = message;
+
+    const [lastCapturedScreenshot, setLastCapturedScreenshot] = useState<
+        string | undefined
+    >(undefined);
+
+    useEffect(() => {
+        if (props.isChatOpen) {
+            detectCapturedScreenshot();
+        }
+    }, [props.isChatOpen]);
+
+    const detectCapturedScreenshot = () => {
+        console.log(document.getElementById('screen-capture-cropped-image'));
+        if (document.getElementById('screen-capture-cropped-image')) {
+            const img = document.getElementById(
+                'screen-capture-cropped-image',
+            ) as HTMLImageElement;
+            if (img) {
+                img.addEventListener('load', () => {
+                    console.log('image loaded');
+                });
+                console.log(img.src);
+                setLastCapturedScreenshot(img.src);
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (
+            document.location.pathname === '/chat' ||
+            document.location.pathname === '/chat/'
+        ) {
+            detectCapturedScreenshot();
+        }
+    }, [document.location.pathname]);
 
     useEffect(() => {
         if (props.selectedMessageForReply) {
@@ -487,6 +517,7 @@ export default function MessageInput(props: MessageInputProps) {
     });
 
     const handleSendMsg = async (msg: string, roomId: string) => {
+        // const ssBlob = await getLastCapturedAsBlob();
         if (msg !== '' && userAddress) {
             if (
                 (isRoomAdmins && props.selectedMessageForReply !== undefined) ||
@@ -506,7 +537,7 @@ export default function MessageInput(props: MessageInputProps) {
                         ? props.selectedMessageForReply?._id
                         : undefined,
                     undefined,
-                    lastCapturedScreenShot,
+                    // ssBlob
                 );
             } else {
                 props.sendMsg(
@@ -522,12 +553,11 @@ export default function MessageInput(props: MessageInputProps) {
                         ? props.selectedMessageForReply?._id
                         : undefined,
                     undefined,
-                    lastCapturedScreenShot,
+                    // ssBlob,
                 );
             }
             props.setIsReplyButtonPressed(false);
             props.setSelectedMessageForReply(undefined);
-            setLastCapturedScreenShot(undefined);
         }
         setInputLength(0);
         if (props.sendMessageListener) {
@@ -723,13 +753,23 @@ export default function MessageInput(props: MessageInputProps) {
     };
 
     useEffect(() => {
-        if (lastCapturedScreenShot !== undefined) {
+        if (lastCapturedScreenshot !== undefined) {
             inputRef.current?.focus();
         }
-    }, [lastCapturedScreenShot]);
+    }, [lastCapturedScreenshot]);
 
     return (
         <>
+            {lastCapturedScreenshot && (
+                <>
+                    <div className={styles.lastCapturedScreenShotDataUrl}>
+                        {lastCapturedScreenshot}
+                    </div>
+                    <div className={styles.lastCapturedScreenShotDataUrl2}>
+                        {lastCapturedScreenshot.length}
+                    </div>
+                </>
+            )}
             {props.isInputDisabled && (
                 <div className={styles.disabled_text}>
                     Message limit per minute exceeded, please wait.{' '}
@@ -771,7 +811,7 @@ export default function MessageInput(props: MessageInputProps) {
                     </>
 
                     <div className={styles.image_to_send_wrapper}>
-                        {lastCapturedScreenShot && (
+                        {lastCapturedScreenshot && (
                             <TextOnlyTooltip title='Cancel'>
                                 <div className={styles.cancel_image_button}>
                                     {' '}
@@ -779,20 +819,21 @@ export default function MessageInput(props: MessageInputProps) {
                                         size={24}
                                         title='Cancel'
                                         onClick={() =>
-                                            setLastCapturedScreenShot(undefined)
+                                            console.log('gonna delete')
                                         }
                                         style={{ cursor: 'pointer' }}
                                     />
                                 </div>
                             </TextOnlyTooltip>
                         )}
-                        {lastCapturedScreenShot && (
-                            <img
-                                src={URL.createObjectURL(
-                                    lastCapturedScreenShot,
-                                )}
-                                alt='Screenshot'
-                            />
+                        {lastCapturedScreenshot && (
+                            <>
+                                <span>{lastCapturedScreenshot}</span>
+                                <img
+                                    src={lastCapturedScreenshot}
+                                    alt='Screenshot'
+                                />
+                            </>
                         )}
                     </div>
 
