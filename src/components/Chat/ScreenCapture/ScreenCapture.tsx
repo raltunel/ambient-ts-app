@@ -203,7 +203,10 @@ export default function ScreenCapture(props: propsIF) {
             undefined,
             undefined,
             (el: Node) => {
-                return !ignoredElements.has((el as HTMLElement).id);
+                return (
+                    !ignoredElements.has((el as HTMLElement).id) &&
+                    (el as HTMLElement).id !== 'screen-capture-component'
+                );
             },
             1,
         );
@@ -553,102 +556,104 @@ export default function ScreenCapture(props: propsIF) {
 
     return (
         <>
-            <div className={styles.screenshot_state_debugger}>
-                {getCaptureStateDebugger()}
-            </div>
-            <div className={styles.screenshot_state_debugger2}>
-                {getDebugger2Content()}
-            </div>
+            <span id='screen-capture-component'>
+                <div className={styles.screenshot_state_debugger}>
+                    {getCaptureStateDebugger()}
+                </div>
+                <div className={styles.screenshot_state_debugger2}>
+                    {getDebugger2Content()}
+                </div>
 
-            {/* <div className={styles.mask_btn} onClick={maskBtnListener}>
+                {/* <div className={styles.mask_btn} onClick={maskBtnListener}>
                 {' '}
                 Mask
             </div> */}
 
-            <div className={styles.reset_btn} onClick={resetBtnListener}>
-                {' '}
-                Reset
-            </div>
-            <div className={styles.debug_btn} onClick={debugBtnListener}>
-                {' '}
-                Debug Overlays
-            </div>
+                <div className={styles.reset_btn} onClick={resetBtnListener}>
+                    {' '}
+                    Reset
+                </div>
+                <div className={styles.debug_btn} onClick={debugBtnListener}>
+                    {' '}
+                    Debug Overlays
+                </div>
 
-            {captureState === ScreenCaptureStates.Idle && (
-                <TextOnlyTooltip
-                    title={
-                        <div className={styles.tooltip_wrapper}>
-                            Take Screenshot
-                        </div>
-                    }
-                    placement='bottom'
-                >
-                    <div
-                        className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} 
-                ${captureState != ScreenCaptureStates.Idle ? styles.active : ''} ${isChatPage ? styles.chat_page : ''}`}
-                        onClick={maskBtnListener}
+                {captureState === ScreenCaptureStates.Idle && (
+                    <TextOnlyTooltip
+                        title={
+                            <div className={styles.tooltip_wrapper}>
+                                Take Screenshot
+                            </div>
+                        }
+                        placement='bottom'
                     >
-                        <BiScreenshot size={18} />
-                    </div>
-                </TextOnlyTooltip>
-            )}
+                        <div
+                            className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} 
+                ${captureState != ScreenCaptureStates.Idle ? styles.active : ''} ${isChatPage ? styles.chat_page : ''}`}
+                            onClick={maskBtnListener}
+                        >
+                            <BiScreenshot size={18} />
+                        </div>
+                    </TextOnlyTooltip>
+                )}
 
-            {/* <div className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} ${captureState != ScreenCaptureStates.Idle ? styles.active : ''}` } onClick={maskBtnListener}>  
+                {/* <div className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} ${captureState != ScreenCaptureStates.Idle ? styles.active : ''}` } onClick={maskBtnListener}>  
                 <BiScreenshot size={18} />
             </div>
              */}
 
-            {(captureState == ScreenCaptureStates.MaskReady ||
-                (captureState == ScreenCaptureStates.Masking && isMobile)) && (
-                <div
-                    className={`${styles.overlay_effect} ${styles.full} ${styles.mask_ready_overlay} ${captureState == ScreenCaptureStates.Masking && isMobile ? styles.transparent : ''}`}
-                    onClick={overlayOnClick}
-                    onMouseDown={overlayOnClick}
-                    onTouchStart={overlayOnTouch}
-                    onTouchMove={touchMoveListener}
-                    onTouchEnd={maskEndClickListener}
-                ></div>
-            )}
+                {(captureState == ScreenCaptureStates.MaskReady ||
+                    (captureState == ScreenCaptureStates.Masking &&
+                        isMobile)) && (
+                    <div
+                        className={`${styles.overlay_effect} ${styles.full} ${styles.mask_ready_overlay} ${captureState == ScreenCaptureStates.Masking && isMobile ? styles.transparent : ''}`}
+                        onClick={overlayOnClick}
+                        onMouseDown={overlayOnClick}
+                        onTouchStart={overlayOnTouch}
+                        onTouchMove={touchMoveListener}
+                        onTouchEnd={maskEndClickListener}
+                    ></div>
+                )}
 
-            {captureState == ScreenCaptureStates.Masking && (
-                <>
-                    <div
-                        style={getPosForOverlayRect(
-                            ScreenCaptureOverlayTypes.LeftTop,
-                        )}
-                        className={`${styles.overlay_effect} ${debugMode ? styles.dbg1 : ' '}`}
-                    ></div>
-                    <div
-                        style={getPosForOverlayRect(
-                            ScreenCaptureOverlayTypes.RightTop,
-                        )}
-                        className={`${styles.overlay_effect} ${debugMode ? styles.dbg2 : ' '}`}
-                    ></div>
-                    <div
-                        style={getPosForOverlayRect(
-                            ScreenCaptureOverlayTypes.RightBottom,
-                        )}
-                        className={`${styles.overlay_effect} ${debugMode ? styles.dbg3 : ' '}`}
-                    ></div>
-                    <div
-                        style={getPosForOverlayRect(
-                            ScreenCaptureOverlayTypes.LeftBottom,
-                        )}
-                        className={`${styles.overlay_effect} ${debugMode ? styles.dbg4 : ' '}`}
-                    ></div>
+                {captureState == ScreenCaptureStates.Masking && (
+                    <>
+                        <div
+                            style={getPosForOverlayRect(
+                                ScreenCaptureOverlayTypes.LeftTop,
+                            )}
+                            className={`${styles.overlay_effect} ${debugMode ? styles.dbg1 : ' '}`}
+                        ></div>
+                        <div
+                            style={getPosForOverlayRect(
+                                ScreenCaptureOverlayTypes.RightTop,
+                            )}
+                            className={`${styles.overlay_effect} ${debugMode ? styles.dbg2 : ' '}`}
+                        ></div>
+                        <div
+                            style={getPosForOverlayRect(
+                                ScreenCaptureOverlayTypes.RightBottom,
+                            )}
+                            className={`${styles.overlay_effect} ${debugMode ? styles.dbg3 : ' '}`}
+                        ></div>
+                        <div
+                            style={getPosForOverlayRect(
+                                ScreenCaptureOverlayTypes.LeftBottom,
+                            )}
+                            className={`${styles.overlay_effect} ${debugMode ? styles.dbg4 : ' '}`}
+                        ></div>
 
-                    <div
-                        onClick={maskEndClickListener}
-                        onMouseUp={maskEndClickListener}
-                        style={getPosForOverlayRect(
-                            ScreenCaptureOverlayTypes.MaskArea,
-                        )}
-                        className={`${styles.overlay_effect} ${styles.mask}`}
-                    ></div>
-                </>
-            )}
+                        <div
+                            onClick={maskEndClickListener}
+                            onMouseUp={maskEndClickListener}
+                            style={getPosForOverlayRect(
+                                ScreenCaptureOverlayTypes.MaskArea,
+                            )}
+                            className={`${styles.overlay_effect} ${styles.mask}`}
+                        ></div>
+                    </>
+                )}
 
-            {/* {
+                {/* {
                 previewActive && (
                     <>
                     <div
@@ -672,134 +677,138 @@ export default function ScreenCapture(props: propsIF) {
                 )
             } */}
 
-            <div
-                className={`${styles.preview_modal} ${previewActive ? styles.active : ''}`}
-                ref={previewModalRef}
-            >
-                <div className={styles.modal_title}>
-                    Share Image
-                    <div
-                        className={styles.close_btn}
-                        onClick={resetBtnListener}
-                    >
-                        X
+                <div
+                    className={`${styles.preview_modal} ${previewActive ? styles.active : ''}`}
+                    ref={previewModalRef}
+                >
+                    <div className={styles.modal_title}>
+                        Share Image
+                        <div
+                            className={styles.close_btn}
+                            onClick={resetBtnListener}
+                        >
+                            X
+                        </div>
                     </div>
-                </div>
-                {imageComp && (
-                    <span className={styles.image_preview_outer}>
+                    {imageComp && (
+                        <span className={styles.image_preview_outer}>
+                            <div
+                                ref={croppedImageRef}
+                                className={styles.image_preview_wrapper}
+                                style={getPreviewSize()}
+                            >
+                                <img
+                                    src={URL.createObjectURL(imageComp)}
+                                    alt='screenshot'
+                                    style={getImageOffset()}
+                                    className={styles.captured_raw_image}
+                                />
+                            </div>
+                        </span>
+                    )}
+                    {!imageComp && (
                         <div
-                            ref={croppedImageRef}
-                            className={styles.image_preview_wrapper}
-                            style={getPreviewSize()}
+                            className={styles.placeholder_wrapper}
+                            style={getPlaceholderSize()}
                         >
-                            <img
-                                src={URL.createObjectURL(imageComp)}
-                                alt='screenshot'
-                                style={getImageOffset()}
-                                className={styles.captured_raw_image}
-                            />
+                            <RiScreenshot2Line size={64} />
+                            <div className={styles.placeholder_text}>
+                                The screen is being captured...
+                            </div>
+                            <div
+                                className={
+                                    styles.placeholder_loader +
+                                    ' ' +
+                                    styles.placeholder_loader_horizontal
+                                }
+                            ></div>
+                            <div
+                                className={
+                                    styles.placeholder_loader +
+                                    ' ' +
+                                    styles.placeholder_loader_horizontal +
+                                    ' ' +
+                                    styles.reverse
+                                }
+                            ></div>
                         </div>
-                    </span>
-                )}
-                {!imageComp && (
-                    <div
-                        className={styles.placeholder_wrapper}
-                        style={getPlaceholderSize()}
-                    >
-                        <RiScreenshot2Line size={64} />
-                        <div className={styles.placeholder_text}>
-                            The screen is being captured...
-                        </div>
-                        <div
-                            className={
-                                styles.placeholder_loader +
-                                ' ' +
-                                styles.placeholder_loader_horizontal
-                            }
-                        ></div>
-                        <div
-                            className={
-                                styles.placeholder_loader +
-                                ' ' +
-                                styles.placeholder_loader_horizontal +
-                                ' ' +
-                                styles.reverse
-                            }
-                        ></div>
-                    </div>
-                )}
-                {/* {isUserConnected && imageComp && <ScreenCaptureMessageInput />} */}
-                <div className={styles.btn_section}>
-                    {isUserConnected ? (
-                        <div
-                            className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom && !isMobile ? styles.hidden : ''}`}
-                            onClick={chatBtnListener}
-                        >
-                            {' '}
-                            <div className={styles.icon_wrapper_inner}>
-                                <BiSend size={18} />
-                            </div>{' '}
-                            Send to Chat{' '}
-                        </div>
-                    ) : (
-                        <TextOnlyTooltip
-                            title={
-                                <div className={styles.tooltip_wrapper}>
-                                    Conect your wallet to send screenshot on
-                                    chat
-                                </div>
-                            }
-                            placement='top'
-                        >
+                    )}
+                    {/* {isUserConnected && imageComp && <ScreenCaptureMessageInput />} */}
+                    <div className={styles.btn_section}>
+                        {isUserConnected ? (
                             <div
                                 className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom && !isMobile ? styles.hidden : ''}`}
-                                onClick={connectBtnListener}
+                                onClick={chatBtnListener}
                             >
                                 {' '}
                                 <div className={styles.icon_wrapper_inner}>
                                     <BiSend size={18} />
                                 </div>{' '}
-                                Send to Chat
+                                Send to Chat{' '}
+                            </div>
+                        ) : (
+                            <TextOnlyTooltip
+                                title={
+                                    <div className={styles.tooltip_wrapper}>
+                                        Conect your wallet to send screenshot on
+                                        chat
+                                    </div>
+                                }
+                                placement='top'
+                            >
+                                <div
+                                    className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom && !isMobile ? styles.hidden : ''}`}
+                                    onClick={connectBtnListener}
+                                >
+                                    {' '}
+                                    <div className={styles.icon_wrapper_inner}>
+                                        <BiSend size={18} />
+                                    </div>{' '}
+                                    Send to Chat
+                                </div>
+                            </TextOnlyTooltip>
+                        )}
+
+                        <TextOnlyTooltip
+                            title={
+                                <div className={styles.tooltip_wrapper}>
+                                    Download Image
+                                </div>
+                            }
+                            placement='top'
+                        >
+                            <div
+                                className={styles.icon_btn_wrapper}
+                                onClick={downloadImage}
+                            >
+                                <RiDownload2Line
+                                    size={18}
+                                    color='var(--text3)'
+                                />
                             </div>
                         </TextOnlyTooltip>
-                    )}
 
-                    <TextOnlyTooltip
-                        title={
-                            <div className={styles.tooltip_wrapper}>
-                                Download Image
-                            </div>
-                        }
-                        placement='top'
-                    >
-                        <div
-                            className={styles.icon_btn_wrapper}
-                            onClick={downloadImage}
+                        <TextOnlyTooltip
+                            title={
+                                <div className={styles.tooltip_wrapper}>
+                                    Copy to Clipboard
+                                </div>
+                            }
+                            placement='top'
                         >
-                            <RiDownload2Line size={18} color='var(--text3)' />
-                        </div>
-                    </TextOnlyTooltip>
-
-                    <TextOnlyTooltip
-                        title={
-                            <div className={styles.tooltip_wrapper}>
-                                Copy to Clipboard
+                            <div
+                                className={styles.icon_btn_wrapper}
+                                onClick={copyCroppedImageToClipboard}
+                            >
+                                <BsCopy size={18} color='var(--text3)' />
                             </div>
-                        }
-                        placement='top'
-                    >
-                        <div
-                            className={styles.icon_btn_wrapper}
-                            onClick={copyCroppedImageToClipboard}
-                        >
-                            <BsCopy size={18} color='var(--text3)' />
-                        </div>
-                    </TextOnlyTooltip>
+                        </TextOnlyTooltip>
+                    </div>
                 </div>
-            </div>
-            <div
-                className={`${styles.preview_backdrop} ${previewActive ? styles.active : ''}`}
-            ></div>
+                <div
+                    className={`${styles.preview_backdrop} ${previewActive ? styles.active : ''}`}
+                ></div>
+            </span>
         </>
     );
 }
