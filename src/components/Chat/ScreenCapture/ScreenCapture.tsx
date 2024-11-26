@@ -34,11 +34,7 @@ export default function ScreenCapture(props: propsIF) {
 
     const navigate = useNavigate();
 
-    const blackListDomElements = [
-        'current_row_scroll',
-        'ambient-header-wallet-name',
-        'chat-wrapper',
-    ];
+    const blackListDomElements = ['current_row_scroll', 'chat-wrapper'];
 
     useEffect(() => {
         setPreviewActive(false);
@@ -197,16 +193,16 @@ export default function ScreenCapture(props: propsIF) {
     const captureDom = async () => {
         const ignoredElements = ignoredBlackListElements();
 
+        ignoredElements.add('screen-capture-component');
+        ignoredElements.add('ambient-header-wallet-name');
+
         const image = await printDomToImage(
             document.getElementById('root') as HTMLElement,
             undefined,
             undefined,
             undefined,
             (el: Node) => {
-                return (
-                    !ignoredElements.has((el as HTMLElement).id) &&
-                    (el as HTMLElement).id !== 'screen-capture-component'
-                );
+                return !ignoredElements.has((el as HTMLElement).id);
             },
             1,
         );
