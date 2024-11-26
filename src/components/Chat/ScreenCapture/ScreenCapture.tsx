@@ -163,6 +163,8 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const isCollidingWithBBox = (el: HTMLElement) => {
+        if (!el) return false;
+
         const elBBox = el.getBoundingClientRect();
         const maskBBox = overlayRectRef.current;
 
@@ -180,7 +182,9 @@ export default function ScreenCapture(props: propsIF) {
         blackListDomElements.forEach((e) => {
             const el = document.getElementById(e) as HTMLElement;
             if (!isCollidingWithBBox(el)) {
-                el.classList.add(styles.ignored_element);
+                if (el) {
+                    el.classList.add(styles.ignored_element);
+                }
                 ret.push(e);
             } else {
                 el.classList.remove(styles.ignored_element);

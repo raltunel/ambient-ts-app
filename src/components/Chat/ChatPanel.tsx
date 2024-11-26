@@ -966,7 +966,7 @@ function ChatPanel(props: propsIF) {
     );
 
     let mentionIxdexPointer = 0;
-    const messageList = (
+    const messageList = isChatOpen ? (
         <div
             ref={messageListWrapper}
             className={styles.scrollable_div}
@@ -1087,6 +1087,8 @@ function ChatPanel(props: propsIF) {
                 }
             />
         </div>
+    ) : (
+        <></>
     );
 
     const chatNotification = (
