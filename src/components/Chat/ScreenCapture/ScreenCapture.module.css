@@ -365,6 +365,20 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
 }
 
 
+
+@keyframes placeholderShadowAnim{
+    0%, 100%{
+        box-shadow: 0px 14px 10px -4.6px 
+color-mix(in srgb, black 50%, transparent), 0px 14px 100px -8.6px 
+color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(in srgb, var(--accent1) 30%, transparent);
+    }
+    50%{
+        box-shadow: 0px 14px 10px -4.6px 
+color-mix(in srgb, black 50%, transparent), 0px 14px 100px 8.6px 
+color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(in srgb, var(--accent1) 30%, transparent);
+    }
+}
+
 .placeholder_wrapper{
     display: flex;
     align-items: center;
@@ -379,6 +393,8 @@ color-mix(in srgb, var(--accent1) 30%, transparent);
     border: 1px solid color-mix(in srgb, var(--accent1) 30%, transparent);
     flex-direction: column;
     overflow: hidden;
+    margin-bottom: 2rem;
+    animation: placeholderShadowAnim 2s ease-in-out infinite;
 }
 
 .placeholder_wrapper svg{

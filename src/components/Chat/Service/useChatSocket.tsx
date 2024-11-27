@@ -56,7 +56,7 @@ const useChatSocket = (
     room: string,
     areSubscriptionsEnabled = true,
     isChatOpen = true,
-    activateToastr: (
+    activateToastr?: (
         message: string,
         type: 'success' | 'error' | 'warning' | 'info',
     ) => void,
@@ -433,7 +433,8 @@ const useChatSocket = (
         );
         const data = await response.json();
         if (data && data.status == 'OK') {
-            activateToastr('Message deleted successfully', 'success');
+            activateToastr &&
+                activateToastr('Message deleted successfully', 'success');
             data.message.deletedMessageText = 'This message has deleted';
             if (data) {
                 const msg = data.message;
@@ -449,22 +450,21 @@ const useChatSocket = (
                 assignMessages([...newMessageList]);
             }
         } else {
-            activateToastr(data.status, 'error');
+            activateToastr && activateToastr(data.status, 'error');
         }
 
         return data;
     }
 
-
     function blobToBase64(blob: Blob) {
         return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result?.toString().split(',')[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob); // read as Base64
+            const reader = new FileReader();
+            reader.onloadend = () =>
+                resolve(reader.result?.toString().split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob); // read as Base64
         });
-      }
-      
+    }
 
     async function sendMsg(
         currentUser: string,
@@ -479,7 +479,6 @@ const useChatSocket = (
         repliedMessageRoomInfo?: string | undefined,
         screenshot?: Blob | undefined,
     ) {
-
         let screenshotFile = undefined;
         if (screenshot !== undefined) {
             screenshotFile = await blobToBase64(screenshot);
