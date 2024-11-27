@@ -60,15 +60,25 @@ export default function ScreenCapture(props: propsIF) {
         }
     }, []);
 
-    const { isUserConnected, setLastCapturedScreenShot } =
-        useContext(UserDataContext);
+    const { isUserConnected } = useContext(UserDataContext);
     const editMasking = false;
 
     const {
         snackbar: { open: openSnackbar },
         walletModal: { open: openWalletModal },
         chat: { isOpen: isChatOpen, setIsOpen: setIsChatOpen },
+        setLastCapturedScreenShot,
+        screenCaptureActive,
+        setScreenCaptureActive,
     } = useContext(AppStateContext);
+
+    useEffect(() => {
+        if (screenCaptureActive) {
+            startCapture();
+        } else {
+            cancelCapture();
+        }
+    }, [screenCaptureActive]);
 
     const isMobile = useMediaQuery('(max-width: 768px)');
 
@@ -122,7 +132,7 @@ export default function ScreenCapture(props: propsIF) {
     const [debugMode, setDebugMode] = useState<boolean>(false);
     const [scaleFactor, setScaleFactor] = useState<number>(1);
 
-    const maskBtnListener = async () => {
+    const startCapture = async () => {
         setTimeout(() => {
             setCaptureState(ScreenCaptureStates.MaskReady);
         }, 200);
@@ -146,13 +156,24 @@ export default function ScreenCapture(props: propsIF) {
         }
     }, [previewActive]);
 
-    const closePreviewModal = () => {
+    const cancelCapture = () => {
+        setImageComp(undefined);
+        setCaptureState(ScreenCaptureStates.Idle);
+        setPreviewActive(false);
+        setOverlayRect(DomRectDefault);
         if (!isMobile) {
             setPreviewActive(false);
         }
     };
 
-    useOnClickOutside(previewModalRef, closePreviewModal);
+    const previewModalOnClickOutside = () => {
+        if (captureStateRef.current === ScreenCaptureStates.PreviewReady) {
+            setScreenCaptureActive(false);
+            setLastCapturedScreenShot(undefined);
+        }
+    };
+
+    useOnClickOutside(previewModalRef, previewModalOnClickOutside);
 
     const debugBtnListener = async () => {
         setDebugMode(!debugMode);
@@ -221,7 +242,6 @@ export default function ScreenCapture(props: propsIF) {
 
     const maskStarter = (x: number, y: number) => {
         setMaskLT({ x: x, y: y });
-        // captureDom();
         setTimeout(() => {
             setCaptureState(ScreenCaptureStates.Masking);
         }, 300);
@@ -444,6 +464,7 @@ export default function ScreenCapture(props: propsIF) {
         if (croppedImageRef.current) {
             const image = await printDomToImage(croppedImageRef.current);
             setLastCapturedScreenShot(image);
+            setScreenCaptureActive(false);
             if (!isMobile) {
                 setCaptureState(ScreenCaptureStates.Idle);
                 setPreviewActive(false);
@@ -560,7 +581,7 @@ export default function ScreenCapture(props: propsIF) {
                     {getDebugger2Content()}
                 </div>
 
-                {/* <div className={styles.mask_btn} onClick={maskBtnListener}>
+                {/* <div className={styles.mask_btn} onClick={startCapture}>
                 {' '}
                 Mask
             </div> */}
@@ -574,7 +595,7 @@ export default function ScreenCapture(props: propsIF) {
                     Debug Overlays
                 </div>
 
-                {captureState === ScreenCaptureStates.Idle && (
+                {/* {captureState === ScreenCaptureStates.Idle && (
                     <TextOnlyTooltip
                         title={
                             <div className={styles.tooltip_wrapper}>
@@ -586,12 +607,12 @@ export default function ScreenCapture(props: propsIF) {
                         <div
                             className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} 
                 ${captureState != ScreenCaptureStates.Idle ? styles.active : ''} ${isChatPage ? styles.chat_page : ''}`}
-                            onClick={maskBtnListener}
+                            onClick={() => {setScreenCaptureActive(true)}}
                         >
                             <BiScreenshot size={18} />
                         </div>
                     </TextOnlyTooltip>
-                )}
+                )} */}
 
                 {/* <div className={`${styles.start_capture_btn} ${!isUserConnected ? styles.not_connected : ''} ${captureState != ScreenCaptureStates.Idle ? styles.active : ''}` } onClick={maskBtnListener}>  
                 <BiScreenshot size={18} />
@@ -681,7 +702,7 @@ export default function ScreenCapture(props: propsIF) {
                         Share Image
                         <div
                             className={styles.close_btn}
-                            onClick={resetBtnListener}
+                            onClick={() => setScreenCaptureActive(false)}
                         >
                             X
                         </div>

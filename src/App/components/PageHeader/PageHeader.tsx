@@ -33,12 +33,16 @@ import { ReceiptContext } from '../../../contexts/ReceiptContext';
 import styles from './PageHeader.module.css';
 import { useBottomSheet } from '../../../contexts/BottomSheetContext';
 import { BrandContext, ChainDataContext } from '../../../contexts';
+import { BiScreenshot } from 'react-icons/bi';
+import { TextOnlyTooltip } from '../../../components/Global/StyledTooltip/StyledTooltip';
 
 const PageHeader = function () {
     const {
         activeNetwork: { chainId, poolIndex: poolId },
         walletModal: { open: openWalletModal },
         appHeaderDropdown,
+        screenCaptureActive,
+        setScreenCaptureActive,
     } = useContext(AppStateContext);
     const { headerImage } = useContext(BrandContext);
     const { crocEnv, setCrocEnv } = useContext(CrocEnvContext);
@@ -461,6 +465,26 @@ const PageHeader = function () {
                                 gap={8}
                                 overflow='visible'
                             >
+                                <TextOnlyTooltip
+                                    title={
+                                        <div className={styles.tooltip_wrapper}>
+                                            Take Screenshot
+                                        </div>
+                                    }
+                                    placement='bottom'
+                                >
+                                    <div
+                                        className={`${styles.screenshotBtn} 
+                                ${screenCaptureActive ? styles.active : ''}`}
+                                        onClick={() =>
+                                            setScreenCaptureActive(
+                                                !screenCaptureActive,
+                                            )
+                                        }
+                                    >
+                                        <BiScreenshot size={20} />
+                                    </div>
+                                </TextOnlyTooltip>
                                 <NetworkSelector />
                                 {!isUserConnected && connectWalletButton}
                                 <UserMenu {...userMenuProps} />

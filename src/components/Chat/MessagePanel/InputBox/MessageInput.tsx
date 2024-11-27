@@ -14,7 +14,7 @@ import PositionBox from '../PositionBox/PositionBox';
 import styles from './MessageInput.module.css';
 
 import { RiCloseFill, RiInformationLine } from 'react-icons/ri';
-// import { AppStateContext } from '../../../../contexts/AppStateContext';
+import { AppStateContext } from '../../../../contexts/AppStateContext';
 import { UserDataContext } from '../../../../contexts/UserDataContext';
 import CircularProgressBarForChat from '../../../Global/OpenOrderStatus/CircularProgressBarForChat';
 import {
@@ -82,20 +82,12 @@ export default function MessageInput(props: MessageInputProps) {
     const [message, setMessage] = useState('');
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [isInfoPressed, setIsInfoPressed] = useState(false);
-    const {
-        userAddress,
-        isUserConnected,
-        lastCapturedScreenShot,
-        setLastCapturedScreenShot,
-    } = useContext(UserDataContext);
+    const { userAddress, isUserConnected } = useContext(UserDataContext);
     const [isPosition, setIsPosition] = useState(false);
     const [tokenForEmojiSearch, setTokenForEmojiSearch] = useState('');
 
-    // disabled for now due to es-lint warnings
-    // const {
-    //     chat: { isOpen: isChatOpen },
-    //     subscriptions: { isEnabled: isSubscriptionsEnabled },
-    // } = useContext(AppStateContext);
+    const { lastCapturedScreenShot, setLastCapturedScreenShot } =
+        useContext(AppStateContext);
 
     const [mentPanelActive, setMentPanelActive] = useState(false);
     const [possibleMentUser, setPossibleMentUser] = useState<User | null>(null);

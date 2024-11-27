@@ -1,4 +1,11 @@
-import React, { createContext, useEffect, useMemo, useState } from 'react';
+import React, {
+    createContext,
+    Dispatch,
+    SetStateAction,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 import { useIdleTimer } from 'react-idle-timer';
 import {
     globalPopupMethodsIF,
@@ -60,6 +67,10 @@ export interface AppStateContextIF {
         contentHeight: number;
         viewportHeight: number;
     };
+    lastCapturedScreenShot: Blob | undefined;
+    setLastCapturedScreenShot: Dispatch<SetStateAction<Blob | undefined>>;
+    screenCaptureActive: boolean;
+    setScreenCaptureActive: Dispatch<SetStateAction<boolean>>;
 }
 
 export const AppStateContext = createContext<AppStateContextIF>(
@@ -77,6 +88,10 @@ export const AppStateContextProvider = (props: {
     const [isUserOnline, setIsUserOnline] = useState(navigator.onLine);
     const [isUserIdle, setIsUserIdle] = useState(false);
     const [isUserIdle20min, setIsUserIdle20min] = useState(false);
+    const [lastCapturedScreenShot, setLastCapturedScreenShot] = useState<
+        Blob | undefined
+    >(undefined);
+    const [screenCaptureActive, setScreenCaptureActive] = useState(false);
 
     // layout---------------
 
@@ -340,6 +355,10 @@ export const AppStateContextProvider = (props: {
             dismissTopBannerPopup,
             activeNetwork,
             chooseNetwork,
+            lastCapturedScreenShot,
+            setLastCapturedScreenShot,
+            screenCaptureActive,
+            setScreenCaptureActive,
         }),
         [
             // Dependency list includes the memoized use*() values from above and any primitives
@@ -367,6 +386,10 @@ export const AppStateContextProvider = (props: {
             dimensions.viewportHeight,
             activeNetwork,
             chooseNetwork,
+            lastCapturedScreenShot,
+            setLastCapturedScreenShot,
+            screenCaptureActive,
+            setScreenCaptureActive,
         ],
     );
 
