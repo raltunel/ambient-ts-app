@@ -6,7 +6,11 @@ import styles from './ScreenCapture.module.css';
 // import { domToImage } from 'modern-screenshot';
 import { BiScreenshot, BiSend } from 'react-icons/bi';
 import { BsCopy } from 'react-icons/bs';
-import { RiDownload2Line, RiScreenshot2Line } from 'react-icons/ri';
+import {
+    RiCloseCircleLine,
+    RiDownload2Line,
+    RiScreenshot2Line,
+} from 'react-icons/ri';
 import { printDomToImage } from '../../../ambient-utils/dataLayer';
 import { AppStateContext, UserDataContext } from '../../../contexts';
 import useCopyToClipboard from '../../../utils/hooks/useCopyToClipboard';
@@ -23,6 +27,9 @@ import ScreenCaptureMessageInput from './ScreenCaptureMessageInput';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import { useNavigate } from 'react-router-dom';
 import useChatSocket from '../Service/useChatSocket';
+import { FaArrowLeft } from 'react-icons/fa';
+import DraggableItem from '../DraggableItem/DraggableItem';
+import { RxReset } from 'react-icons/rx';
 
 interface propsIF {
     name?: string;
@@ -37,6 +44,8 @@ export default function ScreenCapture(props: propsIF) {
 
     const blackListDomElements = ['current_row_scroll', 'chat-wrapper'];
     const [sendToChatActive, setSendToChatActive] = useState(false);
+
+    const [markers, setMarkers] = useState<JSX.Element[]>([]);
 
     const { sendMsg } = useChatSocket('Global', true, sendToChatActive);
 
@@ -78,6 +87,12 @@ export default function ScreenCapture(props: propsIF) {
 
     useEffect(() => {
         if (screenCaptureActive) {
+            console.log('>>> screen capture active', imageComp);
+            if (imageComp) {
+                setCaptureState(ScreenCaptureStates.PreviewReady);
+                setPreviewActive(true);
+                return;
+            }
             startCapture();
         } else {
             cancelCapture();
@@ -90,9 +105,10 @@ export default function ScreenCapture(props: propsIF) {
 
     const [, copy] = useCopyToClipboard();
 
-    const [imageComp, setImageComp] = useState<any>(null);
+    const [imageComp, setImageComp] = useState<any>();
     const [captureState, setCaptureState] = useState<ScreenCaptureStates>(
-        ScreenCaptureStates.Idle,
+        // ScreenCaptureStates.Idle,
+        ScreenCaptureStates.PreviewReady,
     );
 
     const [captureEditState, setCaptureEditState] =
@@ -143,6 +159,7 @@ export default function ScreenCapture(props: propsIF) {
     };
     const resetBtnListener = async () => {
         setCaptureState(ScreenCaptureStates.Idle);
+        console.log('>>> reset btn', captureState);
         setImageComp(undefined);
         setPreviewActive(false);
         setMaskLT({ x: 0, y: 0 });
@@ -150,11 +167,11 @@ export default function ScreenCapture(props: propsIF) {
         setMaskMoveGap(undefined);
         setOverlayRect(DomRectDefault);
         setLastCapturedScreenShot(undefined);
-        setImageComp(null);
         setSendToChatActive(false);
     };
 
     useEffect(() => {
+        console.log('>>>', previewActive);
         if (!previewActive) {
             setImageComp(null);
             setCaptureState(ScreenCaptureStates.Idle);
@@ -163,6 +180,7 @@ export default function ScreenCapture(props: propsIF) {
 
     const cancelCapture = () => {
         setImageComp(undefined);
+        console.log('>>> cancel capture', captureState);
         setCaptureState(ScreenCaptureStates.Idle);
         setPreviewActive(false);
         setOverlayRect(DomRectDefault);
@@ -170,6 +188,7 @@ export default function ScreenCapture(props: propsIF) {
         if (!isMobile) {
             setPreviewActive(false);
         }
+        setMarkers([]);
     };
 
     const previewModalOnClickOutside = () => {
@@ -323,6 +342,7 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     useEffect(() => {
+        console.log('>>> capture state', getCaptureStateDebugger());
         if (isMobile) {
             if (captureState === ScreenCaptureStates.Idle) {
                 setDocumentMode(false);
@@ -579,6 +599,37 @@ export default function ScreenCapture(props: propsIF) {
         );
     };
 
+    const createMarker = (left: number, top: number) => {
+        return (
+            <DraggableItem
+                key={Math.random() * 1000}
+                initialLeft={left}
+                initialTop={top}
+            >
+                <FaArrowLeft
+                    size={20}
+                    className={`${styles.marker_base} ${styles.marker_arrow}`}
+                />
+            </DraggableItem>
+        );
+    };
+
+    const dblClickListener = (e: React.MouseEvent) => {
+        if (croppedImageRef.current) {
+            const wrapperRect = croppedImageRef.current.getBoundingClientRect();
+
+            const left = (e.clientX -= wrapperRect.left);
+            const top = (e.clientY -= wrapperRect.top);
+            console.log('>>> dbl click marker', left, top);
+            setMarkers((prev) => [...prev, createMarker(left, top)]);
+        }
+        console.log('>>> dbl click marker', e);
+    };
+
+    const markerMoveListener = (e: React.MouseEvent) => {
+        console.log('>>> marker move', e);
+    };
+
     return (
         <>
             <span id='screen-capture-component'>
@@ -721,13 +772,30 @@ export default function ScreenCapture(props: propsIF) {
                                 ref={croppedImageRef}
                                 className={styles.image_preview_wrapper}
                                 style={getPreviewSize()}
+                                onDoubleClick={dblClickListener}
                             >
+                                {markers}
                                 <img
                                     src={URL.createObjectURL(imageComp)}
                                     alt='screenshot'
                                     style={getImageOffset()}
                                     className={styles.captured_raw_image}
                                 />
+                            </div>
+
+                            <span className={styles.image_preview_helper_text}>
+                                {' '}
+                                Double click/tap to add marker
+                            </span>
+                            <div
+                                className={
+                                    styles.icon_btn_wrapper +
+                                    ' ' +
+                                    styles.marker_reset_btn
+                                }
+                                onClick={() => setMarkers([])}
+                            >
+                                <RxReset size={18} />
                             </div>
                         </span>
                     )}
@@ -758,86 +826,79 @@ export default function ScreenCapture(props: propsIF) {
                             ></div>
                         </div>
                     )}
-                    {isUserConnected &&
-                        imageComp &&
-                        isMobile &&
-                        sendToChatActive && <ScreenCaptureMessageInput />}
-                    {imageComp && (
-                        <div className={styles.btn_section}>
-                            {isUserConnected ? (
+                    {isUserConnected && isMobile && sendToChatActive && (
+                        <ScreenCaptureMessageInput />
+                    )}
+                    <div className={styles.btn_section}>
+                        {isUserConnected ? (
+                            <div
+                                className={`${styles.btn_wrapper} ${styles.primary_btn} ${imageComp ? '' : styles.disabled} ${!chatOnDom && !isMobile ? styles.hidden : ''}`}
+                                onClick={chatBtnListener}
+                            >
+                                {' '}
+                                <div className={styles.icon_wrapper_inner}>
+                                    <BiSend size={18} />
+                                </div>{' '}
+                                Send to Chat{' '}
+                            </div>
+                        ) : (
+                            <TextOnlyTooltip
+                                title={
+                                    <div className={styles.tooltip_wrapper}>
+                                        Conect your wallet to send screenshot on
+                                        chat
+                                    </div>
+                                }
+                                placement='top'
+                            >
                                 <div
-                                    className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom && !isMobile ? styles.hidden : ''}`}
-                                    onClick={chatBtnListener}
+                                    className={`${styles.btn_wrapper} ${styles.primary_btn} ${imageComp ? '' : styles.disabled} ${!chatOnDom && !isMobile ? styles.hidden : ''}`}
+                                    onClick={connectBtnListener}
                                 >
                                     {' '}
                                     <div className={styles.icon_wrapper_inner}>
                                         <BiSend size={18} />
                                     </div>{' '}
-                                    Send to Chat{' '}
-                                </div>
-                            ) : (
-                                <TextOnlyTooltip
-                                    title={
-                                        <div className={styles.tooltip_wrapper}>
-                                            Conect your wallet to send
-                                            screenshot on chat
-                                        </div>
-                                    }
-                                    placement='top'
-                                >
-                                    <div
-                                        className={`${styles.btn_wrapper} ${styles.primary_btn} ${!chatOnDom && !isMobile ? styles.hidden : ''}`}
-                                        onClick={connectBtnListener}
-                                    >
-                                        {' '}
-                                        <div
-                                            className={
-                                                styles.icon_wrapper_inner
-                                            }
-                                        >
-                                            <BiSend size={18} />
-                                        </div>{' '}
-                                        Send to Chat
-                                    </div>
-                                </TextOnlyTooltip>
-                            )}
-
-                            <TextOnlyTooltip
-                                title={
-                                    <div className={styles.tooltip_wrapper}>
-                                        Download Image
-                                    </div>
-                                }
-                                placement='top'
-                            >
-                                <div
-                                    className={styles.icon_btn_wrapper}
-                                    onClick={downloadImage}
-                                >
-                                    <RiDownload2Line
-                                        size={18}
-                                        color='var(--text3)'
-                                    />
+                                    Send to Chat
                                 </div>
                             </TextOnlyTooltip>
+                        )}
 
-                            <TextOnlyTooltip
-                                title={
-                                    <div className={styles.tooltip_wrapper}>
-                                        Copy to Clipboard
-                                    </div>
-                                }
-                                placement='top'
-                            >
-                                <div
-                                    className={styles.icon_btn_wrapper}
-                                    onClick={copyCroppedImageToClipboard}
-                                >
-                                    <BsCopy size={18} color='var(--text3)' />
+                        <TextOnlyTooltip
+                            title={
+                                <div className={styles.tooltip_wrapper}>
+                                    Download Image
                                 </div>
-                            </TextOnlyTooltip>
-                        </div>
-                    )}
+                            }
+                            placement='top'
+                        >
+                            <div
+                                className={`${styles.icon_btn_wrapper} ${imageComp ? '' : styles.disabled}`}
+                                onClick={downloadImage}
+                            >
+                                <RiDownload2Line
+                                    size={18}
+                                    color='var(--text3)'
+                                />
+                            </div>
+                        </TextOnlyTooltip>
+
+                        <TextOnlyTooltip
+                            title={
+                                <div className={styles.tooltip_wrapper}>
+                                    Copy to Clipboard
+                                </div>
+                            }
+                            placement='top'
+                        >
+                            <div
+                                className={`${styles.icon_btn_wrapper} ${imageComp ? '' : styles.disabled}`}
+                                onClick={copyCroppedImageToClipboard}
+                            >
+                                <BsCopy size={18} color='var(--text3)' />
+                            </div>
+                        </TextOnlyTooltip>
+                    </div>
                 </div>
                 <div
                     className={`${styles.preview_backdrop} ${previewActive ? styles.active : ''}`}

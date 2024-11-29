@@ -91,6 +91,16 @@ export interface DomPositionInterface {
     y: number;
 }
 
+export interface PageCoordsIF {
+    x: number;
+    y: number;
+}
+
+export const PageCoordsDefault: PageCoordsIF = {
+    x: 0,
+    y: 0,
+};
+
 export interface DomRectIF {
     lt: DomPositionInterface;
     rt: DomPositionInterface;

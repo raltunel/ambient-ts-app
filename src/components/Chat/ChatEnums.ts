@@ -22,3 +22,10 @@ export enum ScreenCaptureEditStates {
     Idle,
     MaskMoving,
 }
+
+export enum DraggableItemControlStates {
+    Idle,
+    Rotating,
+    Moving,
+    Scaling,
+}

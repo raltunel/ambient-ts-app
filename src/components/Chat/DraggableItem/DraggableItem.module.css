@@ -1,0 +1,106 @@
+.draggable_wrapper{
+    position: absolute;
+    z-index: 10;
+    left: 1rem;
+    top: 1rem;
+}
+
+
+.draggable_wrapper_content{
+    transition: transform .2s ease-in-out;
+    padding: 1rem;
+    position: relative;
+    border: 2px solid color-mix(in srgb, var(--accent1) 0%, transparent);
+    z-index: 11;
+}
+
+.draggable_wrapper_content:hover{
+    border: 2px solid color-mix(in srgb, var(--accent1) 50%, transparent);
+}
+
+.draggable_wrapper_content:hover .scale_node{
+    display: block;
+}
+
+.draggable_rotate_icon{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translate(50%, 50%);
+
+
+}
+
+.scale_node{
+    transition: all .2s ease-in-out;
+    display: none;
+    cursor: se-resize;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -50%);
+    width: .4rem;
+    height: .4rem;
+    background-color: color-mix(in srgb, var(--accent1) 40%, transparent);
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    z-index: 11;
+}
+
+.scale_node.t{
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: n-resize;
+}
+
+.scale_node.rt{
+    top: 0;
+    right: 0;
+    left: auto;
+    transform: translate(50%, -50%);
+    cursor: ne-resize;
+}
+
+.scale_node.r{
+    top: 50%;
+    right: 0;
+    left: auto;
+    transform: translate(50%, -50%);
+    cursor: e-resize;
+}
+
+.scale_node.rb{
+    top: auto;
+    left: auto;
+    bottom: 0;
+    right: 0;
+    left: auto;
+    transform: translate(50%, 50%);
+    cursor: se-resize;
+}
+
+
+.scale_node.b{
+    top: auto;
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, 50%);
+    cursor: s-resize;
+}
+
+.scale_node.lb{
+    top: auto;
+    bottom: 0;
+    left: 0;
+    transform: translate(-50%, 50%);
+    cursor: sw-resize;
+}
+
+.scale_node.l{
+    left: auto;
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+    cursor: w-resize;
+}

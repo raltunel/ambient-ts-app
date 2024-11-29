@@ -115,7 +115,8 @@ color-mix(in srgb, var(--dark2) 60%, transparent);
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    margin: 0 auto;
+    margin: 2rem auto;
+    user-select: none !important;
     /* box-shadow:  0px 4px 135px 47.4px color-mix(in srgb, var(--accent1) 30%, transparent); */
 
     box-shadow: 0px 14px 10px -4.6px 
@@ -124,7 +125,20 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
 }
 
 .image_preview_outer{
-    /* border: 1px solid rgba(255,255,255, .2); */
+    border: 1px solid transparent;
+    position: relative;
+    display: block;
+}
+
+.image_preview_helper_text{
+    display: block;
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    text-align: center;
+    font-size: .8rem;
+    color: rgba(255,255,255, .5);
+    position: absolute;
 }
 
 .rect1{
@@ -225,6 +239,7 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
 .captured_raw_image{
     width: 100vw;
     position: absolute;
+    user-select: none !important;
 }
 
 .dbg1{
@@ -247,7 +262,7 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
     justify-content: center;
     gap: .4rem;
     margin: 0 auto;
-    margin-top: 2rem;
+    /* margin-top: 2rem; */
     align-items: center;
     
     /* max-width: 30vw; */
@@ -280,6 +295,13 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
     white-space: nowrap;
 }
 
+.btn_wrapper.disabled, .icon_btn_wrapper.disabled {
+    cursor: default;
+    pointer-events: none;
+    background-color: color-mix(in srgb, var(--dark1) 40%, transparent) !important;
+    border: 2px solid rgba(255,255,255, .1) !important;
+}
+
 .btn_wrapper:hover{
     border-color: rgba(255,255,255, .5);
     color: white;
@@ -306,7 +328,7 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
     position: relative;
     border-bottom: 1px solid 
 color-mix(in srgb, var(--accent1) 30%, transparent);
-    margin-bottom: 2rem;
+    /* margin-bottom: 2rem; */
     width: 120%;
     margin-left: -10%;
     padding: 1rem;
@@ -384,7 +406,7 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
     align-items: center;
     justify-content: center;
     margin: 0 auto;
-    margin-top: 1rem;
+    /* margin-top: 1rem; */
     width: 30vw;
     height: 20vw;
     background-color: var(--dark1);
@@ -393,8 +415,8 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
     border: 1px solid color-mix(in srgb, var(--accent1) 30%, transparent);
     flex-direction: column;
     overflow: hidden;
-    margin-bottom: 2rem;
     animation: placeholderShadowAnim 2s ease-in-out infinite;
+    margin: 2rem auto;
 }
 
 .placeholder_wrapper svg{
@@ -578,7 +600,7 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
     height: 100vh;
     top: 0;
     left: 0;
-    backdrop-filter: blur(10px);
+    /* backdrop-filter: blur(10px); */
 }
 
 .preview_backdrop.active{
@@ -589,4 +611,50 @@ color-mix(in srgb, var(--accent1) 50%, transparent), 0px 0px 0px 1px color-mix(i
 
 .ignored_element{
     border: 1px solid red;
+}
+
+
+.marker_wrapper{
+    position: absolute;
+    z-index: 10;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.marker_wrapper::after{
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: red;
+}
+
+svg.marker_base{
+    cursor: grab;
+    fill: var(--accent1);
+    filter: drop-shadow(4px 0px 1px rgba(0,0,0, .5));
+    stroke: #00000077;
+    stroke-width: 104px;
+    stroke-linejoin: round;
+    paint-order: stroke;
+}
+
+.marker_arrow{
+    transform: rotate(45deg);
+}
+
+
+.marker_reset_btn{
+    position: absolute;
+    right: 1rem;
+    bottom: 3rem;
+    display: inline-block;
+    z-index: 99;
+    background-color: var(--accent1);
+}
+
+.marker_reset_btn svg{
+    fill: white !important;
+    color: white !important;
 }
