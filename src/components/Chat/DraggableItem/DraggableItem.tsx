@@ -14,10 +14,33 @@ interface propsIF {
 }
 
 export default function DraggableItem(props: propsIF) {
+    const scaleNodes = ['t', 'rt', 'r', 'rb', 'b', 'lb', 'l', 'lt'];
+    const colorSwatches = [
+        'var(--accent1)',
+        'var(--accent2)',
+        'var(--accent3)',
+        '#f0fc03',
+        '#fc034a',
+    ];
+
     const itemRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
+    const scalePivotRef = useRef<HTMLDivElement>(null);
+    const [scaleTriggerNode, setScaleTriggerNode] =
+        useState<HTMLDivElement | null>(null);
+    const scaleTriggerNodeRef = useRef<HTMLDivElement | null>(null);
+    scaleTriggerNodeRef.current = scaleTriggerNode;
+    const minScale = 0.5;
+    const maxScale = 5;
+
+    const [selectedColor, setSelectedColor] = useState<string>(
+        colorSwatches[0],
+    );
+
     const [parentBounds, setParentBounds] = useState<DomRectIF>();
     const parentBoundsRef = useRef<DomRectIF>();
     parentBoundsRef.current = parentBounds;
+
     const bindParentBounds = () => {
         if (itemRef.current) {
             const parentBounds =
@@ -35,11 +58,15 @@ export default function DraggableItem(props: propsIF) {
 
     useEffect(() => {
         document.addEventListener('mousemove', mouseMoveListener);
+        document.addEventListener('mouseup', mouseUpListener);
         bindParentBounds();
     }, []);
 
     const [rotate, setRotate] = useState(0);
     const [scale, setScale] = useState(1);
+    const [prevScale, setPrevScale] = useState(1);
+    const prevScaleRef = useRef(prevScale);
+    prevScaleRef.current = prevScale;
 
     const [controlState, setControlState] = useState(
         DraggableItemControlStates.Idle,
@@ -78,7 +105,14 @@ export default function DraggableItem(props: propsIF) {
 
     useEffect(() => {
         console.log('>>>>', getControlStateString());
+        if (controlStateRef.current === DraggableItemControlStates.Idle) {
+            setPrevScale(scale);
+        }
     }, [controlState]);
+
+    const mouseUpListener = () => {
+        setControlState(DraggableItemControlStates.Idle);
+    };
 
     const mouseMoveListener = (e: MouseEvent) => {
         const currentPoint = { x: e.clientX, y: e.clientY };
@@ -96,18 +130,11 @@ export default function DraggableItem(props: propsIF) {
                 break;
             case DraggableItemControlStates.Moving:
                 if (!isMouseInParent(currentPoint)) return;
-
-                console.log(
-                    '>>>moving',
-                    controlStartRef.current,
-                    itemMoveRef.current,
-                );
                 if (controlStartRef.current && itemMoveRef.current) {
                     const gap = {
                         x: currentPoint.x - controlStartRef.current.x,
                         y: currentPoint.y - controlStartRef.current.y,
                     };
-                    console.log('>>>gap', gap);
                     setItemMoveDelta({
                         x: gap.x + itemMoveRef.current.x,
                         y: gap.y + itemMoveRef.current.y,
@@ -115,6 +142,38 @@ export default function DraggableItem(props: propsIF) {
                 }
                 break;
             case DraggableItemControlStates.Scaling:
+                console.log('>>>scaling');
+                if (scalePivotRef.current && controlStartRef.current) {
+                    const pivot = scalePivotRef.current.getBoundingClientRect();
+                    const pivotX = pivot.x + pivot.width / 2;
+                    const pivotY = pivot.y + pivot.height / 2;
+
+                    console.log(
+                        '>>>pivot',
+                        pivotX.toFixed(2),
+                        pivotY.toFixed(2),
+                    );
+
+                    const startPoint = controlStartRef.current;
+                    const startPointX = startPoint.x - pivotX;
+                    const startPointY = startPoint.y - pivotY;
+
+                    const currentPointX = currentPoint.x - pivotX;
+                    const currentPointY = currentPoint.y - pivotY;
+
+                    const pivotToStartPointLength = Math.sqrt(
+                        startPointX ** 2 + startPointY ** 2,
+                    );
+                    const pivotToCurrentPointLength = Math.sqrt(
+                        currentPointX ** 2 + currentPointY ** 2,
+                    );
+
+                    let newScale =
+                        pivotToCurrentPointLength / pivotToStartPointLength;
+                    if (newScale < minScale) newScale = minScale;
+                    if (newScale > maxScale) newScale = maxScale;
+                    setScale(newScale * prevScaleRef.current || 1);
+                }
                 break;
         }
 
@@ -127,6 +186,8 @@ export default function DraggableItem(props: propsIF) {
     };
 
     const startMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (controlStateRef.current !== DraggableItemControlStates.Idle) return;
+
         setControlStart({ x: e.clientX, y: e.clientY });
         setControlState(DraggableItemControlStates.Moving);
     };
@@ -134,6 +195,21 @@ export default function DraggableItem(props: propsIF) {
     const itemMouseDownListener = (e: React.MouseEvent<HTMLDivElement>) => {
         console.log('>>>itemMouseDownListener');
         startMove(e);
+    };
+
+    const startScale = (e: React.MouseEvent<HTMLDivElement>) => {
+        setControlStart({ x: e.clientX, y: e.clientY });
+        setControlState(DraggableItemControlStates.Scaling);
+        setScaleTriggerNode(e.target as HTMLDivElement);
+    };
+
+    const controlNodeMouseDownListener = (
+        e: React.MouseEvent<HTMLDivElement>,
+    ) => {
+        console.log('>>>controlNodeMouseDownListener');
+        console.log(e.target);
+        startScale(e);
+        e.stopPropagation();
     };
 
     const itemMouseUpListener = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -146,10 +222,51 @@ export default function DraggableItem(props: propsIF) {
         }
     };
 
-    const startScale = (e: React.MouseEvent<HTMLDivElement>) => {
-        setControlStart({ x: e.clientX, y: e.clientY });
-        setControlState(DraggableItemControlStates.Scaling);
+    const calculateControlNodeStyle = () => {
+        return {
+            width: 0.5 / scale + 'rem',
+            height: 0.5 / scale + 'rem',
+        };
     };
+
+    const getScaleNodeElement = (node: string) => {
+        return (
+            <div
+                onMouseDown={controlNodeMouseDownListener}
+                className={styles.scale_node + ' ' + styles[node]}
+            >
+                <div className={styles.scale_node_inner}>
+                    <div
+                        className={styles.scale_node_indicator}
+                        style={calculateControlNodeStyle()}
+                    ></div>
+                </div>
+            </div>
+        );
+    };
+
+    const getColorSwatchElement = (color: string) => {
+        return (
+            <div
+                className={
+                    styles.color_swatch +
+                    ' ' +
+                    (selectedColor === color ? styles.selected : '')
+                }
+                style={{ backgroundColor: color }}
+                onClick={() => setSelectedColor(color)}
+            ></div>
+        );
+    };
+
+    useEffect(() => {
+        if (contentRef.current) {
+            const svgs = contentRef.current.querySelectorAll('svg');
+            svgs.forEach((svg) => {
+                svg.style.fill = selectedColor;
+            });
+        }
+    }, [selectedColor]);
 
     return (
         <>
@@ -157,26 +274,42 @@ export default function DraggableItem(props: propsIF) {
                 ref={itemRef}
                 className={styles.draggable_wrapper}
                 style={{
-                    transform: `translate(${itemMoveDelta?.x}px, ${itemMoveDelta?.y}px)`,
+                    transform: `translate(${itemMoveDelta?.x}px, ${itemMoveDelta?.y}px) scale(${scale})`,
                     top: props.initialTop || 0,
                     left: props.initialLeft || 0,
                 }}
             >
-                <div
-                    className={styles.draggable_wrapper_content}
-                    style={{ transform: `rotate(${rotate}deg)` }}
-                    onMouseDown={itemMouseDownListener}
-                    onMouseUp={itemMouseUpListener}
-                >
-                    <div className={styles.scale_node + ' ' + styles.t}></div>
-                    <div className={styles.scale_node + ' ' + styles.rt}></div>
-                    <div className={styles.scale_node + ' ' + styles.r}></div>
-                    <div className={styles.scale_node + ' ' + styles.rb}></div>
-                    <div className={styles.scale_node + ' ' + styles.b}></div>
-                    <div className={styles.scale_node + ' ' + styles.lb}></div>
-                    <div className={styles.scale_node + ' ' + styles.l}></div>
-                    <div className={styles.scale_node + ' ' + styles.lt}></div>
-                    {props.children}
+                <div className={styles.draggable_wrapper_control}>
+                    <div
+                        className={styles.color_swatches}
+                        style={{
+                            transform: `translate(-50%, -100%) scale(${1 / scale})`,
+                        }}
+                    >
+                        {colorSwatches.map((color) =>
+                            getColorSwatchElement(color),
+                        )}
+                    </div>
+                    {scaleNodes.map((node) => getScaleNodeElement(node))}
+
+                    <div
+                        ref={scalePivotRef}
+                        className={styles.scale_pivot}
+                        style={calculateControlNodeStyle()}
+                    ></div>
+
+                    <div
+                        ref={contentRef}
+                        className={styles.draggable_wrapper_content}
+                        style={{
+                            transform: `rotate(${rotate}deg)`,
+                            borderWidth: `${2 / scale}px`,
+                        }}
+                        onMouseDown={itemMouseDownListener}
+                        onMouseUp={itemMouseUpListener}
+                    >
+                        {props.children}
+                    </div>
                 </div>
             </div>
         </>
