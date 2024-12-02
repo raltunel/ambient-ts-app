@@ -15,7 +15,6 @@ import {
 } from './ChatIFs';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { domDebug } from './DomDebugger/DomDebuggerUtils';
 
 import { Message } from './Model/MessageModel';
 
@@ -423,8 +422,6 @@ export async function generateObjectHash(jsonObject: any) {
     return hashHex;
 }
 
-
 export function getScreenshotURL(messageId: string) {
     return CHAT_BACKEND_URL + getScreenshotEndpoint + '/' + messageId;
 }
-

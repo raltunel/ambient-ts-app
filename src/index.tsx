@@ -23,9 +23,11 @@ import { GlobalContexts } from './contexts/GlobalContexts';
 import sepoliaLogo from './assets/images/networks/sepolia_logo.webp';
 // import plumeSepoliaLogo from './assets/images/networks/plume_sepolia_network_logo.webp';
 import { getLocalStorageItem } from './ambient-utils/dataLayer';
+import baseSepoliaLogo from './assets/images/networks/base_network_logo_with_margin.webp';
 import blastSepoliaLogo from './assets/images/networks/blast_sepolia_logo.webp';
 import plumeSepoliaLogo from './assets/images/networks/plume_mainnet_logo_small.webp';
 import scrollSepoliaLogo from './assets/images/networks/scroll_sepolia_logo.webp';
+import swellSepoliaLogo from './assets/images/networks/swell_network_logo_with_margin.webp';
 
 // /* Perform a single forcible reload when the page first loads. Without this, there
 //  * are issues with Metamask and Chrome preloading. This shortcircuits preloading, at the
@@ -55,9 +57,15 @@ const metadata = {
     ],
 };
 
+const defaultSupportedNetworkHexId = Object.keys(supportedNetworks)[0];
+
+const defaultChainIdInteger = defaultSupportedNetworkHexId
+    ? parseInt(defaultSupportedNetworkHexId)
+    : 534352;
+
 const ethersConfig = defaultConfig({
     metadata,
-    defaultChainId: 534352,
+    defaultChainId: defaultChainIdInteger,
     enableEmail: false,
     rpcUrl: ' ',
     enableCoinbase: true,
@@ -77,6 +85,8 @@ const modal = createWeb3Modal({
         534352: scrollLogo,
         11155111: sepoliaLogo,
         98864: plumeSepoliaLogo,
+        1924: swellSepoliaLogo,
+        84532: baseSepoliaLogo,
     },
     termsConditionsUrl: '/terms',
     privacyPolicyUrl: '/privacy',
@@ -102,9 +112,14 @@ modal.subscribeEvents(async (event) => {
 
     if (event.data.event === 'CONNECT_SUCCESS') {
         const currentChainId = modal.getState().selectedNetworkId as number;
-        const desiredChainId = parseInt(
-            getLocalStorageItem(LS_KEY_CHAIN_ID) || '534352',
-        );
+
+        const lastUsedNetworkIdString = getLocalStorageItem(
+            LS_KEY_CHAIN_ID,
+        ) as string;
+
+        const desiredChainId = lastUsedNetworkIdString
+            ? parseInt(lastUsedNetworkIdString)
+            : defaultChainIdInteger;
 
         if (currentChainId !== desiredChainId) {
             try {
@@ -115,7 +130,7 @@ modal.subscribeEvents(async (event) => {
 
                 const newChainId = modal.getState().selectedNetworkId as number;
 
-                if (newChainId !== desiredChainId) {
+                if (newChainId !== desiredChainId && !modal.getState().open) {
                     try {
                         await modal.switchNetwork(desiredChainId);
                         await new Promise((resolve) =>
@@ -142,6 +157,7 @@ modal.subscribeEvents(async (event) => {
         event.data.event === 'MODAL_CLOSE' &&
         event.data.properties.connected === true
     ) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         if (
             !networkIds.includes(modal.getState().selectedNetworkId as number)
         ) {

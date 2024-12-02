@@ -17,7 +17,19 @@ import { User, getUserLabelForReactions } from '../../Model/UserModel';
 import useChatApi from '../../Service/ChatApi';
 import PositionBox from '../PositionBox/PositionBox';
 
+import { lookupChain } from '@crocswap-libs/sdk/dist/context';
 import { IoReturnUpForwardSharp } from 'react-icons/io5';
+import blastLogo from '../../../../assets/images/networks/blast_logo.png';
+import ethLogo from '../../../../assets/images/networks/ethereum_logo.svg';
+import scrollLogo from '../../../../assets/images/networks/scroll_logo.svg';
+import {
+    ALLOW_AUTH,
+    ALLOW_REACTIONS,
+    ALLOW_REPLIES,
+    BASIC_CHAT_MODE,
+    REGEX_EMOJI,
+    REGEX_NOT_EMOJI,
+} from '../../ChatConstants/ChatConstants';
 import { ChatVerificationTypes } from '../../ChatEnums';
 import { LikeDislikePayload, MentFoundParam } from '../../ChatIFs';
 import { getAvatarForChat } from '../../ChatRenderUtils';
@@ -32,18 +44,6 @@ import {
 import Options from '../Options/Options';
 import ReplyMessage from '../ReplyMessage/ReplyMessage';
 import styles from './SentMessagePanel.module.css';
-import {
-    ALLOW_AUTH,
-    ALLOW_REACTIONS,
-    ALLOW_REPLIES,
-    BASIC_CHAT_MODE,
-    REGEX_EMOJI,
-    REGEX_NOT_EMOJI,
-} from '../../ChatConstants/ChatConstants';
-import { lookupChain } from '@crocswap-libs/sdk/dist/context';
-import scrollLogo from '../../../../assets/images/networks/scroll_logo.svg';
-import blastLogo from '../../../../assets/images/networks/blast_logo.png';
-import ethLogo from '../../../../assets/images/networks/ethereum_logo.svg';
 
 interface SentMessageProps {
     message: Message;
@@ -457,12 +457,22 @@ function SentMessagePanel(props: SentMessageProps) {
                         (onlyEmoji ? styles.only_emoji : '')
                     }
                 >
-                    {props.message.screenshot && <div className={styles.screenshot_wrapper} onClick={() => {
-                        props.setSelectedMessageForPreview(props.message);
-                    }}>
-                        <img src={getScreenshotURL(props.message._id)} alt="screenshot" />
-                        </div>}
-                    
+                    {props.message.screenshot && (
+                        <div
+                            className={styles.screenshot_wrapper}
+                            onClick={() => {
+                                props.setSelectedMessageForPreview(
+                                    props.message,
+                                );
+                            }}
+                        >
+                            <img
+                                src={getScreenshotURL(props.message._id)}
+                                alt='screenshot'
+                            />
+                        </div>
+                    )}
+
                     {messagesArray.map((e, i) => {
                         return (
                             <span key={i} className={styles.message_token}>

@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-    tokenListURIs,
     defaultTokens,
     hiddenTokens,
+    tokenListURIs,
 } from '../../ambient-utils/constants';
-import { TokenIF, TokenListIF } from '../../ambient-utils/types';
 import {
     chainNumToString,
-    uriToHttp,
     serializeBigInt,
+    uriToHttp,
 } from '../../ambient-utils/dataLayer';
+import { TokenIF, TokenListIF } from '../../ambient-utils/types';
 
 export interface tokenMethodsIF {
     allDefaultTokens: TokenIF[];
@@ -185,7 +185,7 @@ export const useTokens = (
                     deepCopyToken(tkn, tkn.fromList ?? tokenListURIs.ambient),
                 );
         }
-    }, [tokenMap.size, tokenBalances]);
+    }, [tokenMap, tokenBalances]);
 
     // fn to make a deep copy of a token data object
     // without this we overrwrite token data in local storage in post-processing
