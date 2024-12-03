@@ -658,3 +658,51 @@ svg.marker_base{
     fill: white !important;
     color: white !important;
 }
+
+
+.marker_toolbar{
+    display: flex;
+    position: absolute;
+    
+    bottom: 3rem;
+    z-index: 99;
+    flex-direction: row;
+    gap: .5rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.marker_toolbar_item{
+    transition: all .2s ease-in-out;
+    padding: .2rem;
+    border: 1px solid color-mix(in srgb, var(--accent1) 30%, transparent);
+    display: flex;
+    cursor: pointer;
+    background-color: var(--dark2);
+}
+
+
+.marker_toolbar_item.active{
+    background-color: var(--accent1);
+}
+
+.marker_toolbar_item svg{
+    transition: all .2s ease-in-out;
+    fill: rgba(255, 255, 255, .5) !important;
+}
+
+.marker_toolbar_item:hover svg{
+    fill: rgba(255, 255, 255, 1) !important;
+}
+
+.marker_toolbar_item.active svg{
+    fill: white !important;
+}
+
+.marker_toolbar_item.active{
+    border: 1px solid color-mix(in srgb, var(--accent1) 70%, transparent);
+}
+
+.marker_divider{
+    border-left: 1px solid color-mix(in srgb, var(--accent1) 30%, transparent);
+}

@@ -13,9 +13,11 @@ import Blockies from 'react-blockies';
 import { FiEdit3 } from 'react-icons/fi';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { AVATAR_TYPES } from './ChatConstants/ChatConstants';
-import { UserAvatarDataIF } from './ChatIFs';
+import { PageCoordsIF, UserAvatarDataIF } from './ChatIFs';
 import styles from './ChatRenderUtils.module.css';
 import { UserSummaryModel } from './Model/UserSummaryModel';
+import { FaQuestion, FaRocket, FaArrowLeft } from 'react-icons/fa';
+import { MdOutlineErrorOutline } from 'react-icons/md';
 
 export const getAvatarFromMessage = (message: Message) => {
     return (
@@ -317,3 +319,33 @@ export const getActionTrigger = (id: string, action: () => void) => {
         ></span>
     );
 };
+
+export const getCoordsFromElement = (element: HTMLDivElement) => {
+    const rect = element.getBoundingClientRect();
+    return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+};
+
+export const getVectorBetweenPoints = (
+    from: PageCoordsIF,
+    to: PageCoordsIF,
+) => {
+    return { x: to.x - from.x, y: to.y - from.y };
+};
+
+export const getAngleBetweenVectors = (
+    v1: { x: number; y: number },
+    v2: { x: number; y: number },
+) => {
+    return (Math.atan2(v2.y - v1.y, v2.x - v1.x) * 180) / Math.PI;
+};
+
+export const screenCaptureMarkerIcons = [
+    <FaArrowLeft
+        key='marker-arrow-left'
+        size={18}
+        style={{ transform: 'rotate(45deg)' }}
+    />,
+    <MdOutlineErrorOutline key='marker-error' size={18} />,
+    <FaRocket key='marker-rocket' size={18} />,
+    <FaQuestion key='marker-question' size={18} />,
+];

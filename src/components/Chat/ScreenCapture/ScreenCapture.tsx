@@ -4,17 +4,18 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import styles from './ScreenCapture.module.css';
 // import { domToImage } from 'modern-screenshot';
+import { AiOutlineWarning } from 'react-icons/ai';
 import { BiScreenshot, BiSend } from 'react-icons/bi';
 import { BsCopy } from 'react-icons/bs';
-import {
-    RiCloseCircleLine,
-    RiDownload2Line,
-    RiScreenshot2Line,
-} from 'react-icons/ri';
+import { FaArrowLeft, FaQuestion, FaRocket } from 'react-icons/fa';
+import { RiDownload2Line, RiScreenshot2Line } from 'react-icons/ri';
+import { RxReset } from 'react-icons/rx';
+import { useNavigate } from 'react-router-dom';
 import { printDomToImage } from '../../../ambient-utils/dataLayer';
 import { AppStateContext, UserDataContext } from '../../../contexts';
 import useCopyToClipboard from '../../../utils/hooks/useCopyToClipboard';
 import useMediaQuery from '../../../utils/hooks/useMediaQuery';
+import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import { TextOnlyTooltip } from '../../Global/StyledTooltip/StyledTooltip';
 import {
     ScreenCaptureEditStates,
@@ -23,13 +24,10 @@ import {
 } from '../ChatEnums';
 import { DomPositionInterface, DomRectDefault, DomRectIF } from '../ChatIFs';
 import { domDebug } from '../DomDebugger/DomDebuggerUtils';
-import ScreenCaptureMessageInput from './ScreenCaptureMessageInput';
-import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
-import { useNavigate } from 'react-router-dom';
-import useChatSocket from '../Service/useChatSocket';
-import { FaArrowLeft } from 'react-icons/fa';
 import DraggableItem from '../DraggableItem/DraggableItem';
-import { RxReset } from 'react-icons/rx';
+import useChatSocket from '../Service/useChatSocket';
+import ScreenCaptureMessageInput from './ScreenCaptureMessageInput';
+import { screenCaptureMarkerIcons } from '../ChatRenderUtils';
 
 interface propsIF {
     name?: string;
@@ -48,6 +46,12 @@ export default function ScreenCapture(props: propsIF) {
     const [markers, setMarkers] = useState<JSX.Element[]>([]);
 
     const { sendMsg } = useChatSocket('Global', true, sendToChatActive);
+
+    const [selectedMarkerType, setSelectedMarkerType] = useState<number>(0);
+    const [areaDrawActive, setAreaDrawActive] = useState<boolean>(false);
+    const [focusedMarkerId, setFocusedMarkerId] = useState<
+        string | undefined
+    >();
 
     useEffect(() => {
         setPreviewActive(false);
@@ -599,17 +603,22 @@ export default function ScreenCapture(props: propsIF) {
         );
     };
 
+    const markerFocusListener = (id: string) => {
+        console.log('>>> marker focus', id);
+    };
+
     const createMarker = (left: number, top: number) => {
+        const markerId = `marker-${new Date().getTime()}`;
         return (
             <DraggableItem
                 key={Math.random() * 1000}
                 initialLeft={left}
                 initialTop={top}
+                id={markerId}
+                focusListener={markerFocusListener}
+                // isDisabled={areaDrawActive}
             >
-                <FaArrowLeft
-                    size={20}
-                    className={`${styles.marker_base} ${styles.marker_arrow}`}
-                />
+                {screenCaptureMarkerIcons[selectedMarkerType]}
             </DraggableItem>
         );
     };
@@ -628,6 +637,22 @@ export default function ScreenCapture(props: propsIF) {
 
     const markerMoveListener = (e: React.MouseEvent) => {
         console.log('>>> marker move', e);
+    };
+
+    const getToolbarIcons = () => {
+        return screenCaptureMarkerIcons.map((icon, index) => (
+            <div
+                className={
+                    styles.marker_toolbar_item +
+                    ' ' +
+                    (selectedMarkerType == index ? styles.active : '')
+                }
+                key={`marker-${index}`}
+                onClick={() => setSelectedMarkerType(index)}
+            >
+                {icon}
+            </div>
+        ));
     };
 
     return (
@@ -787,6 +812,22 @@ export default function ScreenCapture(props: propsIF) {
                                 {' '}
                                 Double click/tap to add marker
                             </span>
+                            <div className={styles.marker_toolbar}>
+                                {getToolbarIcons()}
+                                <div className={styles.marker_divider}></div>
+                                <div
+                                    className={
+                                        styles.marker_toolbar_item +
+                                        ' ' +
+                                        (areaDrawActive ? styles.active : '')
+                                    }
+                                    onClick={() =>
+                                        setAreaDrawActive(!areaDrawActive)
+                                    }
+                                >
+                                    <BiScreenshot size={18} />
+                                </div>
+                            </div>
                             <div
                                 className={
                                     styles.icon_btn_wrapper +
