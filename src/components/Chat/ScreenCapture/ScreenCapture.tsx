@@ -22,12 +22,17 @@ import {
     ScreenCaptureOverlayTypes,
     ScreenCaptureStates,
 } from '../ChatEnums';
-import { DomPositionInterface, DomRectDefault, DomRectIF } from '../ChatIFs';
+import {
+    DomPositionInterface,
+    DomRectDefault,
+    DomRectIF,
+    ScreenCaptureMarker,
+} from '../ChatIFs';
 import { domDebug } from '../DomDebugger/DomDebuggerUtils';
 import DraggableItem from '../DraggableItem/DraggableItem';
 import useChatSocket from '../Service/useChatSocket';
 import ScreenCaptureMessageInput from './ScreenCaptureMessageInput';
-import { screenCaptureMarkerIcons } from '../ChatRenderUtils';
+import { getStyleFromRect, screenCaptureMarkerIcons } from '../ChatRenderUtils';
 
 interface propsIF {
     name?: string;
@@ -43,12 +48,20 @@ export default function ScreenCapture(props: propsIF) {
     const blackListDomElements = ['current_row_scroll', 'chat-wrapper'];
     const [sendToChatActive, setSendToChatActive] = useState(false);
 
-    const [markers, setMarkers] = useState<JSX.Element[]>([]);
+    const [markers, setMarkers] = useState<ScreenCaptureMarker[]>([]);
 
     const { sendMsg } = useChatSocket('Global', true, sendToChatActive);
 
     const [selectedMarkerType, setSelectedMarkerType] = useState<number>(0);
     const [areaDrawActive, setAreaDrawActive] = useState<boolean>(false);
+    const areaDrawActiveRef = useRef<boolean>(areaDrawActive);
+    areaDrawActiveRef.current = areaDrawActive;
+
+    const [areaDrawStartPoint, setAreaDrawStartPoint] =
+        useState<DomPositionInterface>();
+    const areaDrawStartPointRef = useRef<DomPositionInterface>();
+    areaDrawStartPointRef.current = areaDrawStartPoint;
+
     const [focusedMarkerId, setFocusedMarkerId] = useState<
         string | undefined
     >();
@@ -73,6 +86,8 @@ export default function ScreenCapture(props: propsIF) {
     useEffect(() => {
         if (!isMobile) {
             document.addEventListener('mousemove', mouseMoveListener);
+            // document.addEventListener('mousedown', mouseDownListener);
+            // document.addEventListener('mouseup', mouseUpListener);
             document.addEventListener('keydown', keyDownListener);
         }
     }, []);
@@ -88,6 +103,19 @@ export default function ScreenCapture(props: propsIF) {
         screenCaptureActive,
         setScreenCaptureActive,
     } = useContext(AppStateContext);
+
+    // const mouseUpListener = (e: MouseEvent) => {
+    //     if(areaDrawActiveRef.current){
+    //         setAreaDrawActive(false);
+    //     }
+    // }
+
+    // const mouseDownListener = (e: MouseEvent) => {
+    //     if(areaDrawActiveRef.current){
+    //         console.log('>>> start area ');
+    //         setAreaDrawStartPoint({x: e.clientX, y: e.clientY});
+    //     }
+    // }
 
     useEffect(() => {
         if (screenCaptureActive) {
@@ -151,6 +179,10 @@ export default function ScreenCapture(props: propsIF) {
     const overlayRectRef = useRef<DomRectIF>(DomRectDefault);
     overlayRectRef.current = overlayRect;
 
+    const [areaDrawRect, setAreaDrawRect] = useState<DomRectIF>(DomRectDefault);
+    const areaDrawRectRef = useRef<DomRectIF>(DomRectDefault);
+    areaDrawRectRef.current = areaDrawRect;
+
     const croppedImageRef = useRef<HTMLDivElement>(null);
 
     const [debugMode, setDebugMode] = useState<boolean>(false);
@@ -179,8 +211,20 @@ export default function ScreenCapture(props: propsIF) {
         if (!previewActive) {
             setImageComp(null);
             setCaptureState(ScreenCaptureStates.Idle);
+        } else {
+            setSelectedMarkerType(0);
+            setMarkers([]);
         }
     }, [previewActive]);
+
+    useEffect(() => {
+        setMarkers((prev) => {
+            return prev.map((marker) => {
+                return { ...marker, disabled: areaDrawActive };
+            });
+        });
+        setAreaDrawRect(DomRectDefault);
+    }, [areaDrawActive]);
 
     const cancelCapture = () => {
         setImageComp(undefined);
@@ -278,6 +322,16 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const mouseMoveListener = (e: MouseEvent) => {
+        if (areaDrawActiveRef.current && areaDrawStartPointRef.current) {
+            const rect = getOverlayPoints(areaDrawStartPointRef.current, {
+                x: e.clientX,
+                y: e.clientY,
+            });
+            setAreaDrawRect(rect);
+
+            return;
+        }
+
         if (isMobile) return;
         maskingMouseMoveListener(e.clientX, e.clientY);
     };
@@ -400,10 +454,6 @@ export default function ScreenCapture(props: propsIF) {
                 };
             case ScreenCaptureOverlayTypes.MaskArea:
                 return {
-                    // left: maskLTRef.current.x,
-                    // top: maskLTRef.current.y,
-                    // right: window.innerWidth - maskRBRef.current.x - 10,
-                    // bottom: window.innerHeight - maskRBRef.current.y - 10,
                     left: overlayRect.lt.x - maskOverlayOffset,
                     top: overlayRect.lt.y - maskOverlayOffset,
                     right:
@@ -607,20 +657,25 @@ export default function ScreenCapture(props: propsIF) {
         console.log('>>> marker focus', id);
     };
 
-    const createMarker = (left: number, top: number) => {
-        const markerId = `marker-${new Date().getTime()}`;
+    const createMarkerContent = (markerType: number) => {
         return (
-            <DraggableItem
-                key={Math.random() * 1000}
-                initialLeft={left}
-                initialTop={top}
-                id={markerId}
-                focusListener={markerFocusListener}
-                // isDisabled={areaDrawActive}
-            >
-                {screenCaptureMarkerIcons[selectedMarkerType]}
-            </DraggableItem>
+            <span style={{ transform: 'scale(1.5)', display: 'block' }}>
+                {screenCaptureMarkerIcons[markerType]}
+            </span>
         );
+    };
+
+    const createMarker = (left: number, top: number, markerType: number) => {
+        const markerId = `marker-${new Date().getTime()}`;
+
+        return {
+            key: markerId,
+            disabled: false,
+            left,
+            top,
+            markerType,
+            isShape: false,
+        };
     };
 
     const dblClickListener = (e: React.MouseEvent) => {
@@ -630,7 +685,10 @@ export default function ScreenCapture(props: propsIF) {
             const left = (e.clientX -= wrapperRect.left);
             const top = (e.clientY -= wrapperRect.top);
             console.log('>>> dbl click marker', left, top);
-            setMarkers((prev) => [...prev, createMarker(left, top)]);
+            setMarkers((prev) => [
+                ...prev,
+                createMarker(left, top, selectedMarkerType),
+            ]);
         }
         console.log('>>> dbl click marker', e);
     };
@@ -653,6 +711,10 @@ export default function ScreenCapture(props: propsIF) {
                 {icon}
             </div>
         ));
+    };
+
+    const areaDrawStartListener = (e: React.MouseEvent) => {
+        setAreaDrawStartPoint({ x: e.clientX, y: e.clientY });
     };
 
     return (
@@ -756,8 +818,7 @@ export default function ScreenCapture(props: propsIF) {
 
                 {/* {
                 previewActive && (
-                    <>
-                    <div
+                    <>                    <div
                     style={getPosForOverlayRect(
                         ScreenCaptureOverlayTypes.MaskArea,
                     )}
@@ -798,8 +859,20 @@ export default function ScreenCapture(props: propsIF) {
                                 className={styles.image_preview_wrapper}
                                 style={getPreviewSize()}
                                 onDoubleClick={dblClickListener}
+                                onMouseDown={areaDrawStartListener}
                             >
-                                {markers}
+                                {markers.map((marker) => (
+                                    <DraggableItem
+                                        key={marker.key}
+                                        initialLeft={marker.left}
+                                        initialTop={marker.top}
+                                        id={marker.key}
+                                        focusListener={markerFocusListener}
+                                        isDisabled={marker.disabled}
+                                    >
+                                        {createMarkerContent(marker.markerType)}
+                                    </DraggableItem>
+                                ))}
                                 <img
                                     src={URL.createObjectURL(imageComp)}
                                     alt='screenshot'
@@ -807,6 +880,12 @@ export default function ScreenCapture(props: propsIF) {
                                     className={styles.captured_raw_image}
                                 />
                             </div>
+
+                            {/* {
+                                areaDrawActive && (
+                                    <div className={styles.rect_marker} style={getStyleFromRect(areaDrawRectRef.current)}></div>
+                                )
+                            } */}
 
                             <span className={styles.image_preview_helper_text}>
                                 {' '}

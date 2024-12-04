@@ -114,3 +114,12 @@ export const DomRectDefault: DomRectIF = {
     rb: { x: 0, y: 0 },
     lb: { x: 0, y: 0 },
 };
+
+export interface ScreenCaptureMarker {
+    key: string;
+    disabled: boolean;
+    left: number;
+    top: number;
+    markerType: number;
+    isShape: boolean;
+}

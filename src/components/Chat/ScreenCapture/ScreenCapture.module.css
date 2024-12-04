@@ -706,3 +706,11 @@ svg.marker_base{
 .marker_divider{
     border-left: 1px solid color-mix(in srgb, var(--accent1) 30%, transparent);
 }
+
+
+.rect_marker{
+    position: fixed;
+    border: 2px solid var(--accent1);
+    background-color: color-mix(in srgb, var(--accent1) 13%, transparent);
+    z-index: 11;
+}

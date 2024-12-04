@@ -2,12 +2,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { FaRotate } from 'react-icons/fa6';
 import styles from './DraggableItem.module.css';
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import {
+    MutableRefObject,
+    ReactNode,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import { DraggableItemControlStates } from '../ChatEnums';
 import { DomRectIF, PageCoordsDefault, PageCoordsIF } from '../ChatIFs';
 import rotateIcon from '../../../assets/images/icons/rotate-option.svg';
 import {
-    getAngleBetweenVectors,
+    getAngleOfVector,
     getCoordsFromElement,
     getVectorBetweenPoints,
 } from '../ChatRenderUtils';
@@ -32,6 +38,8 @@ export default function DraggableItem(props: propsIF) {
         '#fc034a',
     ];
 
+    const { isDisabled } = props;
+
     const itemRef = useRef<HTMLDivElement>(null);
     const showIndicators = false;
     const contentRef = useRef<HTMLDivElement>(null);
@@ -46,8 +54,6 @@ export default function DraggableItem(props: propsIF) {
     rotateTriggerNodeRef.current = rotateTriggerNode;
     const minScale = 0.5;
     const maxScale = 5;
-    const isDisabledRef = useRef<boolean>(props.isDisabled || false);
-    isDisabledRef.current = props.isDisabled || false;
 
     const [selectedColor, setSelectedColor] = useState<string>(
         colorSwatches[0],
@@ -136,7 +142,7 @@ export default function DraggableItem(props: propsIF) {
     };
 
     const mouseMoveListener = (e: MouseEvent) => {
-        if (isDisabledRef.current) return;
+        if (isDisabled) return;
         const currentPoint = { x: e.clientX, y: e.clientY };
         if (!isMouseInParent(currentPoint)) {
             setControlState(DraggableItemControlStates.Idle);
@@ -149,18 +155,33 @@ export default function DraggableItem(props: propsIF) {
 
         switch (controlStateRef.current) {
             case DraggableItemControlStates.Rotating:
-                if (rotateTriggerNodeRef.current && controlPivotRef.current) {
+                if (
+                    rotateTriggerNodeRef.current &&
+                    controlPivotRef.current &&
+                    controlStartRef.current
+                ) {
                     const pivot = getCoordsFromElement(controlPivotRef.current);
                     const v1 = getVectorBetweenPoints(pivot, currentPoint);
+                    const angle1 = getAngleOfVector(v1);
+                    console.log('>>>v1', v1);
 
-                    const rotateTriggerNode = getCoordsFromElement(
-                        rotateTriggerNodeRef.current,
-                    );
-                    const v2 = getVectorBetweenPoints(pivot, rotateTriggerNode);
+                    // const rotateTriggerNode = getCoordsFromElement(
+                    //     rotateTriggerNodeRef.current,
+                    // );
+                    // const v2 = getVectorBetweenPoints(pivot, rotateTriggerNode);
 
-                    const angle = getAngleBetweenVectors(v2, v1);
-                    // setRotate(angle + prevRotateRef.current * -1|| 0);
-                    setRotate(angle);
+                    const startPoint = controlStartRef.current;
+                    const v2 = getVectorBetweenPoints(pivot, startPoint);
+                    const angle2 = getAngleOfVector(v2);
+
+                    console.log('>>>v2', v2);
+
+                    const angle = angle2 - angle1;
+
+                    console.log('>>>angle', angle);
+                    console.log('>>>.......................');
+                    setRotate(angle + prevRotateRef.current || 0);
+                    // setRotate(angle);
                 }
                 break;
             case DraggableItemControlStates.Moving:
@@ -179,23 +200,14 @@ export default function DraggableItem(props: propsIF) {
             case DraggableItemControlStates.Scaling:
                 console.log('>>>scaling');
                 if (controlPivotRef.current && controlStartRef.current) {
-                    const pivot =
-                        controlPivotRef.current.getBoundingClientRect();
-                    const pivotX = pivot.x + pivot.width / 2;
-                    const pivotY = pivot.y + pivot.height / 2;
-
-                    console.log(
-                        '>>>pivot',
-                        pivotX.toFixed(2),
-                        pivotY.toFixed(2),
-                    );
+                    const pivot = getCoordsFromElement(controlPivotRef.current);
 
                     const startPoint = controlStartRef.current;
-                    const startPointX = startPoint.x - pivotX;
-                    const startPointY = startPoint.y - pivotY;
+                    const startPointX = startPoint.x - pivot.x;
+                    const startPointY = startPoint.y - pivot.y;
 
-                    const currentPointX = currentPoint.x - pivotX;
-                    const currentPointY = currentPoint.y - pivotY;
+                    const currentPointX = currentPoint.x - pivot.x;
+                    const currentPointY = currentPoint.y - pivot.y;
 
                     const pivotToStartPointLength = Math.sqrt(
                         startPointX ** 2 + startPointY ** 2,
@@ -329,7 +341,7 @@ export default function DraggableItem(props: propsIF) {
                     ' ' +
                     (showIndicators ? styles.show_indicators : '') +
                     ' ' +
-                    (isDisabledRef.current ? styles.disabled : '')
+                    (isDisabled ? styles.disabled : '')
                 }
                 style={{
                     transform: `translate(${itemMoveDelta?.x}px, ${itemMoveDelta?.y}px) scale(${scale})`,

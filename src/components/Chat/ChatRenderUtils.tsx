@@ -13,7 +13,7 @@ import Blockies from 'react-blockies';
 import { FiEdit3 } from 'react-icons/fi';
 import Jazzicon, { jsNumberForAddress } from 'react-jazzicon';
 import { AVATAR_TYPES } from './ChatConstants/ChatConstants';
-import { PageCoordsIF, UserAvatarDataIF } from './ChatIFs';
+import { DomRectIF, PageCoordsIF, UserAvatarDataIF } from './ChatIFs';
 import styles from './ChatRenderUtils.module.css';
 import { UserSummaryModel } from './Model/UserSummaryModel';
 import { FaQuestion, FaRocket, FaArrowLeft } from 'react-icons/fa';
@@ -329,14 +329,11 @@ export const getVectorBetweenPoints = (
     from: PageCoordsIF,
     to: PageCoordsIF,
 ) => {
-    return { x: to.x - from.x, y: to.y - from.y };
+    return { x: to.x - from.x, y: (to.y - from.y) * -1 };
 };
 
-export const getAngleBetweenVectors = (
-    v1: { x: number; y: number },
-    v2: { x: number; y: number },
-) => {
-    return (Math.atan2(v2.y - v1.y, v2.x - v1.x) * 180) / Math.PI;
+export const getAngleOfVector = (v: { x: number; y: number }) => {
+    return (Math.atan2(v.y, v.x) * 180) / Math.PI;
 };
 
 export const screenCaptureMarkerIcons = [
@@ -349,3 +346,12 @@ export const screenCaptureMarkerIcons = [
     <FaRocket key='marker-rocket' size={18} />,
     <FaQuestion key='marker-question' size={18} />,
 ];
+
+export const getStyleFromRect = (rect: DomRectIF, offset = 0) => {
+    return {
+        left: rect.lt.x - offset,
+        top: rect.lt.y - offset,
+        right: window.innerWidth - rect.rt.x - offset,
+        bottom: window.innerHeight - rect.rb.y - offset,
+    };
+};
