@@ -61,9 +61,65 @@
     width: 1rem;
     height: 1rem;
     background:transparent;
-    border-radius: 50%;
+    /* border-radius: 50%; */
     /* background-color: rgba(255,0,0,.2); */
     z-index: 13;
+}
+
+.main_rotate_node{
+    left: 50%;
+    top: -1.5rem;
+    transform:translate(-50%, 0);
+    /* background: orange; */
+    width: .4rem;
+    height: .4rem;
+    position: absolute;
+    z-index: 13;
+    display: flex;
+    align-items: center;
+    cursor: url(../../../assets/images/icons/rotate-option.svg) 10 10, auto;
+}
+
+
+.main_rotate_node_inner{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: block;
+}
+
+.main_rotate_node_indicator{
+    transition: opacity .2s ease-in-out;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: rgba(255,255,255,.8);
+    background-color: var(--accent1);
+    border-radius: 100vw;
+    display: block;
+    z-index: 14;
+    opacity: 0;
+}
+
+
+/* .main_rotate_node svg{
+    display: block;
+    margin: auto;
+    fill: white !important;
+} */
+
+
+.main_rotate_node_tail{
+    transition: opacity .2s ease-in-out;
+    position: absolute;
+    left: 50%;
+    top: -1.5rem;
+    transform: translate(-50%, 0);
+    background: color-mix(in srgb, var(--accent1) 40%, transparent);
+    width: 2px;
+    height: 1.5rem;
+    opacity: 0;
 }
 
 .rotate_node{
@@ -73,7 +129,7 @@
     transform: translate(-50%, -50%);
     width: 1.5rem;
     height: 1.5rem;
-    /* background-color: green; */
+    background-color: green;
     cursor: none;
     cursor: url(../../../assets/images/icons/rotate-option.svg) 10 10, auto;
 }
@@ -121,7 +177,7 @@
     opacity: 0;
 }
 
-.draggable_wrapper:hover .scale_node_indicator{
+.draggable_wrapper:hover .scale_node_indicator, .draggable_wrapper:hover .main_rotate_node_indicator, .draggable_wrapper:hover .main_rotate_node_tail{
     opacity: 1;
 }
 
@@ -260,9 +316,10 @@
     flex-direction: row;
     gap: .5rem;
     position: absolute;
-    top: 0rem;
+    top: auto;
+    bottom: 0rem;
     left: 50%;
-    transform: translate(-50%, -100%);
+    transform: translate(-50%, 100%);
     z-index: 14;
 }
 
@@ -297,8 +354,12 @@
     display: block;
 }
 
-.show_indicators .scale_node_indicator{
+.show_indicators .scale_node_indicator, .show_indicators .main_rotate_node_indicator, .show_indicators .main_rotate_node_tail{
     opacity: 1;
+}
+
+.show_indicators .color_swatch{
+    transform: scale(1);
 }
 
 .disabled{

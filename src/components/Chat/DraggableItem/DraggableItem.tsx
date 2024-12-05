@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { FaRotate } from 'react-icons/fa6';
+import { FaArrowRotateLeft, FaRotate } from 'react-icons/fa6';
 import styles from './DraggableItem.module.css';
 import {
     MutableRefObject,
@@ -40,8 +40,8 @@ export default function DraggableItem(props: propsIF) {
 
     const { isDisabled } = props;
 
+    const showIndicators = true;
     const itemRef = useRef<HTMLDivElement>(null);
-    const showIndicators = false;
     const contentRef = useRef<HTMLDivElement>(null);
     const controlPivotRef = useRef<HTMLDivElement>(null);
     const [scaleTriggerNode, setScaleTriggerNode] =
@@ -53,7 +53,7 @@ export default function DraggableItem(props: propsIF) {
     const rotateTriggerNodeRef = useRef<HTMLDivElement | null>(null);
     rotateTriggerNodeRef.current = rotateTriggerNode;
     const minScale = 0.5;
-    const maxScale = 5;
+    const maxScale = 7;
 
     const [selectedColor, setSelectedColor] = useState<string>(
         colorSwatches[0],
@@ -217,10 +217,11 @@ export default function DraggableItem(props: propsIF) {
                     );
 
                     let newScale =
-                        pivotToCurrentPointLength / pivotToStartPointLength;
+                        (pivotToCurrentPointLength / pivotToStartPointLength) *
+                            prevScaleRef.current || 1;
                     if (newScale < minScale) newScale = minScale;
                     if (newScale > maxScale) newScale = maxScale;
-                    setScale(newScale * prevScaleRef.current || 1);
+                    setScale(newScale);
                 }
                 break;
         }
@@ -259,6 +260,10 @@ export default function DraggableItem(props: propsIF) {
         e.stopPropagation();
     };
 
+    const calculateWithRound = (value: number) => {
+        return Math.round(value * 4) / 4;
+    };
+
     const rotateNodeMouseDownListener = (
         e: React.MouseEvent<HTMLDivElement>,
     ) => {
@@ -278,8 +283,8 @@ export default function DraggableItem(props: propsIF) {
 
     const calculateControlNodeStyle = () => {
         return {
-            width: parseFloat((8 / scale).toFixed(2)) + 'px',
-            height: parseFloat((8 / scale).toFixed(2)) + 'px',
+            width: calculateWithRound(8 / scale) + 'px',
+            height: calculateWithRound(8 / scale) + 'px',
         };
     };
 
@@ -306,6 +311,30 @@ export default function DraggableItem(props: propsIF) {
                 style={{ cursor: 'url(' + rotateIcon + ') 16 16, auto' }}
                 onMouseDown={rotateNodeMouseDownListener}
             ></div>
+        );
+    };
+
+    const getMainRotateNodeElement = () => {
+        return (
+            <>
+                <div
+                    className={styles.main_rotate_node}
+                    onMouseDown={rotateNodeMouseDownListener}
+                >
+                    <div className={styles.main_rotate_node_inner}>
+                        <div
+                            className={styles.main_rotate_node_indicator}
+                            style={calculateControlNodeStyle()}
+                        >
+                            {/* <FaArrowRotateLeft size={4} /> */}
+                        </div>
+                    </div>
+                </div>
+                <div
+                    style={{ width: calculateWithRound(2 / scale) + 'px' }}
+                    className={styles.main_rotate_node_tail}
+                ></div>
+            </>
         );
     };
 
@@ -344,6 +373,7 @@ export default function DraggableItem(props: propsIF) {
                     (isDisabled ? styles.disabled : '')
                 }
                 style={{
+                    // transform: `translate(${itemMoveDelta?.x}px, ${itemMoveDelta?.y}px) scale(${scale})`,
                     transform: `translate(${itemMoveDelta?.x}px, ${itemMoveDelta?.y}px) scale(${scale})`,
                     top: props.initialTop || 0,
                     left: props.initialLeft || 0,
@@ -353,14 +383,15 @@ export default function DraggableItem(props: propsIF) {
                     <div
                         className={styles.color_swatches}
                         style={{
-                            transform: `translate(-50%, -100%) scale(${1 / scale})`,
+                            transform: `translate(-50%, ${140 - 10 * scale}%) scale(${1 / scale})`,
                         }}
                     >
                         {colorSwatches.map((color) =>
                             getColorSwatchElement(color),
                         )}
                     </div>
-                    {controlNodes.map((node) => getRotateNodeElement(node))}
+                    {/* {controlNodes.map((node) => getRotateNodeElement(node))} */}
+                    {getMainRotateNodeElement()}
                     {controlNodes.map((node) => getScaleNodeElement(node))}
 
                     <div
@@ -373,7 +404,7 @@ export default function DraggableItem(props: propsIF) {
                         ref={contentRef}
                         className={styles.draggable_wrapper_content}
                         style={{
-                            borderWidth: `${2 / scale}px`,
+                            borderWidth: `${calculateWithRound(2 / scale)}px`,
                         }}
                         onMouseDown={itemMouseDownListener}
                         onMouseUp={itemMouseUpListener}
