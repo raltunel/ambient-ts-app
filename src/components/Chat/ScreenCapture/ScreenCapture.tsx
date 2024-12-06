@@ -83,6 +83,12 @@ export default function ScreenCapture(props: propsIF) {
         document.body.classList.toggle(styles.page_on_crop, capturing);
     };
 
+    const removeMarker = (id: string) => {
+        setMarkers((prev) => {
+            return prev.filter((marker) => marker.key !== id);
+        });
+    };
+
     useEffect(() => {
         if (!isMobile) {
             document.addEventListener('mousemove', mouseMoveListener);
@@ -869,10 +875,22 @@ export default function ScreenCapture(props: propsIF) {
                                         id={marker.key}
                                         focusListener={markerFocusListener}
                                         isDisabled={marker.disabled}
+                                        removeListener={removeMarker}
                                     >
                                         {createMarkerContent(marker.markerType)}
                                     </DraggableItem>
                                 ))}
+
+                                {areaDrawActive && (
+                                    <>
+                                        <div
+                                            className={
+                                                styles.area_draw_backdrop
+                                            }
+                                        ></div>
+                                    </>
+                                )}
+
                                 <img
                                     src={URL.createObjectURL(imageComp)}
                                     alt='screenshot'

@@ -1,22 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { FaArrowRotateLeft, FaRotate } from 'react-icons/fa6';
-import styles from './DraggableItem.module.css';
-import {
-    MutableRefObject,
-    ReactNode,
-    useEffect,
-    useRef,
-    useState,
-} from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
+import { MdDelete, MdDeleteOutline } from 'react-icons/md';
+import rotateIcon from '../../../assets/images/icons/rotate-option.svg';
 import { DraggableItemControlStates } from '../ChatEnums';
 import { DomRectIF, PageCoordsDefault, PageCoordsIF } from '../ChatIFs';
-import rotateIcon from '../../../assets/images/icons/rotate-option.svg';
 import {
     getAngleOfVector,
     getCoordsFromElement,
     getVectorBetweenPoints,
 } from '../ChatRenderUtils';
+import styles from './DraggableItem.module.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 interface propsIF {
@@ -26,6 +20,7 @@ interface propsIF {
     initialLeft?: number;
     focusListener?: (id: string) => void;
     isDisabled?: boolean;
+    removeListener?: (id: string) => void;
 }
 
 export default function DraggableItem(props: propsIF) {
@@ -40,7 +35,7 @@ export default function DraggableItem(props: propsIF) {
 
     const { isDisabled } = props;
 
-    const showIndicators = true;
+    const showIndicators = false;
     const itemRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
     const controlPivotRef = useRef<HTMLDivElement>(null);
@@ -393,6 +388,17 @@ export default function DraggableItem(props: propsIF) {
                     {/* {controlNodes.map((node) => getRotateNodeElement(node))} */}
                     {getMainRotateNodeElement()}
                     {controlNodes.map((node) => getScaleNodeElement(node))}
+                    <div
+                        className={styles.marker_remove_btn}
+                        onClick={() => {
+                            props.removeListener?.(props.id || '');
+                        }}
+                        style={{
+                            transform: `translateY(-50%) scale(${1 / scale})`,
+                        }}
+                    >
+                        <MdDeleteOutline size={24} />
+                    </div>
 
                     <div
                         ref={controlPivotRef}
