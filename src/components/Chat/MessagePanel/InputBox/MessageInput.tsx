@@ -762,31 +762,35 @@ export default function MessageInput(props: MessageInputProps) {
                         )}
                     </>
 
-                    <div className={styles.image_to_send_wrapper}>
-                        {lastCapturedScreenShot && (
-                            <TextOnlyTooltip title='Cancel'>
-                                <div className={styles.cancel_image_button}>
-                                    {' '}
-                                    <RiCloseFill
-                                        size={24}
-                                        title='Cancel'
-                                        onClick={() =>
-                                            setLastCapturedScreenShot(undefined)
-                                        }
-                                        style={{ cursor: 'pointer' }}
-                                    />
-                                </div>
-                            </TextOnlyTooltip>
-                        )}
-                        {lastCapturedScreenShot && (
-                            <img
-                                src={URL.createObjectURL(
-                                    lastCapturedScreenShot,
-                                )}
-                                alt='Screenshot'
-                            />
-                        )}
-                    </div>
+                    {props.isChatOpen && (
+                        <div className={styles.image_to_send_wrapper}>
+                            {lastCapturedScreenShot && (
+                                <TextOnlyTooltip title='Cancel'>
+                                    <div className={styles.cancel_image_button}>
+                                        {' '}
+                                        <RiCloseFill
+                                            size={24}
+                                            title='Cancel'
+                                            onClick={() =>
+                                                setLastCapturedScreenShot(
+                                                    undefined,
+                                                )
+                                            }
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                    </div>
+                                </TextOnlyTooltip>
+                            )}
+                            {lastCapturedScreenShot && (
+                                <img
+                                    src={URL.createObjectURL(
+                                        lastCapturedScreenShot,
+                                    )}
+                                    alt='Screenshot'
+                                />
+                            )}
+                        </div>
+                    )}
 
                     <div
                         className={

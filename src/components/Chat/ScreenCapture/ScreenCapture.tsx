@@ -66,6 +66,8 @@ export default function ScreenCapture(props: propsIF) {
     const areaDrawStartPointRef = useRef<DomPositionInterface>();
     areaDrawStartPointRef.current = areaDrawStartPoint;
 
+    const [previewLastTouch, setPreviewLastTouch] = useState<number>(0);
+
     const [focusedMarkerId, setFocusedMarkerId] = useState<
         string | undefined
     >();
@@ -249,12 +251,13 @@ export default function ScreenCapture(props: propsIF) {
 
     const previewModalOnClickOutside = () => {
         if (captureStateRef.current === ScreenCaptureStates.PreviewReady) {
+            console.log('>>> setting last captured into undefined');
             setScreenCaptureActive(false);
             setLastCapturedScreenShot(undefined);
         }
     };
 
-    useOnClickOutside(previewModalRef, previewModalOnClickOutside);
+    // useOnClickOutside(previewModalRef, previewModalOnClickOutside);
 
     const debugBtnListener = async () => {
         setDebugMode(!debugMode);
@@ -577,6 +580,8 @@ export default function ScreenCapture(props: propsIF) {
             setIsChatOpen(true);
         }
         openWalletModal();
+        setPreviewActive(false);
+        setScreenCaptureActive(false);
     };
 
     const previewMaskClickListener = (e: React.MouseEvent) => {
@@ -724,11 +729,15 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const dblClickListener = (e: React.MouseEvent) => {
+        addMarker(e.clientX, e.clientY);
+    };
+
+    const addMarker = (touchX: number, touchY: number) => {
         if (croppedImageRef.current) {
             const wrapperRect = croppedImageRef.current.getBoundingClientRect();
 
-            const left = (e.clientX -= wrapperRect.left);
-            const top = (e.clientY -= wrapperRect.top);
+            const left = (touchX -= wrapperRect.left);
+            const top = (touchY -= wrapperRect.top);
             setMarkers((prev) => [
                 ...prev,
                 createMarker(left, top, selectedMarkerType, false),
@@ -823,6 +832,16 @@ export default function ScreenCapture(props: propsIF) {
             }
             setAreaDrawState(AreaDrawStates.Idle);
         }
+    };
+
+    const previewTouchStartListener = (e: React.TouchEvent) => {
+        const doubleTapTreshold = 300;
+
+        if (new Date().getTime() - previewLastTouch < doubleTapTreshold) {
+            addMarker(e.touches[0].clientX, e.touches[0].clientY);
+        }
+
+        setPreviewLastTouch(new Date().getTime());
     };
 
     return (
@@ -967,6 +986,7 @@ export default function ScreenCapture(props: propsIF) {
                                 className={styles.image_preview_wrapper}
                                 style={getPreviewSize()}
                                 onDoubleClick={dblClickListener}
+                                onTouchStart={previewTouchStartListener}
                             >
                                 {markers.map((marker) => (
                                     <DraggableItem
@@ -1153,6 +1173,7 @@ export default function ScreenCapture(props: propsIF) {
                 </div>
                 <div
                     className={`${styles.preview_backdrop} ${previewActive ? styles.active : ''}`}
+                    onClick={previewModalOnClickOutside}
                 ></div>
             </span>
         </>
