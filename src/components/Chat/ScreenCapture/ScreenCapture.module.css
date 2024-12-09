@@ -709,10 +709,10 @@ svg.marker_base{
 
 
 .rect_marker{
-    position: fixed;
+    position: absolute;
     border: 2px solid var(--accent1);
     background-color: color-mix(in srgb, var(--accent1) 13%, transparent);
-    z-index: 11;
+    z-index: 66;
 }
 
 .area_draw_backdrop{
@@ -724,3 +724,9 @@ svg.marker_base{
     z-index: 15;
     background-color: rgba(0,0,0,.25);
 }
+
+.area_draw_marker{
+    display: block;
+    opacity: .1;
+}
+

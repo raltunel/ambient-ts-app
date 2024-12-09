@@ -122,4 +122,6 @@ export interface ScreenCaptureMarker {
     top: number;
     markerType: number;
     isShape: boolean;
+    shapeWidth?: number;
+    shapeHeight?: number;
 }

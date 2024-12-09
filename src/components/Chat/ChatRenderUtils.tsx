@@ -347,11 +347,20 @@ export const screenCaptureMarkerIcons = [
     <FaQuestion key='marker-question' size={18} />,
 ];
 
-export const getStyleFromRect = (rect: DomRectIF, offset = 0) => {
+export const getStyleFromRect = (
+    rect: DomRectIF,
+    offset = 0,
+    parentWidth?: number,
+    parentHeight?: number,
+) => {
     return {
         left: rect.lt.x - offset,
         top: rect.lt.y - offset,
-        right: window.innerWidth - rect.rt.x - offset,
-        bottom: window.innerHeight - rect.rb.y - offset,
+        right: parentWidth
+            ? parentWidth - rect.rt.x - offset
+            : window.innerWidth - rect.rt.x - offset,
+        bottom: parentHeight
+            ? parentHeight - rect.rb.y - offset
+            : window.innerHeight - rect.rb.y - offset,
     };
 };

@@ -29,3 +29,9 @@ export enum DraggableItemControlStates {
     Moving,
     Scaling,
 }
+
+export enum AreaDrawStates {
+    Idle,
+    Ready,
+    Drawing,
+}

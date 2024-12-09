@@ -18,7 +18,7 @@ interface propsIF {
     id?: string;
     initialTop?: number;
     initialLeft?: number;
-    focusListener?: (id: string) => void;
+    focusListener?: (id: string, focus: boolean) => void;
     isDisabled?: boolean;
     removeListener?: (id: string) => void;
 }
@@ -129,6 +129,9 @@ export default function DraggableItem(props: propsIF) {
         if (controlStateRef.current === DraggableItemControlStates.Idle) {
             setPrevScale(scale);
             setPrevRotation(rotate);
+            props.focusListener?.(props.id || '', false);
+        } else {
+            props.focusListener?.(props.id || '', true);
         }
     }, [controlState]);
 
@@ -352,6 +355,12 @@ export default function DraggableItem(props: propsIF) {
             const svgs = contentRef.current.querySelectorAll('svg');
             svgs.forEach((svg) => {
                 svg.style.fill = selectedColor;
+            });
+
+            const areaMakers =
+                contentRef.current.querySelectorAll('.area_draw_marker');
+            areaMakers.forEach((marker) => {
+                (marker as HTMLElement).style.backgroundColor = selectedColor;
             });
         }
     }, [selectedColor]);

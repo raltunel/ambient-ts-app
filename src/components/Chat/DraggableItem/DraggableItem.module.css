@@ -3,6 +3,7 @@
     z-index: 10;
     left: 1rem;
     top: 1rem;
+    transition: opacity .2s ease-in-out;
 }
 
 
@@ -362,10 +363,12 @@
     transform: scale(1);
 }
 
-.disabled{
+.draggable_wrapper.disabled{
     pointer-events: none;
     opacity: .5;
+    z-index: 9;
 }
+
 
 
 .marker_remove_btn{

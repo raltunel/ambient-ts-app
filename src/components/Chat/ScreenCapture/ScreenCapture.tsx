@@ -18,6 +18,7 @@ import useMediaQuery from '../../../utils/hooks/useMediaQuery';
 import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import { TextOnlyTooltip } from '../../Global/StyledTooltip/StyledTooltip';
 import {
+    AreaDrawStates,
     ScreenCaptureEditStates,
     ScreenCaptureOverlayTypes,
     ScreenCaptureStates,
@@ -53,9 +54,12 @@ export default function ScreenCapture(props: propsIF) {
     const { sendMsg } = useChatSocket('Global', true, sendToChatActive);
 
     const [selectedMarkerType, setSelectedMarkerType] = useState<number>(0);
-    const [areaDrawActive, setAreaDrawActive] = useState<boolean>(false);
-    const areaDrawActiveRef = useRef<boolean>(areaDrawActive);
-    areaDrawActiveRef.current = areaDrawActive;
+
+    const [areaDrawState, setAreaDrawState] = useState<AreaDrawStates>(
+        AreaDrawStates.Idle,
+    );
+    const areaDrawStateRef = useRef<AreaDrawStates>(areaDrawState);
+    areaDrawStateRef.current = areaDrawState;
 
     const [areaDrawStartPoint, setAreaDrawStartPoint] =
         useState<DomPositionInterface>();
@@ -93,7 +97,7 @@ export default function ScreenCapture(props: propsIF) {
         if (!isMobile) {
             document.addEventListener('mousemove', mouseMoveListener);
             // document.addEventListener('mousedown', mouseDownListener);
-            // document.addEventListener('mouseup', mouseUpListener);
+            document.addEventListener('mouseup', mouseUpListener);
             document.addEventListener('keydown', keyDownListener);
         }
     }, []);
@@ -110,11 +114,9 @@ export default function ScreenCapture(props: propsIF) {
         setScreenCaptureActive,
     } = useContext(AppStateContext);
 
-    // const mouseUpListener = (e: MouseEvent) => {
-    //     if(areaDrawActiveRef.current){
-    //         setAreaDrawActive(false);
-    //     }
-    // }
+    const mouseUpListener = (e: MouseEvent) => {
+        handleDrawAreaEnd();
+    };
 
     // const mouseDownListener = (e: MouseEvent) => {
     //     if(areaDrawActiveRef.current){
@@ -201,7 +203,6 @@ export default function ScreenCapture(props: propsIF) {
     };
     const resetBtnListener = async () => {
         setCaptureState(ScreenCaptureStates.Idle);
-        console.log('>>> reset btn', captureState);
         setImageComp(undefined);
         setPreviewActive(false);
         setMaskLT({ x: 0, y: 0 });
@@ -213,7 +214,6 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     useEffect(() => {
-        console.log('>>>', previewActive);
         if (!previewActive) {
             setImageComp(null);
             setCaptureState(ScreenCaptureStates.Idle);
@@ -226,15 +226,17 @@ export default function ScreenCapture(props: propsIF) {
     useEffect(() => {
         setMarkers((prev) => {
             return prev.map((marker) => {
-                return { ...marker, disabled: areaDrawActive };
+                return {
+                    ...marker,
+                    disabled: areaDrawState !== AreaDrawStates.Idle,
+                };
             });
         });
         setAreaDrawRect(DomRectDefault);
-    }, [areaDrawActive]);
+    }, [areaDrawState]);
 
     const cancelCapture = () => {
         setImageComp(undefined);
-        console.log('>>> cancel capture', captureState);
         setCaptureState(ScreenCaptureStates.Idle);
         setPreviewActive(false);
         setOverlayRect(DomRectDefault);
@@ -328,19 +330,20 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const mouseMoveListener = (e: MouseEvent) => {
-        if (areaDrawActiveRef.current && areaDrawStartPointRef.current) {
-            const rect = getOverlayPoints(areaDrawStartPointRef.current, {
-                x: e.clientX,
-                y: e.clientY,
-            });
-            setAreaDrawRect(rect);
-
-            return;
+        if (
+            areaDrawStateRef.current == AreaDrawStates.Drawing &&
+            areaDrawStartPointRef.current
+        ) {
+            return areaDrawMoveListener(e);
         }
 
         if (isMobile) return;
         maskingMouseMoveListener(e.clientX, e.clientY);
     };
+
+    // useEffect(() => {
+    //     console.log(areaDrawRect.lt.x, areaDrawRect.lt.y, ' | ' , areaDrawRect.rb.x, areaDrawRect.rb.y)
+    // }, [areaDrawRect]);
 
     const touchMoveListener = (e: React.TouchEvent<HTMLDivElement>) => {
         if (!isMobile) return;
@@ -406,7 +409,6 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     useEffect(() => {
-        console.log('>>> capture state', getCaptureStateDebugger());
         if (isMobile) {
             if (captureState === ScreenCaptureStates.Idle) {
                 setDocumentMode(false);
@@ -659,19 +661,54 @@ export default function ScreenCapture(props: propsIF) {
         );
     };
 
-    const markerFocusListener = (id: string) => {
-        console.log('>>> marker focus', id);
+    const markerFocusListener = (id: string, focus: boolean) => {
+        if (focus) {
+            markers.forEach((marker) => {
+                if (marker.key == id) {
+                    marker.disabled = false;
+                } else {
+                    marker.disabled = true;
+                }
+            });
+        } else {
+            markers.forEach((marker) => {
+                marker.disabled = false;
+            });
+        }
+
+        setMarkers([...markers]);
     };
 
-    const createMarkerContent = (markerType: number) => {
-        return (
-            <span style={{ transform: 'scale(1.5)', display: 'block' }}>
-                {screenCaptureMarkerIcons[markerType]}
-            </span>
-        );
+    const createMarkerContent = (marker: ScreenCaptureMarker) => {
+        if (marker.markerType >= 0) {
+            return (
+                <span style={{ transform: 'scale(1.5)', display: 'block' }}>
+                    {screenCaptureMarkerIcons[marker.markerType]}
+                </span>
+            );
+        } else {
+            return (
+                <div
+                    className={
+                        styles.area_draw_marker + ' ' + 'area_draw_marker'
+                    }
+                    style={{
+                        width: marker.shapeWidth,
+                        height: marker.shapeHeight,
+                    }}
+                ></div>
+            );
+        }
     };
 
-    const createMarker = (left: number, top: number, markerType: number) => {
+    const createMarker = (
+        left: number,
+        top: number,
+        markerType: number,
+        isShape: boolean,
+        shapeWidth?: number,
+        shapeHeight?: number,
+    ) => {
         const markerId = `marker-${new Date().getTime()}`;
 
         return {
@@ -680,7 +717,9 @@ export default function ScreenCapture(props: propsIF) {
             left,
             top,
             markerType,
-            isShape: false,
+            isShape,
+            shapeWidth,
+            shapeHeight,
         };
     };
 
@@ -690,13 +729,11 @@ export default function ScreenCapture(props: propsIF) {
 
             const left = (e.clientX -= wrapperRect.left);
             const top = (e.clientY -= wrapperRect.top);
-            console.log('>>> dbl click marker', left, top);
             setMarkers((prev) => [
                 ...prev,
-                createMarker(left, top, selectedMarkerType),
+                createMarker(left, top, selectedMarkerType, false),
             ]);
         }
-        console.log('>>> dbl click marker', e);
     };
 
     const markerMoveListener = (e: React.MouseEvent) => {
@@ -720,7 +757,72 @@ export default function ScreenCapture(props: propsIF) {
     };
 
     const areaDrawStartListener = (e: React.MouseEvent) => {
-        setAreaDrawStartPoint({ x: e.clientX, y: e.clientY });
+        const parent = croppedImageRef.current?.getBoundingClientRect();
+        if (parent) {
+            setAreaDrawStartPoint({
+                x: e.clientX - parent.left,
+                y: e.clientY - parent.top,
+            });
+            setAreaDrawState(AreaDrawStates.Drawing);
+        }
+    };
+
+    const areaDrawMoveListener = (e: MouseEvent) => {
+        const parent = croppedImageRef.current?.getBoundingClientRect();
+        if (parent && areaDrawStartPointRef.current) {
+            const rect = getOverlayPoints(areaDrawStartPointRef.current, {
+                x: e.clientX - parent.left,
+                y: e.clientY - parent.top,
+            });
+
+            console.log(
+                '>>> start',
+                areaDrawStartPointRef.current.x,
+                areaDrawStartPointRef.current.y,
+            );
+            console.log(
+                '>>> current',
+                e.clientX - parent.left,
+                e.clientY - parent.top,
+            );
+            console.log('>>> rect', rect);
+            console.log('>>> ............');
+
+            setAreaDrawRect(rect);
+            return;
+        }
+    };
+
+    const areaDrawBtnListener = () => {
+        if (areaDrawStateRef.current == AreaDrawStates.Idle) {
+            setAreaDrawState(AreaDrawStates.Ready);
+        } else {
+            setAreaDrawState(AreaDrawStates.Idle);
+        }
+    };
+
+    useEffect(() => {
+        console.log('>>> markers', markers);
+    }, [markers]);
+
+    const handleDrawAreaEnd = () => {
+        if (areaDrawStateRef.current == AreaDrawStates.Drawing) {
+            const rect = areaDrawRectRef.current;
+            if (rect) {
+                setMarkers((prev) => [
+                    ...prev,
+                    createMarker(
+                        rect.lt.x,
+                        rect.lt.y,
+                        -1,
+                        true,
+                        rect.rt.x - rect.lt.x,
+                        rect.lb.y - rect.lt.y,
+                    ),
+                ]);
+            }
+            setAreaDrawState(AreaDrawStates.Idle);
+        }
     };
 
     return (
@@ -865,7 +967,6 @@ export default function ScreenCapture(props: propsIF) {
                                 className={styles.image_preview_wrapper}
                                 style={getPreviewSize()}
                                 onDoubleClick={dblClickListener}
-                                onMouseDown={areaDrawStartListener}
                             >
                                 {markers.map((marker) => (
                                     <DraggableItem
@@ -877,17 +978,34 @@ export default function ScreenCapture(props: propsIF) {
                                         isDisabled={marker.disabled}
                                         removeListener={removeMarker}
                                     >
-                                        {createMarkerContent(marker.markerType)}
+                                        {createMarkerContent(marker)}
                                     </DraggableItem>
                                 ))}
 
-                                {areaDrawActive && (
+                                {areaDrawStateRef.current !==
+                                    AreaDrawStates.Idle && (
                                     <>
                                         <div
+                                            onMouseDown={areaDrawStartListener}
                                             className={
                                                 styles.area_draw_backdrop
                                             }
                                         ></div>
+
+                                        {areaDrawStateRef.current ==
+                                            AreaDrawStates.Drawing && (
+                                            <div
+                                                className={styles.rect_marker}
+                                                style={getStyleFromRect(
+                                                    areaDrawRectRef.current,
+                                                    0,
+                                                    croppedImageRef.current
+                                                        ?.clientWidth,
+                                                    croppedImageRef.current
+                                                        ?.clientHeight,
+                                                )}
+                                            ></div>
+                                        )}
                                     </>
                                 )}
 
@@ -898,12 +1016,6 @@ export default function ScreenCapture(props: propsIF) {
                                     className={styles.captured_raw_image}
                                 />
                             </div>
-
-                            {/* {
-                                areaDrawActive && (
-                                    <div className={styles.rect_marker} style={getStyleFromRect(areaDrawRectRef.current)}></div>
-                                )
-                            } */}
 
                             <span className={styles.image_preview_helper_text}>
                                 {' '}
@@ -916,11 +1028,12 @@ export default function ScreenCapture(props: propsIF) {
                                     className={
                                         styles.marker_toolbar_item +
                                         ' ' +
-                                        (areaDrawActive ? styles.active : '')
+                                        (areaDrawStateRef.current !==
+                                        AreaDrawStates.Idle
+                                            ? styles.active
+                                            : '')
                                     }
-                                    onClick={() =>
-                                        setAreaDrawActive(!areaDrawActive)
-                                    }
+                                    onClick={areaDrawBtnListener}
                                 >
                                     <BiScreenshot size={18} />
                                 </div>
