@@ -997,6 +997,7 @@ export default function ScreenCapture(props: propsIF) {
                                         focusListener={markerFocusListener}
                                         isDisabled={marker.disabled}
                                         removeListener={removeMarker}
+                                        isShape={marker.isShape}
                                     >
                                         {createMarkerContent(marker)}
                                     </DraggableItem>

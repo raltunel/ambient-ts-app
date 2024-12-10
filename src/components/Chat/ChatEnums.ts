@@ -28,10 +28,17 @@ export enum DraggableItemControlStates {
     Rotating,
     Moving,
     Scaling,
+    XScaling,
+    YScaling,
 }
 
 export enum AreaDrawStates {
     Idle,
     Ready,
     Drawing,
+}
+
+export enum ScaleTypes {
+    X,
+    Y,
 }
