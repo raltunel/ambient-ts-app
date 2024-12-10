@@ -85,9 +85,9 @@ export default function DraggableItem(props: propsIF) {
     const prevRotateRef = useRef(prevRotation);
     prevRotateRef.current = prevRotation;
 
-    const [scale, setScale] = useState<number | number[]>(isShape ? [1, 1] : 1);
-    const [prevScale, setPrevScale] = useState(isShape ? [1, 1] : 1);
-    const prevScaleRef = useRef<number | number[]>(prevScale);
+    const [scale, setScale] = useState<number[]>([1, 1]);
+    const [prevScale, setPrevScale] = useState([1, 1]);
+    const prevScaleRef = useRef<number[]>(prevScale);
     prevScaleRef.current = prevScale;
 
     const [controlState, setControlState] = useState(
@@ -140,32 +140,20 @@ export default function DraggableItem(props: propsIF) {
         setControlState(DraggableItemControlStates.Idle);
     };
 
-    const getNewScale = (ratio: number | number[]) => {
-        if (Array.isArray(ratio)) {
-            if (prevScaleRef.current && Array.isArray(prevScaleRef.current)) {
-                const ret = [
-                    ratio[0] * prevScaleRef.current[0],
-                    ratio[1] * prevScaleRef.current[1],
-                ];
+    const getNewScale = (ratio: number[]) => {
+        if (prevScaleRef.current) {
+            const ret = [
+                ratio[0] * prevScaleRef.current[0],
+                ratio[1] * prevScaleRef.current[1],
+            ];
 
-                if (ret[0] < minScale) ret[0] = minScale;
-                if (ret[1] < minScale) ret[1] = minScale;
-                if (ret[0] > maxScale) ret[0] = maxScale;
-                if (ret[1] > maxScale) ret[1] = maxScale;
-                return ret;
-            }
-        } else {
-            if (
-                prevScaleRef.current &&
-                typeof prevScaleRef.current === 'number'
-            ) {
-                let ret = ratio * prevScaleRef.current || 1;
-                if (ret < minScale) ret = minScale;
-                if (ret > maxScale) ret = maxScale;
-                return ret;
-            }
+            if (ret[0] < minScale) ret[0] = minScale;
+            if (ret[1] < minScale) ret[1] = minScale;
+            if (ret[0] > maxScale) ret[0] = maxScale;
+            if (ret[1] > maxScale) ret[1] = maxScale;
+            return ret;
         }
-        return 1;
+        return [1, 1];
     };
 
     const getScaleAsCoef = () => {
@@ -255,9 +243,10 @@ export default function DraggableItem(props: propsIF) {
                         currentPointX ** 2 + currentPointY ** 2,
                     );
 
-                    const newScale = getNewScale(
+                    const newScale = getNewScale([
                         pivotToCurrentPointLength / pivotToStartPointLength,
-                    );
+                        pivotToCurrentPointLength / pivotToStartPointLength,
+                    ]);
                     setScale(newScale);
                 }
                 break;
@@ -358,8 +347,8 @@ export default function DraggableItem(props: propsIF) {
 
     const calculateControlNodeStyle = () => {
         return {
-            width: calculateWithRound(8 / getScaleAsCoef()) + 'px',
-            height: calculateWithRound(8 / getScaleAsCoef()) + 'px',
+            width: calculateWithRound(8 / scale[0]) + 'px',
+            height: calculateWithRound(8 / scale[1]) + 'px',
         };
     };
 
@@ -414,7 +403,7 @@ export default function DraggableItem(props: propsIF) {
                 </div>
                 <div
                     style={{
-                        width: calculateWithRound(2 / getScaleAsCoef()) + 'px',
+                        width: calculateWithRound(2 / scale[0]) + 'px',
                     }}
                     className={styles.main_rotate_node_tail}
                 ></div>
@@ -473,7 +462,7 @@ export default function DraggableItem(props: propsIF) {
                     <div
                         className={styles.color_swatches}
                         style={{
-                            transform: `translate(-50%, ${140 - 10 * getScaleAsCoef()}%) scale(${1 / getScaleAsCoef()})`,
+                            transform: `translate(-50%, ${140 - 10 * getScaleAsCoef()}%) scale(${1 / scale[0]}, ${1 / scale[1]})`,
                         }}
                     >
                         {colorSwatches.map((color) =>
@@ -489,7 +478,7 @@ export default function DraggableItem(props: propsIF) {
                             props.removeListener?.(props.id || '');
                         }}
                         style={{
-                            transform: `translateY(-50%) scale(${1 / getScaleAsCoef()})`,
+                            transform: `translateY(-50%) scale(${1 / scale[0]}, ${1 / scale[1]})`,
                         }}
                     >
                         <MdDeleteOutline size={24} />
@@ -505,7 +494,7 @@ export default function DraggableItem(props: propsIF) {
                         ref={contentRef}
                         className={styles.draggable_wrapper_content}
                         style={{
-                            borderWidth: `${calculateWithRound(2 / getScaleAsCoef())}px`,
+                            borderWidth: `${calculateWithRound(2 / scale[0])}px`,
                         }}
                         onMouseDown={itemMouseDownListener}
                         onMouseUp={itemMouseUpListener}
