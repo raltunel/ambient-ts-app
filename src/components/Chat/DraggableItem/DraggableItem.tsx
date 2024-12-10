@@ -391,6 +391,9 @@ export default function DraggableItem(props: propsIF) {
                 <div
                     className={styles.main_rotate_node}
                     onMouseDown={rotateNodeMouseDownListener}
+                    style={{
+                        top: -2 / scale[0] + 'rem',
+                    }}
                 >
                     <div className={styles.main_rotate_node_inner}>
                         <div
@@ -404,6 +407,8 @@ export default function DraggableItem(props: propsIF) {
                 <div
                     style={{
                         width: calculateWithRound(2 / scale[0]) + 'px',
+                        height: 2 / scale[0] + 'rem',
+                        top: -2 / scale[0] + 'rem',
                     }}
                     className={styles.main_rotate_node_tail}
                 ></div>
@@ -479,6 +484,8 @@ export default function DraggableItem(props: propsIF) {
                         }}
                         style={{
                             transform: `translateY(-50%) scale(${1 / scale[0]}, ${1 / scale[1]})`,
+                            // right: -75 + 4 * scale[0] + '%',
+                            right: -1 - 1 / scale[0] + 'rem',
                         }}
                     >
                         <MdDeleteOutline size={24} />
