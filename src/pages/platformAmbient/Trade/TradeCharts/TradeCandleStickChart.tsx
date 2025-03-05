@@ -520,8 +520,6 @@ function TradeCandleStickChart(props: propsIF) {
             depthLiqBidData.sort((a: any, b: any) => b.liqPrices - a.liqPrices);
             depthLiqAskData.sort((a: any, b: any) => b.liqPrices - a.liqPrices);
 
-            console.log({ depthLiqBidData });
-
             return {
                 liqAskData: liqAskData,
                 liqBidData: liqBidData,
