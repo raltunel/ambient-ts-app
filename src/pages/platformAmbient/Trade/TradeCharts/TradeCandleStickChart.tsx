@@ -460,6 +460,8 @@ function TradeCandleStickChart(props: propsIF) {
                     ? data.upperBoundInvPriceDecimalCorrected
                     : data.upperBoundPriceDecimalCorrected;
 
+                const cumLiq = isDenomBase ? data.cumBidLiq : data.cumAskLiq;
+
                 liqAskData.push({
                     activeLiq: liquidityScale(data.activeLiq),
                     liqPrices: liqUpperPrices,
@@ -473,7 +475,7 @@ function TradeCandleStickChart(props: propsIF) {
 
                 depthLiqAskData.push({
                     activeLiq: depthLiquidityScale(
-                        data.cumAskLiq > 0 ? data.cumAskLiq : -data.cumAskLiq,
+                        cumLiq > 0 ? cumLiq : -cumLiq,
                     ),
                     liqPrices: liqUpperPrices,
                     deltaAverageUSD: data.deltaAverageUSD,
@@ -488,6 +490,8 @@ function TradeCandleStickChart(props: propsIF) {
                     ? data.lowerBoundInvPriceDecimalCorrected
                     : data.lowerBoundPriceDecimalCorrected;
 
+                const cumLiq = isDenomBase ? data.cumAskLiq : data.cumBidLiq;
+
                 liqBidData.push({
                     activeLiq: liquidityScale(data.activeLiq),
                     liqPrices: liqLowerPrices,
@@ -501,7 +505,7 @@ function TradeCandleStickChart(props: propsIF) {
 
                 depthLiqBidData.push({
                     activeLiq: depthLiquidityScale(
-                        data.cumBidLiq > 0 ? data.cumBidLiq : -data.cumBidLiq,
+                        cumLiq > 0 ? cumLiq : -cumLiq,
                     ),
                     liqPrices: liqLowerPrices,
                     deltaAverageUSD: data.deltaAverageUSD,
@@ -515,6 +519,8 @@ function TradeCandleStickChart(props: propsIF) {
             liqBidData.sort((a: any, b: any) => b.liqPrices - a.liqPrices);
             depthLiqBidData.sort((a: any, b: any) => b.liqPrices - a.liqPrices);
             depthLiqAskData.sort((a: any, b: any) => b.liqPrices - a.liqPrices);
+
+            console.log({ depthLiqBidData });
 
             return {
                 liqAskData: liqAskData,
