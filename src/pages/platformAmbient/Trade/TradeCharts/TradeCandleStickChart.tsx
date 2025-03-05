@@ -457,7 +457,7 @@ function TradeCandleStickChart(props: propsIF) {
 
             tempAskRanges.forEach((data: LiquidityRangeIF) => {
                 const liqUpperPrices = isDenomBase
-                    ? data.lowerBoundInvPriceDecimalCorrected
+                    ? data.upperBoundInvPriceDecimalCorrected
                     : data.upperBoundPriceDecimalCorrected;
 
                 liqAskData.push({
@@ -485,7 +485,7 @@ function TradeCandleStickChart(props: propsIF) {
 
             tempBidRanges.forEach((data: LiquidityRangeIF) => {
                 const liqLowerPrices = isDenomBase
-                    ? data.upperBoundInvPriceDecimalCorrected
+                    ? data.lowerBoundInvPriceDecimalCorrected
                     : data.lowerBoundPriceDecimalCorrected;
 
                 liqBidData.push({

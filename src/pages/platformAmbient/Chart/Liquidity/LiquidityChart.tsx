@@ -151,28 +151,6 @@ export default function LiquidityChart(props: liquidityPropsIF) {
 
     const isAmbientPosition = simpleRangeWidth === 100 && !advancedMode;
 
-    const liqDataDepthAsk = useMemo<LiquidityDataLocal[]>(() => {
-        return advancedMode
-            ? liquidityData?.depthLiqAskData
-            : liquidityData?.depthLiqAskData.filter(
-                  (d: LiquidityDataLocal) =>
-                      d.liqPrices <= liquidityData?.topBoundary,
-              );
-    }, [
-        advancedMode,
-        liquidityData?.depthLiqAskData,
-        liquidityData?.topBoundary,
-    ]);
-
-    const liqDataAsk = useMemo<LiquidityDataLocal[]>(() => {
-        return advancedMode
-            ? liquidityData?.liqAskData
-            : liquidityData?.liqAskData.filter(
-                  (d: LiquidityDataLocal) =>
-                      d.liqPrices <= liquidityData?.topBoundary,
-              );
-    }, [liquidityData?.liqAskData]);
-
     const findLiqNearest = (
         liqDataAll: LiquidityDataLocal[],
     ): nearestLiquidity => {
@@ -217,6 +195,34 @@ export default function LiquidityChart(props: liquidityPropsIF) {
         }
         return { min: undefined, max: undefined };
     };
+
+    const liqDataDepthAsk = useMemo<LiquidityDataLocal[]>(() => {
+        return advancedMode
+            ? liquidityData?.depthLiqAskData
+            : liquidityData?.depthLiqAskData.filter(
+                  (d: LiquidityDataLocal) =>
+                      d.liqPrices <=
+                      (scaleData
+                          ? scaleData?.yScale.domain()[1]
+                          : liquidityData?.topBoundary),
+              );
+    }, [
+        advancedMode,
+        liquidityData?.depthLiqAskData,
+        scaleData?.yScale.domain()[1],
+    ]);
+
+    const liqDataAsk = useMemo<LiquidityDataLocal[]>(() => {
+        return advancedMode
+            ? liquidityData?.liqAskData
+            : liquidityData?.liqAskData.filter(
+                  (d: LiquidityDataLocal) =>
+                      d.liqPrices <=
+                      (scaleData
+                          ? scaleData?.yScale.domain()[1]
+                          : liquidityData?.topBoundary),
+              );
+    }, [liquidityData?.liqAskData, scaleData?.yScale.domain()[1]]);
 
     const liqMaxActiveLiq = useMemo<number | undefined>(() => {
         if (scaleData && liquidityDepthScale && liquidityScale) {
@@ -1012,9 +1018,6 @@ export default function LiquidityChart(props: liquidityPropsIF) {
                     item.liqPrices ===
                     d3.min(filtered, (d: LiquidityDataLocal) => d.liqPrices),
             );
-
-            console.log('liquidityData?.liqAskData', liqDataAsk, closest);
-
             filtered.map((data: LiquidityDataLocal) => {
                 if (
                     mousePosition > data.liqPrices &&
