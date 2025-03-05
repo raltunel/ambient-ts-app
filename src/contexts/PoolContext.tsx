@@ -22,15 +22,17 @@ import { PoolIF, PoolStatIF } from '../ambient-utils/types';
 import useFetchPoolStats from '../App/hooks/useFetchPoolStats';
 import { usePoolList } from '../App/hooks/usePoolList';
 import { AppStateContext } from './AppStateContext';
+import { ChainDataContext } from './ChainDataContext';
 import { CrocEnvContext } from './CrocEnvContext';
 import { TradeDataContext } from './TradeDataContext';
 
 export interface PoolContextIF {
-    poolList: PoolIF[];
+    analyticsPoolList: PoolIF[] | undefined;
+    activePoolList: PoolIF[];
     pool: CrocPoolView | undefined;
     isPoolInitialized: boolean | undefined;
     poolPriceDisplay: number | undefined;
-    isPoolPriceChangePositive: boolean;
+    isPoolPriceChangePositive: boolean | undefined;
     poolPriceChangePercent: string | undefined;
     dailyVol: number | undefined;
     poolData: PoolStatIF;
@@ -48,14 +50,35 @@ export const PoolContext = createContext({} as PoolContextIF);
 
 export const PoolContextProvider = (props: { children: ReactNode }) => {
     const {
-        activeNetwork: { GCGO_URL, chainId, poolIndex },
+        activeNetwork: { chainId, poolIndex },
     } = useContext(AppStateContext);
     const { crocEnv } = useContext(CrocEnvContext);
+    const { gcgoPoolList } = useContext(ChainDataContext);
+
+    const analyticsPoolList: PoolIF[] | undefined = usePoolList(crocEnv);
+
+    const [activePoolList, setActivePoolList] = useState<PoolIF[]>(
+        analyticsPoolList?.length ? analyticsPoolList : [],
+    );
+
+    useEffect(() => {
+        let timeout: NodeJS.Timeout;
+
+        if (!analyticsPoolList?.length) {
+            timeout = setTimeout(() => {
+                if (!analyticsPoolList?.length && gcgoPoolList?.length) {
+                    setActivePoolList(gcgoPoolList);
+                }
+            }, 2000);
+        } else {
+            setActivePoolList(analyticsPoolList);
+        }
+
+        return () => clearTimeout(timeout); // Cleanup on re-run or unmount
+    }, [JSON.stringify(analyticsPoolList), JSON.stringify(gcgoPoolList)]);
 
     const { baseToken, quoteToken, isDenomBase, didUserFlipDenom } =
         useContext(TradeDataContext);
-
-    const poolList: PoolIF[] = usePoolList(GCGO_URL, crocEnv);
 
     const pool = useMemo(
         () => crocEnv?.pool(baseToken.address, quoteToken.address),
@@ -63,14 +86,17 @@ export const PoolContextProvider = (props: { children: ReactNode }) => {
     );
 
     const poolArg: PoolIF = {
-        base: baseToken,
-        quote: quoteToken,
+        baseToken,
+        quoteToken,
+        base: baseToken.address,
+        quote: quoteToken.address,
         chainId: chainId,
         poolIdx: poolIndex,
     };
 
     const poolData = useFetchPoolStats(
         poolArg,
+        activePoolList,
         undefined,
         true,
         true,
@@ -133,14 +159,15 @@ export const PoolContextProvider = (props: { children: ReactNode }) => {
             baseToken.address,
             quoteToken.address,
         );
-        const isPairEthPair = isETHPair(baseToken.address, quoteToken.address);
+        const isPairEthPair = isETHPair(
+            baseToken.address,
+            quoteToken.address,
+            chainId,
+        );
         const isPoolBtcPair = isBtcPair(baseToken.address, quoteToken.address);
 
         const excludeFromUsdConversion =
-            isDefaultDenomTokenExcludedFromUsdConversion(
-                baseToken.address,
-                quoteToken.address,
-            );
+            isDefaultDenomTokenExcludedFromUsdConversion(baseToken, quoteToken);
 
         const isPairEthWbtc =
             baseToken.address === ZERO_ADDRESS &&
@@ -165,7 +192,8 @@ export const PoolContextProvider = (props: { children: ReactNode }) => {
     }, [baseToken.address, quoteToken.address, usdPrice !== undefined]);
 
     const poolContext: PoolContextIF = {
-        poolList,
+        analyticsPoolList,
+        activePoolList,
         pool,
         isPoolInitialized,
         poolPriceDisplay,

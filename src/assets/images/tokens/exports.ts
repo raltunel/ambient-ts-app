@@ -15,10 +15,12 @@ import EZETH from './EZETH.png';
 import FRAX from './FRAX.png';
 import GLORY from './GLORY.png';
 import JUICE from './JUICE.svg';
+import KING from './KING.svg';
 import LDO from './LDO.svg';
 import LINK from './LINK.svg';
 import MIA from './MIA.png';
 import MKR from './MKR.png';
+import NELIXIR from './NELIXIR.svg';
 import NEV from './NEV.webp';
 import NRWA from './NRWA.svg';
 import NTBILL from './NTBILL.svg';
@@ -86,10 +88,12 @@ export {
     FRAX,
     GLORY,
     JUICE,
+    KING,
     LDO,
     LINK,
     MIA,
     MKR,
+    NELIXIR,
     NEV,
     NRWA,
     NTBILL,

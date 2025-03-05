@@ -59,15 +59,18 @@ import {
 } from '../../../../utils/TransactionError';
 
 export default function Limit() {
-    const { crocEnv, ethMainnetUsdPrice, provider } =
-        useContext(CrocEnvContext);
+    const { crocEnv, provider } = useContext(CrocEnvContext);
 
     const {
         activeNetwork: { chainId, gridSize, poolIndex },
         isUserOnline,
     } = useContext(AppStateContext);
-    const { gasPriceInGwei, isActiveNetworkL2, isActiveNetworkPlume } =
-        useContext(ChainDataContext);
+    const {
+        gasPriceInGwei,
+        nativeTokenUsdPrice,
+        isActiveNetworkL2,
+        isActiveNetworkPlume,
+    } = useContext(ChainDataContext);
     const {
         pool,
         isPoolInitialized,
@@ -561,7 +564,7 @@ export default function Limit() {
     const [extraL1GasFeeLimit] = useState(isActiveNetworkL2 ? 0.01 : 0);
 
     useEffect(() => {
-        if (gasPriceInGwei && ethMainnetUsdPrice) {
+        if (gasPriceInGwei && nativeTokenUsdPrice) {
             const averageLimitCostInGasDrops = isSellTokenNativeToken
                 ? GAS_DROPS_ESTIMATE_LIMIT_NATIVE
                 : isWithdrawFromDexChecked
@@ -594,7 +597,7 @@ export default function Limit() {
                 gasPriceInGwei *
                 averageLimitCostInGasDrops *
                 NUM_GWEI_IN_WEI *
-                ethMainnetUsdPrice;
+                nativeTokenUsdPrice;
 
             setOrderGasPriceInDollars(
                 getFormattedNumber({
@@ -605,7 +608,7 @@ export default function Limit() {
         }
     }, [
         gasPriceInGwei,
-        ethMainnetUsdPrice,
+        nativeTokenUsdPrice,
         isSellTokenNativeToken,
         isWithdrawFromDexChecked,
         isTokenADexSurplusSufficient,
@@ -655,7 +658,20 @@ export default function Limit() {
         });
 
         let tx;
+
         try {
+            const pos = crocEnv.positions(
+                baseToken.address,
+                quoteToken.address,
+                userAddress ?? '',
+            );
+            const liqBigInt = (
+                await pos.queryKnockoutLivePos(
+                    isSellTokenBase,
+                    isSellTokenBase ? limitTick : limitTick - gridSize,
+                    isSellTokenBase ? limitTick + gridSize : limitTick,
+                )
+            ).liq;
             try {
                 tx = await submitLimitOrder({
                     crocEnv,
@@ -760,6 +776,13 @@ export default function Limit() {
                         ? limitTick + gridSize
                         : limitTick,
                     isBid: isSellTokenBase,
+                    initialTokenQty: isSellTokenBase
+                        ? tokenAInputQtyNoExponentString
+                        : tokenBInputQtyNoExponentString,
+                    secondaryTokenQty: isSellTokenBase
+                        ? tokenBInputQtyNoExponentString
+                        : tokenAInputQtyNoExponentString,
+                    currentLiquidity: liqBigInt,
                 },
             });
 

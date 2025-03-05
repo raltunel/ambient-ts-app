@@ -59,14 +59,18 @@ export const DEFAULT_MIN_PRICE_DIFF_PERCENTAGE = -10;
 export const DEFAULT_MAX_PRICE_DIFF_PERCENTAGE = 10;
 
 function Range() {
-    const { ethMainnetUsdPrice, crocEnv } = useContext(CrocEnvContext);
+    const { crocEnv } = useContext(CrocEnvContext);
 
     const {
         activeNetwork: { chainId, gridSize },
     } = useContext(AppStateContext);
 
-    const { gasPriceInGwei, isActiveNetworkPlume, isActiveNetworkL2 } =
-        useContext(ChainDataContext);
+    const {
+        gasPriceInGwei,
+        nativeTokenUsdPrice,
+        isActiveNetworkPlume,
+        isActiveNetworkL2,
+    } = useContext(ChainDataContext);
     const {
         poolPriceDisplay,
         dailyVol,
@@ -278,19 +282,21 @@ function Range() {
     const isAdd = useMemo(
         () =>
             userPositions.length > 0 &&
-            userPositions.some((position: PositionIF) => {
-                if (isAmbient && position.positionType === 'ambient') {
-                    return true;
-                } else if (
-                    !isAmbient &&
-                    defaultLowTick === position.bidTick &&
-                    defaultHighTick === position.askTick
-                ) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }),
+            userPositions
+                .filter((position) => position.positionLiq !== 0)
+                .some((position: PositionIF) => {
+                    if (isAmbient && position.positionType === 'ambient') {
+                        return true;
+                    } else if (
+                        !isAmbient &&
+                        defaultLowTick === position.bidTick &&
+                        defaultHighTick === position.askTick
+                    ) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }),
         [userPositions, isAmbient, defaultLowTick, defaultHighTick],
     );
 
@@ -886,7 +892,7 @@ function Range() {
     }, [tokenA.address + tokenB.address, primaryQuantity]);
 
     useEffect(() => {
-        if (gasPriceInGwei && ethMainnetUsdPrice) {
+        if (gasPriceInGwei && nativeTokenUsdPrice) {
             const costOfMainnetPoolInETH =
                 gasPriceInGwei * GAS_DROPS_ESTIMATE_POOL * NUM_GWEI_IN_WEI;
 
@@ -915,7 +921,7 @@ function Range() {
                 gasPriceInGwei *
                 GAS_DROPS_ESTIMATE_POOL *
                 NUM_GWEI_IN_WEI *
-                ethMainnetUsdPrice;
+                nativeTokenUsdPrice;
 
             setRangeGasPriceinDollars(
                 getFormattedNumber({
@@ -926,7 +932,7 @@ function Range() {
         }
     }, [
         gasPriceInGwei,
-        ethMainnetUsdPrice,
+        nativeTokenUsdPrice,
         l1GasFeePoolInGwei,
         extraL1GasFeePool,
     ]);

@@ -19,6 +19,7 @@ import {
     tickToPrice,
     toDisplayPrice,
 } from '@crocswap-libs/sdk';
+import { lookupChain } from '@crocswap-libs/sdk/dist/context';
 import { candleTimeIF } from '../../../App/hooks/useChartSettings';
 import useDebounce from '../../../App/hooks/useDebounce';
 import { useDrawSettings } from '../../../App/hooks/useDrawSettings';
@@ -27,6 +28,7 @@ import {
     diffHashSig,
     diffHashSigChart,
     diffHashSigScaleData,
+    formatSubscript,
     getPinnedPriceValuesFromDisplayPrices,
     getPinnedPriceValuesFromTicks,
     getPinnedTickFromDisplayPrice,
@@ -42,6 +44,7 @@ import {
     LimitOrderIF,
     TransactionIF,
 } from '../../../ambient-utils/types';
+import { GraphDataContext } from '../../../contexts';
 import { AppStateContext } from '../../../contexts/AppStateContext';
 import { BrandContext } from '../../../contexts/BrandContext';
 import { CandleContext } from '../../../contexts/CandleContext';
@@ -55,7 +58,6 @@ import { UserDataContext } from '../../../contexts/UserDataContext';
 import useHandleSwipeBack from '../../../utils/hooks/useHandleSwipeBack';
 import { linkGenMethodsIF, useLinkGen } from '../../../utils/hooks/useLinkGen';
 import useMediaQuery from '../../../utils/hooks/useMediaQuery';
-import useOnClickOutside from '../../../utils/hooks/useOnClickOutside';
 import { updatesIF } from '../../../utils/hooks/useUrlParams';
 import { formatDollarAmountAxis } from '../../../utils/numbers';
 import ChartSettings from '../../Chart/ChartSettings/ChartSettings';
@@ -64,6 +66,7 @@ import XAxisCanvas from './Axes/xAxis/XaxisCanvas';
 import YAxisCanvas from './Axes/yAxis/YaxisCanvas';
 import CandleChart from './Candle/CandleChart';
 import './Chart.css';
+import { updateZeroPriceCandles } from './ChartUtils/candleDataUtils';
 import {
     LS_KEY_CHART_ANNOTATIONS,
     defaultCandleBandwith,
@@ -124,9 +127,6 @@ import OrderHistoryTooltip from './OrderHistoryCh/OrderHistoryTooltip';
 import RangeLinesChart from './RangeLine/RangeLinesChart';
 import TvlChart from './Tvl/TvlChart';
 import VolumeBarCanvas from './Volume/VolumeBarCanvas';
-import { GraphDataContext } from '../../../contexts';
-import { lookupChain } from '@crocswap-libs/sdk/dist/context';
-import { updateZeroPriceCandles } from './ChartUtils/candleDataUtils';
 
 interface propsIF {
     isTokenABase: boolean;
@@ -254,6 +254,7 @@ export default function Chart(props: propsIF) {
         setShouldResetBuffer,
         colorChangeTrigger,
         setColorChangeTrigger,
+        chartSettingsRef,
     } = useContext(ChartContext);
     const {
         setCandleDomains,
@@ -449,16 +450,26 @@ export default function Chart(props: propsIF) {
     const clickOutsideChartHandler = (event: Event) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const e = event.target as any;
-        if (!e.id.includes('chart_settings') && shouldDisableChartSettings) {
-            setContextmenu(false);
+
+        const el = chartSettingsRef?.current;
+
+        const contextButton = document.getElementById('chart_settings_button');
+
+        if (
+            (contextButton && contextButton.contains(e as Node)) ||
+            el.contains((e as Node) || null)
+        ) {
+            return;
         }
 
         if (!shouldDisableChartSettings) {
             setCloseOutherChartSetting(true);
         }
-    };
 
-    useOnClickOutside(d3Container, clickOutsideChartHandler);
+        if (shouldDisableChartSettings) {
+            setContextmenu(false);
+        }
+    };
 
     const isShowLatestCandle = useMemo(() => {
         return checkShowLatestCandle(period, scaleData?.xScale);
@@ -1245,8 +1256,9 @@ export default function Chart(props: propsIF) {
             period,
             isCondensedModeEnabled,
             candleDomains,
+            timeGaps,
         );
-    }, [period, isCondensedModeEnabled]);
+    }, [period, isCondensedModeEnabled, timeGaps]);
 
     const chartPoolPrice = useMemo(() => {
         let poolPrice = poolPriceDisplay;
@@ -1427,7 +1439,10 @@ export default function Chart(props: propsIF) {
 
                 const rectCanvas = canvas.getBoundingClientRect();
                 const width = rectCanvas.width;
+
                 scaleData.xScale.range([0, width]);
+                scaleData.drawingLinearxScale.range([0, width]);
+
                 const lastDateArray = timeGaps
                     .sort((a, b) => b.range[1] - a.range[1])
                     .filter((i) => i.isAddedPixel);
@@ -2796,11 +2811,11 @@ export default function Chart(props: propsIF) {
             .node() as HTMLCanvasElement;
         const rectCanvas = canvas.getBoundingClientRect();
         let offsetY = 0;
-        let movemementY = 0;
+        let movementY = 0;
         let newLimitValue: number | undefined;
         let tempNewLimitValue: number | undefined;
 
-        let tempMovemementY = 0;
+        let tempMovementY = 0;
         let cancelDrag = false;
         let oldLimitValue: number | undefined = undefined;
         // clicking esc while dragging the line sets the line to the last value
@@ -2834,7 +2849,7 @@ export default function Chart(props: propsIF) {
                     typeof TouchEvent !== 'undefined' &&
                     event.sourceEvent instanceof TouchEvent
                 ) {
-                    tempMovemementY =
+                    tempMovementY =
                         event.sourceEvent.touches[0].clientY - rectCanvas?.top;
                 }
             })
@@ -2850,11 +2865,11 @@ export default function Chart(props: propsIF) {
                             event.sourceEvent.touches[0].clientY -
                             rectCanvas?.top;
 
-                        movemementY = offsetY - tempMovemementY;
+                        movementY = offsetY - tempMovementY;
                     } else {
                         offsetY = event.sourceEvent.clientY - rectCanvas?.top;
 
-                        movemementY = event.sourceEvent.movementY;
+                        movementY = event.sourceEvent.movementY;
                     }
                     if (!cancelDrag) {
                         // to hide the crosshair when dragging the line set the crosshairActive to 'none'.
@@ -2864,7 +2879,7 @@ export default function Chart(props: propsIF) {
                         if (tempNewLimitValue !== undefined) {
                             tempNewLimitValue = scaleData?.yScale.invert(
                                 scaleData?.yScale(tempNewLimitValue) +
-                                    movemementY,
+                                    movementY,
                             );
 
                             // Perform calculations based on the new limit value
@@ -2886,14 +2901,14 @@ export default function Chart(props: propsIF) {
                         typeof TouchEvent !== 'undefined' &&
                         event.sourceEvent instanceof TouchEvent
                     ) {
-                        tempMovemementY =
+                        tempMovementY =
                             event.sourceEvent.touches[0].clientY -
                             rectCanvas?.top;
                     }
                 });
             })
             .on('end', () => {
-                tempMovemementY = 0;
+                tempMovementY = 0;
                 setIsLineDrag(false);
                 // If the drag is not canceled
                 if (!cancelDrag) {
@@ -3077,6 +3092,7 @@ export default function Chart(props: propsIF) {
             const domain = [newDomainMin, newDomainMax];
 
             scaleData?.xScale.domain([domain[0], domain[1]]);
+            scaleData?.drawingLinearxScale.domain([domain[0], domain[1]]);
         }
     }
 
@@ -3517,6 +3533,10 @@ export default function Chart(props: propsIF) {
                 })
                 .on('measure', (event: CustomEvent) => {
                     scaleData?.xScale.range([0, event.detail.width]);
+                    scaleData?.drawingLinearxScale.range([
+                        0,
+                        event.detail.width,
+                    ]);
                     scaleData?.yScale.range([event.detail.height, 0]);
                     ctx.setLineDash([4, 2]);
                     crosshairVerticalCanvas.context(ctx);
@@ -3533,17 +3553,17 @@ export default function Chart(props: propsIF) {
     ]);
 
     const circleSeries = createCircle(
-        scaleData?.xScale,
+        scaleData?.drawingLinearxScale,
         scaleData?.yScale,
-        60,
+        50,
         0.5,
         denomInBase,
     );
 
     const selectedCircleSeries = createCircle(
-        scaleData?.xScale,
+        scaleData?.drawingLinearxScale,
         scaleData?.yScale,
-        80,
+        70,
         0.5,
         denomInBase,
         true,
@@ -3560,13 +3580,13 @@ export default function Chart(props: propsIF) {
 
         if (scaleData && lineSeries) {
             const rayLine = createAnnotationLineSeries(
-                scaleData?.xScale.copy(),
+                scaleData?.drawingLinearxScale.copy(),
                 scaleData?.yScale,
                 denomInBase,
             );
 
             const bandArea = createBandArea(
-                scaleData?.xScale.copy(),
+                scaleData?.drawingLinearxScale.copy(),
                 scaleData?.yScale,
                 denomInBase,
             );
@@ -3603,6 +3623,7 @@ export default function Chart(props: propsIF) {
                                     );
 
                                     lineSeries(item?.data);
+                                    if (ctx) ctx.setLineDash([0, 0]);
                                 }
 
                                 if (
@@ -3610,8 +3631,12 @@ export default function Chart(props: propsIF) {
                                     item.type === 'DPRange'
                                 ) {
                                     const range = [
-                                        scaleData?.xScale(item.data[0].x),
-                                        scaleData?.xScale(item.data[1].x),
+                                        scaleData?.drawingLinearxScale(
+                                            item.data[0].x,
+                                        ),
+                                        scaleData?.drawingLinearxScale(
+                                            item.data[1].x,
+                                        ),
                                     ];
 
                                     bandArea.xScale().range(range);
@@ -3720,6 +3745,10 @@ export default function Chart(props: propsIF) {
                                                                     );
                                                                 }
                                                             } else {
+                                                                if (ctx)
+                                                                    ctx.setLineDash(
+                                                                        [0, 0],
+                                                                    );
                                                                 circleSeries([
                                                                     element,
                                                                 ]);
@@ -3753,7 +3782,7 @@ export default function Chart(props: propsIF) {
                                         const lineOfDPRange =
                                             createPointsOfDPRangeLine(
                                                 item.data,
-                                                scaleData.xScale,
+                                                scaleData.drawingLinearxScale,
                                             );
 
                                         lineOfDPRange?.forEach((line) => {
@@ -3815,8 +3844,10 @@ export default function Chart(props: propsIF) {
                                         );
 
                                         const width = Math.abs(
-                                            scaleData.xScale(item.data[0].x) -
-                                                scaleData.xScale(
+                                            scaleData.drawingLinearxScale(
+                                                item.data[0].x,
+                                            ) -
+                                                scaleData.drawingLinearxScale(
                                                     item.data[1].x,
                                                 ),
                                         );
@@ -3858,16 +3889,16 @@ export default function Chart(props: propsIF) {
 
                                         const diff =
                                             Math.abs(
-                                                scaleData.xScale(
+                                                scaleData.drawingLinearxScale(
                                                     item.data[0].x,
                                                 ) -
-                                                    scaleData.xScale(
+                                                    scaleData.drawingLinearxScale(
                                                         item.data[1].x,
                                                     ),
                                             ) / 2;
 
                                         const infoLabelXAxisData =
-                                            scaleData.xScale(
+                                            scaleData.drawingLinearxScale(
                                                 Math.min(
                                                     item.data[0].x,
                                                     item.data[1].x,
@@ -3991,8 +4022,8 @@ export default function Chart(props: propsIF) {
                                             );
                                             const showCandleCount =
                                                 getCandleCount(
-                                                    scaleData.xScale,
-                                                    visibleCandleData,
+                                                    scaleData.drawingLinearxScale,
+                                                    unparsedCandleData,
                                                     [min, max],
                                                     period,
                                                     isCondensedModeEnabled,
@@ -4057,6 +4088,8 @@ export default function Chart(props: propsIF) {
                                                     ]);
                                                 }
                                             } else {
+                                                if (ctx)
+                                                    ctx.setLineDash([0, 0]);
                                                 circleSeries([element]);
                                             }
                                         });
@@ -4066,15 +4099,19 @@ export default function Chart(props: propsIF) {
                                 if (item.type === 'Ray') {
                                     rayLine
                                         .xScale()
-                                        .domain(scaleData.xScale.domain());
+                                        .domain(
+                                            scaleData.drawingLinearxScale.domain(),
+                                        );
 
                                     rayLine
                                         .yScale()
                                         .domain(scaleData.yScale.domain());
 
                                     const range = [
-                                        scaleData.xScale(item.data[0].x),
-                                        scaleData.xScale.range()[1],
+                                        scaleData.drawingLinearxScale(
+                                            item.data[0].x,
+                                        ),
+                                        scaleData.drawingLinearxScale.range()[1],
                                     ];
 
                                     rayLine.xScale().range(range);
@@ -4135,6 +4172,7 @@ export default function Chart(props: propsIF) {
                                                 ]);
                                             }
                                         } else {
+                                            if (ctx) ctx.setLineDash([0, 0]);
                                             circleSeries([
                                                 {
                                                     denomInBase:
@@ -4160,16 +4198,16 @@ export default function Chart(props: propsIF) {
 
                                     const range = [
                                         item.extendLeft
-                                            ? scaleData.xScale.range()[0]
-                                            : scaleData?.xScale(
+                                            ? scaleData.drawingLinearxScale.range()[0]
+                                            : scaleData?.drawingLinearxScale(
                                                   Math.min(
                                                       item.data[0].x,
                                                       item.data[1].x,
                                                   ),
                                               ),
                                         item.extendRight
-                                            ? scaleData.xScale.range()[1]
-                                            : scaleData?.xScale(
+                                            ? scaleData.drawingLinearxScale.range()[1]
+                                            : scaleData?.drawingLinearxScale(
                                                   Math.max(
                                                       item.data[0].x,
                                                       item.data[1].x,
@@ -4184,12 +4222,14 @@ export default function Chart(props: propsIF) {
                                     const fibLineData = calculateFibRetracement(
                                         data,
                                         item.extraData,
+                                        denomInBase,
                                     );
 
                                     const bandAreaData =
                                         calculateFibRetracementBandAreas(
                                             data,
                                             item.extraData,
+                                            denomInBase,
                                         );
 
                                     bandAreaData.forEach((bandData) => {
@@ -4206,12 +4246,21 @@ export default function Chart(props: propsIF) {
                                     });
 
                                     fibLineData.forEach((lineData) => {
+                                        const level =
+                                            lineData[0].denomInBase ===
+                                            denomInBase
+                                                ? lineData[0].y
+                                                : 1 / lineData[0].y;
+
+                                        const priceLevel =
+                                            level < 1
+                                                ? formatSubscript(level)
+                                                : level.toFixed(2).toString();
+
                                         const lineLabel =
                                             lineData[0].level +
                                             ' (' +
-                                            lineData[0].y
-                                                .toFixed(2)
-                                                .toString() +
+                                            priceLevel +
                                             ')';
 
                                         const lineMeasures =
@@ -4256,17 +4305,18 @@ export default function Chart(props: propsIF) {
                                             lineMeasures &&
                                             ctx
                                         ) {
-                                            const buffer = scaleData.xScale(
-                                                Math.min(
-                                                    lineData[0].x,
-                                                    lineData[1].x,
-                                                ) +
-                                                    Math.abs(
-                                                        lineData[0].x -
-                                                            lineData[1].x,
-                                                    ) /
-                                                        2,
-                                            );
+                                            const buffer =
+                                                scaleData.drawingLinearxScale(
+                                                    Math.min(
+                                                        lineData[0].x,
+                                                        lineData[1].x,
+                                                    ) +
+                                                        Math.abs(
+                                                            lineData[0].x -
+                                                                lineData[1].x,
+                                                        ) /
+                                                            2,
+                                                );
 
                                             ctx.save();
                                             ctx.beginPath();
@@ -4369,14 +4419,14 @@ export default function Chart(props: propsIF) {
                                                         'Left'
                                                     ) {
                                                         location =
-                                                            scaleData.xScale.domain()[0];
+                                                            scaleData.drawingLinearxScale.domain()[0];
                                                     } else if (
                                                         item.labelPlacement ===
                                                         'Right'
                                                     ) {
                                                         if (item.extendRight) {
                                                             location =
-                                                                scaleData.xScale.domain()[1];
+                                                                scaleData.drawingLinearxScale.domain()[1];
                                                         } else {
                                                             location = Math.max(
                                                                 lineData[0].x,
@@ -4392,7 +4442,7 @@ export default function Chart(props: propsIF) {
                                                                   lineData[0].x,
                                                                   lineData[1].x,
                                                               )
-                                                            : scaleData.xScale.domain()[1];
+                                                            : scaleData.drawingLinearxScale.domain()[1];
                                                 } else {
                                                     location =
                                                         item.labelPlacement ===
@@ -4409,7 +4459,9 @@ export default function Chart(props: propsIF) {
                                             }
 
                                             const linePlacement =
-                                                scaleData.xScale(location) +
+                                                scaleData.drawingLinearxScale(
+                                                    location,
+                                                ) +
                                                 (alignment === 'right'
                                                     ? -10
                                                     : alignment === 'left'
@@ -4615,6 +4667,10 @@ export default function Chart(props: propsIF) {
                 })
                 .on('measure', (event: CustomEvent) => {
                     scaleData?.xScale.range([0, event.detail.width]);
+                    scaleData?.drawingLinearxScale.range([
+                        0,
+                        event.detail.width,
+                    ]);
                     scaleData?.yScale.range([event.detail.height, 0]);
                     ctx.setLineDash([5, 3]);
                     marketLine.context(ctx);
@@ -4699,7 +4755,7 @@ export default function Chart(props: propsIF) {
                     ? 1 / poolPriceWithoutDenom
                     : poolPriceWithoutDenom;
 
-                const filteredMin = d3.min(unparsedCandleData, (d) =>
+                const filteredMin = d3.min(visibleCandleData, (d) =>
                     denomInBase
                         ? isLine
                             ? d.invPriceCloseExclMEVDecimalCorrected
@@ -4709,7 +4765,7 @@ export default function Chart(props: propsIF) {
                           : d.minPriceExclMEVDecimalCorrected,
                 );
 
-                const filteredMax = d3.max(unparsedCandleData, (d) =>
+                const filteredMax = d3.max(visibleCandleData, (d) =>
                     denomInBase
                         ? isLine
                             ? d.invPriceCloseExclMEVDecimalCorrected
@@ -5012,6 +5068,8 @@ export default function Chart(props: propsIF) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDocumentClick = (event: any) => {
             setHandleDocumentEvent(event);
+            clickOutsideChartHandler(event);
+
             if (
                 d3Container.current &&
                 !d3Container.current.contains(event.target) &&
@@ -5027,7 +5085,7 @@ export default function Chart(props: propsIF) {
         return () => {
             document.removeEventListener('click', handleDocumentClick);
         };
-    }, []);
+    }, [chartSettingsRef]);
 
     // mouseleave
     useEffect(() => {
@@ -5264,9 +5322,9 @@ export default function Chart(props: propsIF) {
             const distance = distanceToLine(
                 mouseX,
                 mouseY,
-                scaleData.xScale(startX),
+                scaleData.drawingLinearxScale(startX),
                 scaleData.yScale(startY),
-                scaleData.xScale(endX),
+                scaleData.drawingLinearxScale(endX),
                 scaleData.yScale(endY),
             );
 
@@ -5303,8 +5361,8 @@ export default function Chart(props: propsIF) {
             const endX = Math.max(element[0].x, element[1].x);
 
             if (
-                mouseX > scaleData.xScale(startX) - threshold &&
-                mouseX < scaleData.xScale(endX) + threshold &&
+                mouseX > scaleData.drawingLinearxScale(startX) - threshold &&
+                mouseX < scaleData.drawingLinearxScale(endX) + threshold &&
                 mouseY < scaleData.yScale(startY) + threshold &&
                 mouseY > scaleData.yScale(endY) - threshold
             ) {
@@ -5327,7 +5385,7 @@ export default function Chart(props: propsIF) {
                 element[0].denomInBase === denomInBase
                     ? element[0].y
                     : 1 / element[0].y;
-            const endX = scaleData.xScale.domain()[1];
+            const endX = scaleData.drawingLinearxScale.domain()[1];
             const endY =
                 element[0].denomInBase === denomInBase
                     ? element[0].y
@@ -5337,9 +5395,9 @@ export default function Chart(props: propsIF) {
             const distance = distanceToLine(
                 mouseX,
                 mouseY,
-                scaleData.xScale(startX),
+                scaleData.drawingLinearxScale(startX),
                 scaleData.yScale(startY),
-                scaleData.xScale(endX),
+                scaleData.drawingLinearxScale(endX),
                 scaleData.yScale(endY),
             );
 
@@ -5389,14 +5447,24 @@ export default function Chart(props: propsIF) {
         mouseX: number,
         mouseY: number,
         denomInBase: boolean,
+        extendLeft: boolean,
+        extendRight: boolean,
     ) {
         if (scaleData) {
-            const fibLineData = calculateFibRetracement(data, extraData);
+            const fibLineData = calculateFibRetracement(
+                data,
+                extraData,
+                denomInBase,
+            );
 
-            const startX = fibLineData[0][0].x;
-            const endX = fibLineData[0][1].x;
-            const tempStartXLocation = scaleData.xScale(startX);
-            const tempEndXLocation = scaleData.xScale(endX);
+            const startX = extendLeft
+                ? scaleData.drawingLinearxScale.domain()[0]
+                : fibLineData[0][0].x;
+            const endX = extendRight
+                ? scaleData.drawingLinearxScale.domain()[1]
+                : fibLineData[0][1].x;
+            const tempStartXLocation = scaleData.drawingLinearxScale(startX);
+            const tempEndXLocation = scaleData.drawingLinearxScale(endX);
 
             const threshold = 10;
 
@@ -5469,6 +5537,8 @@ export default function Chart(props: propsIF) {
                             mouseX,
                             mouseY,
                             denomInBase,
+                            element.extendLeft,
+                            element.extendRight,
                         )
                     ) {
                         resElement = element;
@@ -5501,8 +5571,8 @@ export default function Chart(props: propsIF) {
 
                         const dpRangeTooltipData: lineData[] = [
                             {
-                                x: scaleData.xScale.invert(
-                                    scaleData.xScale(
+                                x: scaleData.drawingLinearxScale.invert(
+                                    scaleData.drawingLinearxScale(
                                         Math.min(
                                             element.data[0].x,
                                             element.data[1].x,
@@ -5521,8 +5591,8 @@ export default function Chart(props: propsIF) {
                                 denomInBase: element.data[0].denomInBase,
                             },
                             {
-                                x: scaleData.xScale.invert(
-                                    scaleData.xScale(
+                                x: scaleData.drawingLinearxScale.invert(
+                                    scaleData.drawingLinearxScale(
                                         Math.min(
                                             element.data[0].x,
                                             element.data[1].x,
@@ -5618,12 +5688,19 @@ export default function Chart(props: propsIF) {
                 (data) => data.totalValueUSD,
             );
 
+            const swapData = userTransactionData.filter(
+                (transaction) =>
+                    (transaction.entityType === 'limitOrder' ||
+                        transaction.entityType === 'swap') &&
+                    transaction.totalValueUSD > 0,
+            );
+
             if (domainRight && domainLeft) {
                 const scale = d3
                     .scaleLinear()
                     .range([750, 3000])
                     .domain([
-                        userTransactionData.length > 2 ? domainLeft : 0,
+                        swapData.length > 3 ? domainLeft : 0,
                         domainRight,
                     ]);
 
@@ -6365,7 +6442,7 @@ export default function Chart(props: propsIF) {
     useEffect(() => {
         if (scaleData) {
             const lineSeries = createLinearLineSeries(
-                scaleData?.xScale,
+                scaleData?.drawingLinearxScale,
                 scaleData?.yScale,
                 denomInBase,
             );
@@ -6373,7 +6450,7 @@ export default function Chart(props: propsIF) {
             setLineSeries(() => lineSeries);
 
             const annotationLineSeries = createAnnotationLineSeries(
-                scaleData?.xScale.copy(),
+                scaleData?.drawingLinearxScale.copy(),
                 scaleData?.yScale,
                 denomInBase,
             );
@@ -7089,7 +7166,9 @@ export default function Chart(props: propsIF) {
                         period={period}
                         crosshairData={crosshairData}
                         snapForCandle={snapForCandle}
-                        visibleCandleData={visibleCandleData}
+                        visibleCandleData={
+                            unparsedData.candles as Array<CandleDataChart>
+                        }
                         render={render}
                         zoomBase={zoomBase}
                         setIsChartZoom={setIsChartZoom}
@@ -7113,7 +7192,7 @@ export default function Chart(props: propsIF) {
                         drawnShapeHistory={drawnShapeHistory}
                         render={render}
                         mousemove={mousemove}
-                        setCrossHairDataFunc={setCrossHairDataFunc}
+                        setCrosshairActive={setCrosshairActive}
                         setSelectedDrawnShape={setSelectedDrawnShape}
                         setIsUpdatingShape={setIsUpdatingShape}
                         denomInBase={denomInBase}
@@ -7226,6 +7305,7 @@ export default function Chart(props: propsIF) {
                         isUpdatingShape={isUpdatingShape}
                         timeGaps={timeGaps}
                         isDiscontinuityScaleEnabled={isCondensedModeEnabled}
+                        bandwidth={bandwidth}
                     />
                 </div>
             </d3fc-group>

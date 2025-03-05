@@ -33,11 +33,7 @@ import {
 } from '../ambient-utils/constants';
 import { tokens as AMBIENT_TOKEN_LIST } from '../ambient-utils/constants/ambient-token-list.json';
 import { getChainStats, getFormattedNumber } from '../ambient-utils/dataLayer';
-import {
-    AllVaultsServerIF,
-    SinglePoolDataIF,
-    TokenIF,
-} from '../ambient-utils/types';
+import { AllVaultsServerIF, PoolIF, TokenIF } from '../ambient-utils/types';
 import { AppStateContext } from './AppStateContext';
 import { BrandContext } from './BrandContext';
 import { CachedDataContext } from './CachedDataContext';
@@ -69,12 +65,13 @@ export interface ChainDataContextIF {
     isActiveNetworkPlume: boolean;
     isActiveNetworkSwell: boolean;
     isActiveNetworkBase: boolean;
+    isActiveNetworkMonad: boolean;
     isActiveNetworkScroll: boolean;
     isActiveNetworkMainnet: boolean;
     isVaultSupportedOnNetwork: boolean;
     isActiveNetworkL2: boolean;
     nativeTokenUsdPrice: number | undefined;
-    allPoolStats: SinglePoolDataIF[] | undefined;
+    gcgoPoolList: PoolIF[] | undefined;
     allVaultsData: AllVaultsServerIF[] | null | undefined;
     setAllVaultsData: Dispatch<
         SetStateAction<AllVaultsServerIF[] | null | undefined>
@@ -143,6 +140,7 @@ export const ChainDataContextProvider = (props: { children: ReactNode }) => {
     const isActiveNetworkPlume = ['0x18230', '0x18231'].includes(chainId);
     const isActiveNetworkSwell = ['0x783', '0x784'].includes(chainId);
     const isActiveNetworkBase = ['0x14a34'].includes(chainId);
+    const isActiveNetworkMonad = ['0x279f'].includes(chainId);
 
     const isVaultSupportedOnNetwork =
         vaultSupportedNetworkIds.includes(chainId);
@@ -173,8 +171,9 @@ export const ChainDataContextProvider = (props: { children: ReactNode }) => {
     // boolean representing whether the active network is an L2
     const isActiveNetworkL2 = !L1_NETWORKS.includes(chainId);
 
-    const BLOCK_NUM_POLL_MS = isUserIdle ? 30000 : 5000; // poll for new block every 30 seconds when user is idle, every 5 seconds when user is active
-    const GAS_PRICE_POLL_MS = isUserIdle ? 60000 : 10000; // poll for new gas price every 60 seconds when user is idle, every 10 seconds when user is active
+    const BLOCK_NUM_POLL_MS = isUserIdle || isActiveNetworkMonad ? 30000 : 5000; // poll for new block every 30 seconds when user is idle, every 5 seconds when user is active
+    const GAS_PRICE_POLL_MS =
+        isUserIdle || isActiveNetworkMonad ? 60000 : 10000; // poll for new gas price every 60 seconds when user is idle, every 10 seconds when user is active
 
     const poolStatsPollingCacheTime = Math.floor(
         Date.now() / (isUserIdle ? 120000 : 30000),
@@ -226,22 +225,43 @@ export const ChainDataContextProvider = (props: { children: ReactNode }) => {
         return () => clearInterval(interval);
     }, [isUserOnline, chainId, BLOCK_NUM_POLL_MS, blockPollingUrl]);
 
-    const [allPoolStats, setAllPoolStats] = useState<
-        SinglePoolDataIF[] | undefined
-    >();
+    const [gcgoPoolList, setGcgoPoolList] = useState<PoolIF[] | undefined>();
 
     async function updateAllPoolStats(): Promise<void> {
         try {
-            const allPoolStats = await cachedAllPoolStatsFetch(
+            const gcgoPoolList: Promise<PoolIF[]> = cachedAllPoolStatsFetch(
                 chainId,
                 GCGO_URL,
                 poolStatsPollingCacheTime,
                 true,
             );
 
-            if (allPoolStats) {
-                setAllPoolStats(allPoolStats);
-            }
+            Promise.resolve<PoolIF[]>(gcgoPoolList)
+                .then((res: PoolIF[]) => {
+                    return res
+                        .map((result: PoolIF) => {
+                            const baseToken: TokenIF | undefined =
+                                tokens.getTokenByAddress(result.base);
+                            const quoteToken: TokenIF | undefined =
+                                tokens.getTokenByAddress(result.quote);
+                            if (baseToken && quoteToken) {
+                                return {
+                                    ...result, // Spreads all properties of result
+                                    baseToken, // Overwrite base with the mapped token
+                                    quoteToken, // Overwrite quote with the mapped token
+                                };
+                            } else {
+                                return null;
+                            }
+                        })
+                        .filter(
+                            (pool: PoolIF | null) => pool !== null,
+                        ) as PoolIF[];
+                })
+                .then((pools) => {
+                    setGcgoPoolList(pools);
+                })
+                .catch((err) => console.error(err));
         } catch (error) {
             console.log({ error });
         }
@@ -251,7 +271,13 @@ export const ChainDataContextProvider = (props: { children: ReactNode }) => {
         if (chainId && GCGO_URL && isUserOnline) {
             updateAllPoolStats();
         }
-    }, [chainId, GCGO_URL, poolStatsPollingCacheTime, isUserOnline]);
+    }, [
+        chainId,
+        GCGO_URL,
+        poolStatsPollingCacheTime,
+        isUserOnline,
+        tokens.getTokenByAddress,
+    ]);
 
     useEffect(() => {
         isPrimaryRpcNodeInactive.current = false;
@@ -516,7 +542,7 @@ export const ChainDataContextProvider = (props: { children: ReactNode }) => {
                 setNativeTokenUsdPrice(response?.usdPrice);
             },
         );
-    }, [chainId]);
+    }, [chainId, everyFiveMinutes]);
 
     const [connectedUserXp, setConnectedUserXp] = useState<UserXpDataIF>({
         dataReceived: false,
@@ -866,11 +892,12 @@ export const ChainDataContextProvider = (props: { children: ReactNode }) => {
         isActiveNetworkPlume,
         isActiveNetworkSwell,
         isActiveNetworkBase,
+        isActiveNetworkMonad,
         isActiveNetworkScroll,
         isActiveNetworkMainnet,
         isVaultSupportedOnNetwork,
         isActiveNetworkL2,
-        allPoolStats,
+        gcgoPoolList,
         nativeTokenUsdPrice,
         allVaultsData,
         setAllVaultsData,

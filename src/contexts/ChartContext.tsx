@@ -80,6 +80,8 @@ export interface ChartContextIF {
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     toolbarRef: React.MutableRefObject<any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    chartSettingsRef: React.MutableRefObject<any>;
     activeDrawingType: string;
     setActiveDrawingType: React.Dispatch<SetStateAction<string>>;
     selectedDrawnShape: selectedDrawnData | undefined;
@@ -100,6 +102,8 @@ export interface ChartContextIF {
     chartThemeColors: ChartThemeIF | undefined;
     setColorChangeTrigger: React.Dispatch<SetStateAction<boolean>>;
     colorChangeTrigger: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    getColorFromLocalStorageOrDefault: (key: string) => any;
     defaultChartSettings: LocalChartSettingsIF | undefined;
     setContextmenu: React.Dispatch<SetStateAction<boolean>>;
     contextmenu: boolean;
@@ -144,9 +148,6 @@ export interface ChartThemeIF {
 
     // triangle color
     triangleColor: d3.RGBColor | d3.HSLColor;
-
-    // drawing color
-    drawngShapeDefaultColor: d3.RGBColor | d3.HSLColor;
 
     // order color
     orderSellColor: d3.RGBColor | d3.HSLColor;
@@ -220,6 +221,7 @@ export const ChartContextProvider = (props: { children: React.ReactNode }) => {
 
     const { isDenomBase, isTokenABase } = useContext(TradeDataContext);
     const toolbarRef = useRef<HTMLDivElement | null>(null);
+    const chartSettingsRef = useRef<HTMLDivElement | null>(null);
 
     const denominationsInBase = isDenomBase;
     const undoRedoOptions = useUndoRedo(denominationsInBase, isTokenABase);
@@ -349,6 +351,7 @@ export const ChartContextProvider = (props: { children: React.ReactNode }) => {
         setIsToolbarOpen,
         undoRedoOptions,
         toolbarRef,
+        chartSettingsRef,
         activeDrawingType,
         setActiveDrawingType,
         selectedDrawnShape,
@@ -370,6 +373,7 @@ export const ChartContextProvider = (props: { children: React.ReactNode }) => {
         setContextMenuPlacement,
         shouldResetBuffer,
         setShouldResetBuffer,
+        getColorFromLocalStorageOrDefault,
     };
 
     useEffect(() => {
@@ -453,7 +457,6 @@ export const ChartContextProvider = (props: { children: React.ReactNode }) => {
             orderBuyColor: getCssVariable(skin.active, '--order-buy-color'),
 
             triangleColor: getCssVariable(skin.active, '--triangle-color'),
-            drawngShapeDefaultColor: getCssVariable(skin.active, '--accent1'),
             textColor: getCssVariable(skin.active, '--text2'),
             text1: getCssVariable(skin.active, '--text1'),
             text2: getCssVariable(skin.active, '--text2'),
@@ -520,14 +523,11 @@ export const ChartContextProvider = (props: { children: React.ReactNode }) => {
                         getColorFromLocalStorageOrDefault('triangleColor'),
                     shareableLineColor:
                         getColorFromLocalStorageOrDefault('shareableLineColor'),
-                    drawngShapeDefaultColor: getColorFromLocalStorageOrDefault(
-                        'drawngShapeDefaultColor',
-                    ),
 
                     orderSellColor:
-                        getColorFromLocalStorageOrDefault('orderSell'),
+                        getColorFromLocalStorageOrDefault('orderSellColor'),
                     orderBuyColor:
-                        getColorFromLocalStorageOrDefault('orderBuy'),
+                        getColorFromLocalStorageOrDefault('orderBuyColor'),
 
                     textColor: getColorFromLocalStorageOrDefault('textColor'),
                     text1: getColorFromLocalStorageOrDefault('text1'),

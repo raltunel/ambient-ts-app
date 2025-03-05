@@ -13,7 +13,7 @@ export interface PoolStatIF {
     apr?: string | undefined;
     poolAmbientAprEstimate: number | undefined;
     poolPriceChangePercent?: string;
-    isPoolPriceChangePositive: boolean;
+    isPoolPriceChangePositive: boolean | undefined;
 
     baseTokenCharacter?: string;
     quoteTokenCharacter?: string;
@@ -29,7 +29,16 @@ export interface PoolStatIF {
     feesTotalUsd?: number;
     basePrice?: number;
     quotePrice?: number;
-
+    baseVolumeDecimal?: number;
+    quoteVolumeDecimal?: number;
+    baseFeeDecimal?: number;
+    quoteFeeDecimal?: number;
+    baseVolumeUsd?: number;
+    quoteVolumeUsd?: number;
+    baseFeeUsd?: number;
+    quoteFeeUsd?: number;
+    tvlTotalUsd?: number;
+    volumeTotalUsd?: number;
     baseFdvUsd?: number;
     quoteFdvUsd?: number;
 }
