@@ -5,24 +5,18 @@ import { TokenPriceFn } from './fetchTokenPrice';
 export const fetchPoolLiquidity = async (
     chainId: string,
     base: string,
-    baseTokenDecimals: number,
     quote: string,
-    quoteTokenDecimals: number,
     poolIdx: number,
-    crocEnv: CrocEnv,
     GCGO_URL: string,
-    cachedFetchTokenPrice: TokenPriceFn,
-    cachedQuerySpotTick: SpotPriceFn,
-    currentPoolPriceTick?: number | undefined,
-): Promise<LiquidityDataIF | undefined> => {
+): Promise<LiquidityCurveServerIF | undefined> => {
     const poolLiquidityCacheEndpoint = GCGO_URL + '/pool_liq_curve?';
-    return fetch(
+    return await fetch(
         poolLiquidityCacheEndpoint +
             new URLSearchParams({
-                chainId: chainId,
-                base: base,
-                quote: quote,
+                base: base.toLowerCase(),
+                quote: quote.toLowerCase(),
                 poolIdx: poolIdx.toString(),
+                chainId: chainId.toLowerCase(),
             }),
     )
         .then((response) => response.json())
@@ -31,23 +25,11 @@ export const fetchPoolLiquidity = async (
                 return undefined;
             }
             const bumps = json.data as LiquidityCurveServerIF;
-            return await expandLiquidityData(
-                bumps,
-                base,
-                baseTokenDecimals,
-                quote,
-                quoteTokenDecimals,
-                poolIdx,
-                chainId,
-                crocEnv,
-                cachedFetchTokenPrice,
-                cachedQuerySpotTick,
-                currentPoolPriceTick,
-            );
+            return bumps;
         });
 };
 
-async function expandLiquidityData(
+export async function expandLiquidityData(
     liq: LiquidityCurveServerIF,
     base: string,
     baseTokenDecimals: number,
@@ -294,7 +276,12 @@ export interface LiquidityParsedDataIF {
     bidRanges: Array<LiquidityRangeIF>;
 }
 
-interface LiquidityCurveServerIF {
+export interface LiquidityParsedDataIF {
+    askRanges: Array<LiquidityRangeIF>;
+    bidRanges: Array<LiquidityRangeIF>;
+}
+
+export interface LiquidityCurveServerIF {
     ambientLiq: number;
     liquidityBumps: {
         bumpTick: number;
