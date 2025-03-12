@@ -242,7 +242,7 @@ export default function LiquidityChart(props: liquidityPropsIF) {
                   (d: LiquidityDataLocal) =>
                       d.liqPrices <=
                       (scaleData
-                          ? scaleData?.yScale.domain()[1]
+                          ? scaleData?.yScale.domain()[1] + poolPriceDisplay
                           : liquidityData?.topBoundary),
               );
     }, [liquidityData?.liqAskData, scaleData?.yScale.domain()[1]]);
@@ -343,6 +343,8 @@ export default function LiquidityChart(props: liquidityPropsIF) {
         diffHashSigScaleData(scaleData, 'y'),
         liquidityData?.depthLiqAskData,
         liquidityData?.depthLiqBidData,
+        liquidityData?.liqAskData,
+        liquidityData?.liqBidData,
         mobileView,
         liquidityScale,
     ]);
