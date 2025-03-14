@@ -756,7 +756,7 @@ function InfiniteScroll(props: propsIF) {
                 ),
             );
         }
-    }, [sortBy, reverseSort]);
+    }, [sortBy, reverseSort, fetchedTransactionsRef.current]);
 
     const dataToDisplay = useMemo(() => {
         const startIndex = getIndexForPages(true);
